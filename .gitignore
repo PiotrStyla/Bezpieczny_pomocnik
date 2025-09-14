@@ -1,0 +1,27 @@
+# Pliki konfiguracyjne i sekrety
+.env
+*.env
+
+# Baza danych subskrypcji
+subscriptions.json
+/backend/data/
+
+# Pliki generowane przez Pythona
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Foldery środowisk wirtualnych
+env/
+venv/
+.venv/
+
+# Pliki generowane przez edytory i IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Artefakty testowe
+.pytest_cache/

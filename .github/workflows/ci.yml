@@ -1,0 +1,32 @@
+name: Python Application CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r backend/requirements.txt
+    
+    - name: Run tests
+      env:
+        OPENAI_API_KEY: "test"
+        VAPID_PRIVATE_KEY: "test"
+        VAPID_PUBLIC_KEY: "test"
+      run: |
+        pytest backend/tests

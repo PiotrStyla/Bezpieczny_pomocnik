@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bezpieczny Pomocnik</title>
+    
+    <!-- Biblioteka Leaflet.js do map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3367D6"/>
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+</head>
+<body>
+    <header>
+        <h1>Bezpieczny Pomocnik</h1>
+        <nav>
+            <button id="lang-pl" class="active">PL</button>
+            <button id="lang-en">EN</button>
+            <button id="lang-ua">UA</button>
+        </nav>
+    </header>
+
+    <!-- Kontener na mapę -->
+    <div id="map"></div>
+
+    <div class="filters">
+        <label for="location-filter">Pokaż alerty dla:</label>
+        <select id="location-filter">
+            <option value="all">Wszystkie</option>
+            <option value="Polska">Polska (krajowe)</option>
+            <option value="Warszawa">Warszawa</option>
+            <option value="Kraków">Kraków</option>
+            <option value="Lublin">Lublin</option>
+            <option value="Białystok">Białystok</option>
+        </select>
+    </div>
+
+    <main id="alerts-container">
+        <!-- Alerty będą wstrzykiwane tutaj -->
+    </main>
+    
+    <div class="controls">
+        <button id="notifications-btn">Włącz powiadomienia</button>
+    </div>
+
+    <footer>
+        <p>Dane pochodzą z oficjalnych źródeł publicznych.</p>
+    </footer>
+    <script src="app.js"></script>
+</body>
+</html>

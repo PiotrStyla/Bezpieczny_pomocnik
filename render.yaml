@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: bezpieczny-pomocnik
+    env: python
+    plan: free
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.4
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_EMAIL
+        sync: false
+    disks:
+      - name: data
+        mountPath: /app/backend/data
+        sizeGB: 1

@@ -1,0 +1,21 @@
+{
+    "name": "Bezpieczny Pomocnik",
+    "short_name": "Pomocnik",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f4f7fa",
+    "theme_color": "#3367D6",
+    "description": "Aplikacja z alertami bezpieczeństwa dla Polski.",
+    "icons": [
+        {
+            "src": "/images/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

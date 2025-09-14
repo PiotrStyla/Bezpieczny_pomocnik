@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+openai
+feedparser
+requests
+beautifulsoup4
+lxml
+cachetools
+pywebpush
+tinydb
+apscheduler
+pytest
+pytest-asyncio
+pydantic
