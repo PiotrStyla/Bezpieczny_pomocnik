@@ -48,12 +48,14 @@ def send_notification_to_all(title: str, body: str):
                 db.remove(Subscription.endpoint == sub.get('endpoint'))
 
 def generate_vapid_keys():
-    from pywebpush import vapid
-    private_key = vapid.generate_private_key()
-    public_key = private_key.public_key
+    # Zaktualizowany sposób generowania kluczy dla nowej wersji pywebpush
+    from pywebpush import Vapid
+    vapid = Vapid.from_new()
+    private_key = vapid.private_key_b64
+    public_key = vapid.public_key_b64
     print("Wygenerowane klucze VAPID. Zapisz je w pliku .env.")
-    print(f"VAPID_PUBLIC_KEY={public_key.encode().decode('utf-8')}")
-    print(f"VAPID_PRIVATE_KEY={private_key.encode().decode('utf-8')}")
+    print(f"VAPID_PUBLIC_KEY={public_key}")
+    print(f"VAPID_PRIVATE_KEY={private_key}")
 
 if __name__ == "__main__":
     generate_vapid_keys()

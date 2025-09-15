@@ -12,3 +12,4 @@ apscheduler
 pytest
 pytest-asyncio
 pydantic
+pydantic-settings
