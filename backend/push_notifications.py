@@ -1,40 +1,34 @@
 import json
-import os
-from pywebpush import webpush, WebPushException
 import logging
-from tinydb import TinyDB, Query
+from pywebpush import webpush, WebPushException
 
 from .config import settings
 
-DATA_DIR = "data"
-DB_PATH = os.path.join(DATA_DIR, "subscriptions.json")
-
-os.makedirs(DATA_DIR, exist_ok=True)
-
-db = TinyDB(DB_PATH)
-Subscription = Query()
+# Store subscriptions in memory instead of a file
+subscriptions_in_memory = []
 
 def get_vapid_public_key() -> str:
     return settings.VAPID_PUBLIC_KEY
 
 def add_subscription(subscription_info: dict):
     endpoint = subscription_info.get('endpoint')
-    if not db.search(Subscription.endpoint == endpoint):
-        logging.info(f"Dodawanie nowej subskrypcji do bazy danych: {endpoint}")
-        db.insert(subscription_info)
+    # Check if the endpoint already exists to avoid duplicates
+    if not any(sub.get('endpoint') == endpoint for sub in subscriptions_in_memory):
+        logging.info(f"Adding new in-memory subscription: {endpoint}")
+        subscriptions_in_memory.append(subscription_info)
 
 def send_notification_to_all(title: str, body: str):
     if "Your_VAPID" in settings.VAPID_PRIVATE_KEY or not settings.VAPID_PUBLIC_KEY:
-        logging.warning("Brak kluczy VAPID. Wysyłanie powiadomień jest niemożliwe.")
+        logging.warning("VAPID keys not configured. Cannot send notifications.")
         return
 
-    all_subscriptions = db.all()
-    logging.info(f"Wysyłanie powiadomienia do {len(all_subscriptions)} subskrybentów.")
+    logging.info(f"Sending notification to {len(subscriptions_in_memory)} in-memory subscribers.")
     
     notification_payload = json.dumps({"title": title, "body": body, "icon": "/images/icon-192x192.png"})
     vapid_claims = {"sub": settings.VAPID_EMAIL}
 
-    for sub in all_subscriptions:
+    # Create a copy to iterate over, so we can modify the original list
+    for sub in list(subscriptions_in_memory):
         try:
             webpush(
                 subscription_info=sub,
@@ -43,9 +37,11 @@ def send_notification_to_all(title: str, body: str):
                 vapid_claims=vapid_claims
             )
         except WebPushException as ex:
-            logging.error(f"Błąd wysyłania powiadomienia do {sub.get('endpoint')}: {ex}")
+            logging.error(f"Error sending notification to {sub.get('endpoint')}: {ex}")
+            # If the subscription is gone (410), remove it from our list
             if ex.response and ex.response.status_code == 410:
-                db.remove(Subscription.endpoint == sub.get('endpoint'))
+                logging.info(f"Removing expired subscription: {sub.get('endpoint')}")
+                subscriptions_in_memory.remove(sub)
 
 def generate_vapid_keys():
     # Zaktualizowany sposób generowania kluczy dla nowej wersji pywebpush
