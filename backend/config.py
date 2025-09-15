@@ -15,10 +15,10 @@ class Settings(BaseSettings):
     # --- Źródła danych ---
     SOURCES: Dict[str, Dict[str, Any]] = Field(default={
         "rcb": {"url": "https://www.gov.pl/web/rcb/ostrzezenia-rcb-rss", "type": "rss", "location": "Polska"},
-        "warszawa": {"url": "https://warszawa19115.pl/-/komunikaty-19115", "type": "web_warszawa", "location": "Warszawa"},
+        "warszawa": {"url": "https://warszawa19115.pl/szukasz-informacji/porzadek-i-bezpieczenstwo/komunikaty-i-awarie", "type": "web_warszawa", "location": "Warszawa"},
         "krakow": {"url": "https://www.krakow.pl/informacje/20026,48,komunikat,bezpieczenstwo.html", "type": "rss", "location": "Kraków"},
-        "lublin": {"url": "https://lublin.eu/mieszkancy/bezpieczenstwo/komunikaty/", "type": "web_lublin", "location": "Lublin"},
-        "bialystok": {"url": "https://www.bialystok.pl/pl/dla_mieszkancow/wiadomosci/ostrzezenia/", "type": "web_bialystok", "location": "Białystok"}
+        "lublin": {"url": "https://lublin.eu/mieszkancy/bezpieczenstwo/komunikaty-i-ostrzezenia/", "type": "web_lublin", "location": "Lublin"},
+        "bialystok": {"url": "https://www.bialystok.pl/pl/dla_mieszkancow/bezpieczenstwo/miejskie_centrum_zarzadzania_kryzysowego/komunikaty.html", "type": "web_bialystok", "location": "Białystok"}
     })
 
     # --- Słowa kluczowe do klasyfikacji ---
