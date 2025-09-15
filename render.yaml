@@ -8,14 +8,6 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.4
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: VAPID_PRIVATE_KEY
-        sync: false
-      - key: VAPID_PUBLIC_KEY
-        sync: false
-      - key: VAPID_EMAIL
-        sync: false
     disks:
       - name: data
         mountPath: /app/backend/data
