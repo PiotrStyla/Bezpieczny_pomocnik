@@ -10,6 +10,10 @@ from urllib.parse import urljoin
 
 from .config import settings
 
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+}
+
 def _generate_id(title: str, published_date: str) -> str:
     return hashlib.sha256(f"{title}{published_date}".encode()).hexdigest()
 
@@ -31,7 +35,7 @@ def _parse_web_warszawa(url: str, location: str) -> List[Dict[str, Any]]:
     logging.info(f"Pobieranie danych web z: {url}")
     alerts = []
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=10, headers=HEADERS)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'lxml')
         articles = soup.find_all('div', class_='article-item')
@@ -43,8 +47,6 @@ def _parse_web_warszawa(url: str, location: str) -> List[Dict[str, Any]]:
                 content = content_tag.get_text(strip=True)
                 now = datetime.datetime.now()
                 alerts.append({"id": _generate_id(title, now.isoformat()), "source": url, "title": title, "content": content, "timestamp": now, "location": location})
-    except requests.RequestException as e:
-        logging.error(f"Błąd sieciowy podczas pobierania danych z {url}: {e}")
     except Exception as e:
         logging.error(f"Nieoczekiwany błąd podczas parsowania strony Warszawy: {e}")
     logging.info(f"Znaleziono {len(alerts)} alertów na stronie Warszawy.")
@@ -54,7 +56,7 @@ def _parse_web_lublin(url: str, location: str) -> List[Dict[str, Any]]:
     logging.info(f"Pobieranie danych web z: {url}")
     alerts = []
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=10, headers=HEADERS)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'lxml')
         content_div = soup.find('div', class_='tresc-artykulu')
@@ -65,7 +67,7 @@ def _parse_web_lublin(url: str, location: str) -> List[Dict[str, Any]]:
             date_match = re.search(r'(\d{2}\.\d{2}\.\d{4})', title)
             dt_object = datetime.datetime.strptime(date_match.group(1), '%d.%m.%Y') if date_match else datetime.datetime.now()
             try:
-                article_res = requests.get(article_url, timeout=10)
+                article_res = requests.get(article_url, timeout=10, headers=HEADERS)
                 article_res.raise_for_status()
                 article_soup = BeautifulSoup(article_res.content, 'lxml')
                 article_content_div = article_soup.find('div', class_='tresc-artykulu')
@@ -84,7 +86,7 @@ def _parse_web_bialystok(url: str, location: str) -> List[Dict[str, Any]]:
     logging.info(f"Pobieranie danych web z: {url}")
     alerts = []
     try:
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=10, headers=HEADERS)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'lxml')
         for item in soup.find_all('div', class_='news-item'):
@@ -92,7 +94,7 @@ def _parse_web_bialystok(url: str, location: str) -> List[Dict[str, Any]]:
             if not link_tag: continue
             article_url = urljoin(url, link_tag['href'])
             try:
-                article_res = requests.get(article_url, timeout=10)
+                article_res = requests.get(article_url, timeout=10, headers=HEADERS)
                 article_res.raise_for_status()
                 article_soup = BeautifulSoup(article_res.content, 'lxml')
                 title = article_soup.find('h1').get_text(strip=True)
