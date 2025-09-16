@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException, Query, Body
 import base64
-from cryptography.hazmat.primitives import serialization
+from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from typing import List, Literal, Dict, Any
@@ -8,7 +8,6 @@ from cachetools import TTLCache
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from .config import settings
 from .schema import Alert, SeverityLevel
 from .data_sources import fetch_all_alerts
 from .ai_processor import simplify_text, generate_tips
@@ -90,28 +89,10 @@ async def get_alerts(lang: Literal['pl', 'en', 'ua'] = Query('pl', description="
 
 @app.get("/api/vapid_public_key")
 def get_vapid_key():
-    try:
-        with open("public_key.pem", "rb") as f:
-            public_key_pem = f.read()
-        
-        public_key = serialization.load_pem_public_key(public_key_pem)
-        
-        raw_key = public_key.public_bytes(
-            encoding=serialization.Encoding.X962,
-            format=serialization.PublicFormat.UncompressedPoint
-        )
-        
-        url_safe_key = base64.urlsafe_b64encode(raw_key).rstrip(b'=').decode('utf-8')
-        
-        return {"public_key": url_safe_key}
-    except FileNotFoundError:
-        logging.error("VAPID public key file (public_key.pem) not found.")
-        # Return a valid but incorrect key to prevent the frontend from crashing.
-        # The subscription will fail, but the app will load.
-        return {"public_key": ""}
-    except Exception as e:
-        logging.error(f"Could not process VAPID public key: {e}")
-        raise HTTPException(status_code=500, detail="Could not process VAPID public key.")
+    # Directly return the key from the environment settings.
+    # This is the URL-safe base64 encoded public key.
+    public_key = get_vapid_public_key()
+    return {"public_key": public_key}
 
 @app.post("/api/subscribe", status_code=201, summary="Zapisz subskrypcję na powiadomienia")
 def subscribe(subscription: Dict[str, Any] = Body(...)):
