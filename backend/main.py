@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Query, Body
+from fastapi import FastAPI, Request, HTTPException
+import base64
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from typing import List, Literal, Dict, Any
@@ -86,11 +87,15 @@ async def get_alerts(lang: Literal['pl', 'en', 'ua'] = Query('pl', description="
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Wystąpił błąd: {str(e)}")
 
-@app.get("/api/vapid_public_key", summary="Pobierz publiczny klucz VAPID")
-def get_public_key():
-    key = get_vapid_public_key()
-    if not key or "Your_VAPID" in key: raise HTTPException(status_code=503, detail="Klucz VAPID nie jest skonfigurowany.")
-    return {"public_key": key}
+@app.get("/api/vapid_public_key")
+def get_vapid_key():
+    public_key = get_vapid_public_key()
+    try:
+        decoded_key = base64.b64decode(public_key)
+        url_safe_key = base64.urlsafe_b64encode(decoded_key).rstrip(b'=').decode('utf-8')
+        return {"public_key": url_safe_key}
+    except (base64.binascii.Error, TypeError):
+        return {"public_key": public_key}
 
 @app.post("/api/subscribe", status_code=201, summary="Zapisz subskrypcję na powiadomienia")
 def subscribe(subscription: Dict[str, Any] = Body(...)):
