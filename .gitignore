@@ -25,3 +25,6 @@ venv/
 
 # Artefakty testowe
 .pytest_cache/
+
+# Pliki tymczasowe
+generate_keys.py
