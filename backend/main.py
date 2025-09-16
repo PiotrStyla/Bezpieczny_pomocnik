@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 import base64
+from cryptography.hazmat.primitives import serialization
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from typing import List, Literal, Dict, Any
@@ -89,13 +90,26 @@ async def get_alerts(lang: Literal['pl', 'en', 'ua'] = Query('pl', description="
 
 @app.get("/api/vapid_public_key")
 def get_vapid_key():
-    public_key = get_vapid_public_key()
     try:
-        decoded_key = base64.b64decode(public_key)
-        url_safe_key = base64.urlsafe_b64encode(decoded_key).rstrip(b'=').decode('utf-8')
+        with open("public_key.pem", "rb") as f:
+            public_key_pem = f.read()
+        
+        public_key = serialization.load_pem_public_key(public_key_pem)
+        
+        # Get the raw public key in uncompressed format
+        raw_key = public_key.public_bytes(
+            encoding=serialization.Encoding.X962,
+            format=serialization.PublicFormat.UncompressedPoint
+        )
+        
+        # The applicationServerKey needs to be the raw key, URL-safe base64 encoded
+        # The raw key for P-256 is 65 bytes (0x04 prefix + 32 bytes for x + 32 bytes for y)
+        url_safe_key = base64.urlsafe_b64encode(raw_key).rstrip(b'=').decode('utf-8')
+        
         return {"public_key": url_safe_key}
-    except (base64.binascii.Error, TypeError):
-        return {"public_key": public_key}
+    except Exception as e:
+        logging.error(f"Could not process VAPID public key: {e}")
+        raise HTTPException(status_code=500, detail="Could not process VAPID public key.")
 
 @app.post("/api/subscribe", status_code=201, summary="Zapisz subskrypcję na powiadomienia")
 def subscribe(subscription: Dict[str, Any] = Body(...)):
