@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Query, Body
 import base64
 from cryptography.hazmat.primitives import serialization
 from fastapi.middleware.cors import CORSMiddleware
@@ -96,17 +96,19 @@ def get_vapid_key():
         
         public_key = serialization.load_pem_public_key(public_key_pem)
         
-        # Get the raw public key in uncompressed format
         raw_key = public_key.public_bytes(
             encoding=serialization.Encoding.X962,
             format=serialization.PublicFormat.UncompressedPoint
         )
         
-        # The applicationServerKey needs to be the raw key, URL-safe base64 encoded
-        # The raw key for P-256 is 65 bytes (0x04 prefix + 32 bytes for x + 32 bytes for y)
         url_safe_key = base64.urlsafe_b64encode(raw_key).rstrip(b'=').decode('utf-8')
         
         return {"public_key": url_safe_key}
+    except FileNotFoundError:
+        logging.error("VAPID public key file (public_key.pem) not found.")
+        # Return a valid but incorrect key to prevent the frontend from crashing.
+        # The subscription will fail, but the app will load.
+        return {"public_key": ""}
     except Exception as e:
         logging.error(f"Could not process VAPID public key: {e}")
         raise HTTPException(status_code=500, detail="Could not process VAPID public key.")
