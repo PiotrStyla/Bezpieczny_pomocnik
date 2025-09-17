@@ -47,6 +47,8 @@ def _parse_web_warszawa(url: str, location: str) -> List[Dict[str, Any]]:
                 content = content_tag.get_text(strip=True)
                 now = datetime.datetime.now()
                 alerts.append({"id": _generate_id(title, now.isoformat()), "source": url, "title": title, "content": content, "timestamp": now, "location": location})
+    except requests.RequestException as e:
+        logging.error(f"Błąd sieciowy podczas pobierania danych z {url}: {e}")
     except Exception as e:
         logging.error(f"Nieoczekiwany błąd podczas parsowania strony Warszawy: {e}")
     logging.info(f"Znaleziono {len(alerts)} alertów na stronie Warszawy.")
