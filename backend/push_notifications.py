@@ -2,38 +2,33 @@ import json
 import logging
 from pywebpush import webpush, WebPushException
 
-import base64
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives import serialization
+from py_vapid import Vapid
 from .config import settings
 
 # --- Permanent Fix --- #
-# Generate VAPID keys on startup to bypass corrupted environment variables.
-private_key = ec.generate_private_key(ec.SECP256R1())
-public_key = private_key.public_key()
-
-# Get the raw public key in uncompressed format for the browser
-raw_public_key = public_key.public_bytes(
-    encoding=serialization.Encoding.X962,
-    format=serialization.PublicFormat.UncompressedPoint
-)
-url_safe_public_key = base64.urlsafe_b64encode(raw_public_key).rstrip(b'=').decode('utf-8')
-
-# Get the private key in PEM format for the webpush library
-private_pem = private_key.private_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PrivateFormat.PKCS8,
-    encryption_algorithm=serialization.NoEncryption()
-)
-
-logging.info("Generated in-memory VAPID keys for this session.")
+# Generate VAPID keys on startup using py_vapid to ensure proper formatting.
+try:
+    # Try to create a new Vapid instance
+    vapid = Vapid()
+    vapid.generate_keys()
+    # Get the keys in the proper format
+    vapid_public_key = vapid.public_key
+    vapid_private_key = vapid.private_key
+    logging.info("Generated in-memory VAPID keys for this session.")
+    logging.info(f"Public key (first 50 chars): {vapid_public_key[:50]}...")
+except Exception as e:
+    logging.error(f"Failed to generate VAPID keys: {e}")
+    # Fallback to environment variables if generation fails
+    vapid_public_key = settings.VAPID_PUBLIC_KEY
+    vapid_private_key = settings.VAPID_PRIVATE_KEY
+    logging.info("Using VAPID keys from environment variables.")
 
 # Store subscriptions in memory instead of a file
 subscriptions_in_memory = []
 
 def get_vapid_public_key() -> str:
     # Use the in-memory public key.
-    return url_safe_public_key
+    return vapid_public_key
 
 def add_subscription(subscription_info: dict):
     endpoint = subscription_info.get('endpoint')
@@ -54,7 +49,7 @@ def send_notification_to_all(title: str, body: str):
                 subscription_info=sub,
                 data=notification_payload,
                 # Use the in-memory private key.
-                vapid_private_key=private_pem,
+                vapid_private_key=vapid_private_key,
                 vapid_claims=vapid_claims
             )
         except WebPushException as ex:
