@@ -52,7 +52,7 @@ def send_notification_to_all(title: str, body: str):
             webpush(
                 subscription_info=sub,
                 data=notification_payload,
-                vapid_private_key=vapid_private_key,
+                vapid_private_key=vapid_private_key.decode('utf-8'),
                 vapid_claims=vapid_claims
             )
         except WebPushException as ex:
