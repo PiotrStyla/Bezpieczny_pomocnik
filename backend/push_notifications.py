@@ -16,7 +16,7 @@ raw_public_key = public_key.public_bytes(
     encoding=serialization.Encoding.X962,
     format=serialization.PublicFormat.UncompressedPoint
 )
-vapid_public_key = base64.urlsafe_b64encode(raw_public_key).rstrip(b'=').decode('utf-8')
+vapid_public_key = base64.urlsafe_b64encode(raw_public_key).rstrip(b'=').decode('utf-8').strip()
 
 # Get the private key in PEM format for the webpush library
 vapid_private_key = private_key.private_bytes(
