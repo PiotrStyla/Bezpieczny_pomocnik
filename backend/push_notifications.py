@@ -1,6 +1,6 @@
 import json
 import logging
-from pywebpush import webpush, WebPushException
+from webpush import webpush, WebPushException
 
 import base64
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -9,7 +9,7 @@ from .config import settings
 
 # --- Permanent Fix --- #
 # Generate VAPID keys on startup to bypass corrupted environment variables.
-# This implementation worked before (gave AbortError, not InvalidAccessError)
+# This implementation uses a new library to fix the AbortError.
 private_key = ec.generate_private_key(ec.SECP256R1())
 public_key = private_key.public_key()
 
