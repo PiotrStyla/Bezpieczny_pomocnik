@@ -1,3 +1,5 @@
+console.log("✅ app.js loaded");
+
 document.addEventListener('DOMContentLoaded', () => {
     const alertsContainer = document.getElementById('alerts-container');
     const langButtons = document.querySelectorAll('header nav button');
@@ -73,19 +75,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function subscribeUserToPush() {
+        console.log("🚩 subscribeUserToPush called");
+        
         try {
+            // 1) Poproś jawnie o uprawnienie do powiadomień
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                console.warn('Powiadomienia zablokowane przez użytkownika/UA');
+                notificationsBtn.textContent = 'Zablokowane';
+                return;
+            }
+
+            // 2) Poczekaj aż SW będzie aktywny
             const reg = await navigator.serviceWorker.ready;
+
+            // 3) Usuń starą subskrypcję (klucze mogły się zmieniać między wdrożeniami)
+            const existing = await reg.pushManager.getSubscription();
+            if (existing) {
+                try {
+                    await existing.unsubscribe();
+                    console.log('Stara subskrypcja usunięta');
+                } catch (e) {
+                    console.warn('Nie udało się usunąć starej subskrypcji', e);
+                }
+            }
+
+            console.log("Before VAPID fetch");
+
+            // 4) Pobierz i przygotuj klucz VAPID
             const response = await fetch(`${API_BASE_URL}/vapid_public_key`);
             const { public_key } = await response.json();
+            const trimmedKey = (public_key || '').trim();
+            const appServerKey = urlBase64ToUint8Array(trimmedKey);
+            console.log('Debug VAPID key chars:', trimmedKey.length, 'bytes:', appServerKey.length);
+
+            // 5) Zasubskrybuj push z aktualnym kluczem
             const subscription = await reg.pushManager.subscribe({
                 userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(public_key)
+                applicationServerKey: appServerKey
             });
+
+            // 6) Zapisz subskrypcję w backendzie
             await fetch(`${API_BASE_URL}/subscribe`, {
                 method: 'POST',
                 body: JSON.stringify(subscription),
                 headers: { 'Content-Type': 'application/json' }
             });
+
             notificationsBtn.textContent = 'Powiadomienia włączone';
             notificationsBtn.disabled = true;
         } catch (error) {
