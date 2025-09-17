@@ -26,6 +26,9 @@ vapid_private_key = private_key.private_bytes(
 ).decode('utf-8')
 
 logging.info("Generated in-memory VAPID keys for this session.")
+logging.info(f"Raw public key bytes length: {len(raw_public_key)}")
+logging.info(f"VAPID public key length: {len(vapid_public_key)} chars")
+logging.info(f"VAPID public key: {vapid_public_key}")
 
 # Store subscriptions in memory instead of a file
 subscriptions_in_memory = []
