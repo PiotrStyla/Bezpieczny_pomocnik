@@ -1,7 +1,6 @@
 import json
 import logging
-from webpush import webpush, WebPushException
-
+from pywebpush import webpush, WebPushException
 import base64
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization
@@ -9,7 +8,6 @@ from .config import settings
 
 # --- Permanent Fix --- #
 # Generate VAPID keys on startup to bypass corrupted environment variables.
-# This implementation uses a new library to fix the AbortError.
 private_key = ec.generate_private_key(ec.SECP256R1())
 public_key = private_key.public_key()
 
@@ -28,7 +26,6 @@ vapid_private_key = private_key.private_bytes(
 )
 
 logging.info("Generated in-memory VAPID keys for this session.")
-logging.info(f"Public key (first 50 chars): {vapid_public_key[:50]}...")
 
 # Store subscriptions in memory instead of a file
 subscriptions_in_memory = []
