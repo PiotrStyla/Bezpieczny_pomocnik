@@ -92,7 +92,6 @@ def get_vapid_key():
     # Directly return the key from the environment settings.
     # This is the URL-safe base64 encoded public key.
     public_key = get_vapid_public_key()
-    logging.info(f"Serving VAPID Public Key: {public_key}")
     return {"public_key": public_key}
 
 @app.post("/api/subscribe", status_code=201, summary="Zapisz subskrypcję na powiadomienia")
