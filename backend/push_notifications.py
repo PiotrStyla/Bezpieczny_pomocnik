@@ -43,10 +43,6 @@ def add_subscription(subscription_info: dict):
         subscriptions_in_memory.append(subscription_info)
 
 def send_notification_to_all(title: str, body: str):
-    if "Your_VAPID" in settings.VAPID_PRIVATE_KEY or not settings.VAPID_PUBLIC_KEY:
-        logging.warning("VAPID keys not configured. Cannot send notifications.")
-        return
-
     notification_payload = json.dumps({"title": title, "body": body, "icon": "/images/icon-192x192.png"})
     # Use the VAPID_EMAIL from the environment variables.
     vapid_claims = {"sub": settings.VAPID_EMAIL}
