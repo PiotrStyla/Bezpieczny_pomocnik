@@ -11,15 +11,13 @@ from .config import settings
 private_key = ec.generate_private_key(ec.SECP256R1())
 public_key = private_key.public_key()
 
-# Get the raw public key in uncompressed format for the browser
+# Get the raw public key in uncompressed format for the browser (full 65 bytes)
 raw_public_key = public_key.public_bytes(
     encoding=serialization.Encoding.X962,
     format=serialization.PublicFormat.UncompressedPoint
 )
-# Remove the 0x04 prefix to get exactly 64 bytes (32+32 coordinates)
-# This should result in exactly 86 base64url characters
-if raw_public_key[0] == 0x04:
-    raw_public_key = raw_public_key[1:]  # Remove the 0x04 prefix
+# 65 bytes should encode to exactly 87 base64url characters
+# But we need to check why we're getting an extra character
 vapid_public_key = base64.urlsafe_b64encode(raw_public_key).rstrip(b'=').decode('utf-8')
 
 # Get the private key in PEM format for the webpush library
