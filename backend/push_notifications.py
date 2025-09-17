@@ -23,7 +23,7 @@ vapid_private_key = private_key.private_bytes(
     encoding=serialization.Encoding.PEM,
     format=serialization.PrivateFormat.PKCS8,
     encryption_algorithm=serialization.NoEncryption()
-)
+).decode('utf-8')
 
 logging.info("Generated in-memory VAPID keys for this session.")
 
