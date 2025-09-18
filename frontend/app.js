@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const alertsContainer = document.getElementById('alerts-container');
-    const langButtons = document.querySelectorAll('header nav button');
+    const langButtons = document.querySelectorAll('.lang-btn');
     const notificationsBtn = document.getElementById('notifications-btn');
     const locationFilter = document.getElementById('location-filter');
     
@@ -57,15 +57,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function speakText(text, lang = 'pl') {
-        if (!speechEnabled || !window.speechSynthesis) return;
+        console.log('🗣️ Próba mowy:', text, 'Lang:', lang, 'Enabled:', speechEnabled);
+        
+        if (!speechEnabled) {
+            console.log('❌ Mowa wyłączona');
+            return;
+        }
+        
+        if (!window.speechSynthesis) {
+            console.log('❌ Brak wsparcia TTS w przeglądarce');
+            return;
+        }
         
         // Zatrzymaj poprzednią mowę
         if (window.speechSynthesis.speaking) {
+            console.log('🛑 Zatrzymuję poprzednią mowę');
             window.speechSynthesis.cancel();
         }
         
         // Poczekaj chwilę, żeby mózg dziecka się przygotował
         setTimeout(() => {
+            console.log('🎤 Rozpoczynam mowę...');
             const utterance = new SpeechSynthesisUtterance(text);
             
             // Ustawienia dla dzieci
@@ -74,30 +86,24 @@ document.addEventListener('DOMContentLoaded', () => {
             utterance.pitch = 1.2; // Wyżej, przyjazniej 
             utterance.volume = 0.9; // Głośno, ale nie za głośno
             
-            // Spróbuj znaleźć kobieci głos (bardziej przyjazny dla dzieci)
+            // Spróbuj znaleźć głos
             const voices = window.speechSynthesis.getVoices();
+            console.log('🔊 Dostępne głosy:', voices.length);
+            
             const preferredVoice = voices.find(voice => 
-                voice.lang.startsWith(utterance.lang.split('-')[0]) && 
-                (voice.name.toLowerCase().includes('female') || 
-                 voice.name.toLowerCase().includes('kobieta') ||
-                 voice.name.toLowerCase().includes('zofia') ||
-                 voice.name.toLowerCase().includes('anna'))
-            ) || voices.find(voice => voice.lang.startsWith(utterance.lang.split('-')[0]));
+                voice.lang.startsWith(utterance.lang.split('-')[0])
+            );
             
             if (preferredVoice) {
                 utterance.voice = preferredVoice;
+                console.log('✅ Używam głosu:', preferredVoice.name);
+            } else {
+                console.log('⚠️ Używam domyślnego głosu');
             }
             
-            // Dodaj pauzę na końcu
-            utterance.onend = () => {
-                // Krótka pauza po skończeniu mówienia
-                setTimeout(() => {
-                    console.log('Mowa zakończona');
-                }, 500);
-            };
-            
-            // Animacja podczas mówienia
+            // Events
             utterance.onstart = () => {
+                console.log('🎵 Mowa rozpoczęta');
                 const mascot = document.querySelector('.mascot');
                 if (mascot) {
                     mascot.classList.add('speaking');
@@ -105,13 +111,23 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             utterance.onend = () => {
+                console.log('✅ Mowa zakończona');
                 const mascot = document.querySelector('.mascot');
                 if (mascot) {
                     mascot.classList.remove('speaking');
                 }
             };
             
-            window.speechSynthesis.speak(utterance);
+            utterance.onerror = (event) => {
+                console.log('❌ Błąd mowy:', event.error);
+            };
+            
+            try {
+                window.speechSynthesis.speak(utterance);
+                console.log('🚀 Komenda speak() wysłana');
+            } catch (error) {
+                console.log('💥 Błąd podczas speak():', error);
+            }
             
         }, 300); // Krótka pauza przed rozpoczęciem mowy
     }
@@ -564,9 +580,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     locationFilter.addEventListener('change', displayFilteredAlerts);
     
+    // Initialize speech synthesis voices
+    function initializeSpeech() {
+        // Czekamy na załadowanie głosów
+        if (window.speechSynthesis.getVoices().length === 0) {
+            window.speechSynthesis.addEventListener('voiceschanged', () => {
+                console.log('Głosy załadowane:', window.speechSynthesis.getVoices().length);
+            });
+        }
+    }
+    
     // Initialize app
     initMap();
     fetchAndDisplayAlerts(currentLang);
+    initializeSpeech();
+    
+    // Powitanie po 2 sekundach (daj czas na załadowanie)
+    setTimeout(() => {
+        updateMascotMessage('welcome');
+        // Automatyczne powitanie głosem
+        setTimeout(() => {
+            const welcomeMessage = "Cześć! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij przycisk znajdź mnie, żeby zobaczyć alerty w twojej okolicy!";
+            if (speechEnabled && mascotText) {
+                speakText(welcomeMessage, currentLang);
+            }
+        }, 1000);
+    }, 2000);
     
     // Add event listeners for speech and location buttons
     document.addEventListener('click', (e) => {
@@ -578,3 +617,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Globalna funkcja testowa dla przycisku
+window.testSpeech = function() {
+    console.log('🎤 TEST: Kliknięto przycisk test mowy');
+    const testMessage = "Witaj! To jest test mowy. Jeśli mnie słyszysz, znaczy że wszystko działa!";
+    
+    if (window.speechSynthesis) {
+        // Wymuszenie TTS bez sprawdzania speechEnabled
+        const utterance = new SpeechSynthesisUtterance(testMessage);
+        utterance.lang = 'pl-PL';
+        utterance.rate = 0.8;
+        utterance.pitch = 1.1;
+        utterance.volume = 1.0;
+        
+        utterance.onstart = () => console.log('🎵 Test mowy rozpoczęty');
+        utterance.onend = () => console.log('✅ Test mowy zakończony');
+        utterance.onerror = (e) => console.log('❌ Błąd test mowy:', e.error);
+        
+        window.speechSynthesis.speak(utterance);
+        console.log('🚀 Test speak() wysłany');
+    } else {
+        console.log('❌ Brak TTS w przeglądarce');
+        alert('Twoja przeglądarka nie obsługuje mowy!');
+    }
+};
