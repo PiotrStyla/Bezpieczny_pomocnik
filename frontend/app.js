@@ -25,9 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mascot messages
     const mascotMessages = {
         pl: {
-            welcome: "Cześć! Jestem twoim pomocnikiem bezpieczeństwa. Sprawdź, co dzieje się w twojej okolicy! 🤖",
-            loading: "Szukam najnowszych informacji dla ciebie... 🔍",
-            noAlerts: "Super! W tej chwili wszystko jest bezpieczne w wybranej lokalizacji! 🌟"
+            welcome: "Cześć! Jestem twoim pomocnikiem bezpieczeństwa. Sprawdź, co dzieje się w twojej okolicy!",
+            loading: "Szukam najnowszych informacji dla ciebie...",
+            noAlerts: "Super! W tej chwili wszystko jest bezpieczne w wybranej lokalizacji!"
+        },
+        en: {
+            welcome: "Hi! I'm your safety helper. Check what's happening in your area!",
+            loading: "Looking for the latest information for you...",
+            noAlerts: "Great! Everything is safe in the selected location right now!"
+        },
+        ua: {
+            welcome: "Привіт! Я твій помічник з безпеки. Подивись, що відбувається в твоєму районі!",
+            loading: "Шукаю найсвіжішу інформацію для тебе...",
+            noAlerts: "Чудово! Зараз все безпечно в обраній локації!"
         }
     };
     
@@ -81,24 +91,59 @@ document.addEventListener('DOMContentLoaded', () => {
             const utterance = new SpeechSynthesisUtterance(text);
             
             // Ustawienia dla dzieci
-            utterance.lang = lang === 'pl' ? 'pl-PL' : lang === 'en' ? 'en-US' : 'uk-UA';
+            const langCodes = {
+                'pl': 'pl-PL',
+                'en': 'en-US', 
+                'ua': 'uk-UA'
+            };
+            
+            utterance.lang = langCodes[lang] || 'pl-PL';
             utterance.rate = 0.7; // Wolniej dla dzieci
             utterance.pitch = 1.2; // Wyżej, przyjazniej 
             utterance.volume = 0.9; // Głośno, ale nie za głośno
             
-            // Spróbuj znaleźć głos
+            // Spróbuj znaleźć głos dla konkretnego języka
             const voices = window.speechSynthesis.getVoices();
-            console.log('🔊 Dostępne głosy:', voices.length);
+            console.log('🔊 Dostępne głosy:', voices.length, 'Szukam dla:', utterance.lang);
             
-            const preferredVoice = voices.find(voice => 
-                voice.lang.startsWith(utterance.lang.split('-')[0])
-            );
+            // Lista preferowanych głosów dla każdego języka
+            let preferredVoice = null;
+            
+            if (lang === 'en') {
+                // Angielski - szukaj natywnych głosów US/UK
+                preferredVoice = voices.find(voice => 
+                    (voice.lang === 'en-US' || voice.lang === 'en-GB') &&
+                    (voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('zira') || voice.name.toLowerCase().includes('susan'))
+                ) || voices.find(voice => voice.lang.startsWith('en'));
+            } else if (lang === 'ua') {
+                // Ukraiński - spróbuj ukraińskich głosów
+                preferredVoice = voices.find(voice => 
+                    voice.lang === 'uk-UA' || voice.lang.startsWith('uk')
+                ) || voices.find(voice => 
+                    // Fallback - rosyjski może być bardziej zrozumiały niż polski dla ukraińskiego tekstu
+                    voice.lang === 'ru-RU' || voice.lang.startsWith('ru')
+                );
+            } else {
+                // Polski - szukaj polskich głosów
+                preferredVoice = voices.find(voice => 
+                    voice.lang === 'pl-PL' && 
+                    (voice.name.toLowerCase().includes('paulina') || voice.name.toLowerCase().includes('zofia'))
+                ) || voices.find(voice => voice.lang.startsWith('pl'));
+            }
             
             if (preferredVoice) {
                 utterance.voice = preferredVoice;
-                console.log('✅ Używam głosu:', preferredVoice.name);
+                console.log('✅ Używam głosu:', preferredVoice.name, 'Lang:', preferredVoice.lang);
             } else {
-                console.log('⚠️ Używam domyślnego głosu');
+                console.log('⚠️ Brak głosu dla', lang, '- używam domyślnego');
+                // Jeśli nie ma głosu dla ukraińskiego, wymuś angielski zamiast polskiego
+                if (lang === 'ua') {
+                    const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+                    if (englishVoice) {
+                        utterance.voice = englishVoice;
+                        console.log('🔄 Fallback na angielski dla ukraińskiego:', englishVoice.name);
+                    }
+                }
             }
             
             // Events
@@ -272,13 +317,31 @@ document.addEventListener('DOMContentLoaded', () => {
             // Poinformuj użytkownika - czytelnie dla dzieci
             setTimeout(() => {
                 const cityMessages = {
-                    'Warszawa': 'Znalazłem cię w Warszawie! Teraz pokażę ci, co dzieje się w twojej stolicy.',
-                    'Kraków': 'Znalazłem cię w Krakowie! Teraz pokażę ci, co dzieje się w twoim pięknym mieście.',
-                    'Lublin': 'Znalazłem cię w Lublinie! Teraz pokażę ci, co dzieje się w twoim mieście.',
-                    'Białystok': 'Znalazłem cię w Białymstoku! Teraz pokażę ci, co dzieje się w twoim mieście.'
+                    pl: {
+                        'Warszawa': 'Znalazłem cię w Warszawie! Teraz pokażę ci, co dzieje się w twojej stolicy.',
+                        'Kraków': 'Znalazłem cię w Krakowie! Teraz pokażę ci, co dzieje się w twoim pięknym mieście.',
+                        'Lublin': 'Znalazłem cię w Lublinie! Teraz pokażę ci, co dzieje się w twoim mieście.',
+                        'Białystok': 'Znalazłem cię w Białymstoku! Teraz pokażę ci, co dzieje się w twoim mieście.'
+                    },
+                    en: {
+                        'Warszawa': 'Found you in Warsaw! Now I\'ll show you what\'s happening in your capital.',
+                        'Kraków': 'Found you in Krakow! Now I\'ll show you what\'s happening in your beautiful city.',
+                        'Lublin': 'Found you in Lublin! Now I\'ll show you what\'s happening in your city.',
+                        'Białystok': 'Found you in Bialystok! Now I\'ll show you what\'s happening in your city.'
+                    },
+                    ua: {
+                        'Warszawa': 'Знайшов тебе у Варшаві! Тепер покажу, що відбувається в твоїй столиці.',
+                        'Kraków': 'Знайшов тебе у Кракові! Тепер покажу, що відбувається в твоєму прекрасному місті.',
+                        'Lublin': 'Знайшов тебе у Любліні! Тепер покажу, що відбувається в твоєму місті.',
+                        'Białystok': 'Знайшов тебе у Білостоці! Тепер покажу, що відбувається в твоєму місті.'
+                    }
                 };
                 
-                const message = cityMessages[nearestCity] || `Znalazłem cię w ${nearestCity}! Teraz pokażę ci lokalne informacje.`;
+                const langMessages = cityMessages[currentLang] || cityMessages.pl;
+                const message = langMessages[nearestCity] || 
+                    (currentLang === 'en' ? `Found you in ${nearestCity}! Now I'll show you local information.` :
+                     currentLang === 'ua' ? `Знайшов тебе в ${nearestCity}! Тепер покажу місцеву інформацію.` :
+                     `Znalazłem cię w ${nearestCity}! Teraz pokażę ci lokalne informacje.`);
                 
                 updateMascotMessage('welcome');
                 if (mascotText) {
@@ -598,9 +661,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Powitanie po 2 sekundach (daj czas na załadowanie)
     setTimeout(() => {
         updateMascotMessage('welcome');
-        // Automatyczne powitanie głosem
+        // Automatyczne powitanie głosem - używaj wiadomość z mascotMessages
         setTimeout(() => {
-            const welcomeMessage = "Cześć! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij przycisk znajdź mnie, żeby zobaczyć alerty w twojej okolicy!";
+            const messages = mascotMessages[currentLang] || mascotMessages.pl;
+            const welcomeMessage = messages.welcome;
             if (speechEnabled && mascotText) {
                 speakText(welcomeMessage, currentLang);
             }
