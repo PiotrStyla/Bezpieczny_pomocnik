@@ -1,5 +1,3 @@
-console.log("✅ app.js loaded");
-
 document.addEventListener('DOMContentLoaded', () => {
     const alertsContainer = document.getElementById('alerts-container');
     const langButtons = document.querySelectorAll('header nav button');
@@ -75,8 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function subscribeUserToPush() {
-        console.log("🚩 subscribeUserToPush called");
-        
         try {
             // 1) Poproś jawnie o uprawnienie do powiadomień
             const permission = await Notification.requestPermission();
@@ -100,14 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            console.log("Before VAPID fetch");
-
             // 4) Pobierz i przygotuj klucz VAPID
             const response = await fetch(`${API_BASE_URL}/vapid_public_key`);
             const { public_key } = await response.json();
             const trimmedKey = (public_key || '').trim();
             const appServerKey = urlBase64ToUint8Array(trimmedKey);
-            console.log('Debug VAPID key chars:', trimmedKey.length, 'bytes:', appServerKey.length);
 
             // 5) Zasubskrybuj push z aktualnym kluczem
             const subscription = await reg.pushManager.subscribe({
