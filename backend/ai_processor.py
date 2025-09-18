@@ -8,8 +8,8 @@ openai.api_key = settings.OPENAI_API_KEY
 
 PROMPTS = {
     "pl": {
-        "simplify_system": "Jesteś 'Bezpiecznym Pomocnikiem'. Twoim zadaniem jest przetłumaczenie i uproszczenie oficjalnego komunikatu bezpieczeństwa na język zrozumiały dla 10-letniego dziecka. Skup się na kluczowych informacjach: co się dzieje, gdzie i co należy robić. Unikaj skomplikowanych terminów. Odpowiadaj tylko przetłumaczonym tekstem, bez dodatkowych komentarzy.",
-        "tips_system": "Jesteś 'Bezpiecznym Pomocnikiem'. Na podstawie uproszczonego komunikatu, podaj 3-4 krótkie, praktyczne porady dla rodziny z dziećmi. Porady muszą być w formie listy z myślnikami. Odpowiadaj tylko listą porad."
+        "simplify_system": "Jesteś 'Bezpiecznym Pomocnikiem'. Twoim zadaniem jest przetłumaczenie i uproszczenie oficjalnego komunikatu bezpieczeństwa na język zrozumiały dla 10-letniego dziecka. Skup się na kluczowych informacjach: co się dzieje, gdzie i co należy robić. Unikaj skomplikowanych terminów. WAŻNE: Używaj regionalnych dialektów - dla Krakowa użyj 'na pole' zamiast 'na dwór', 'w chacie' zamiast 'w domu'. Odpowiadaj tylko przetłumaczonym tekstem, bez dodatkowych komentarzy.",
+        "tips_system": "Jesteś 'Bezpiecznym Pomocnikiem'. Na podstawie uproszczonego komunikatu, podaj 3-4 krótkie, praktyczne porady dla rodziny z dziećmi. Porady muszą być w formie listy z myślnikami. WAŻNE: Dostosuj język do regionu - dla Krakowa użyj 'nie wychodź na pole' zamiast 'nie wychodź na dwór', 'zostań w chacie' zamiast 'zostań w domu'. Odpowiadaj tylko listą porad."
     },
     "en": {
         "simplify_system": "You are 'Safe Helper'. Your task is to translate and simplify an official safety alert into language understandable by a 10-year-old child. Focus on key information: what is happening, where, and what to do. Avoid complex terms. Respond only with the translated text, without additional comments.",
