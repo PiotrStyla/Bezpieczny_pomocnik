@@ -103,6 +103,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
+    // Card title translations
+    const cardTitles = {
+        pl: {
+            // Safety tips
+            'Bezpieczeństwo na drodze': 'Bezpieczeństwo na drodze',
+            'W domu': 'W domu', 
+            'Z nieznajomymi': 'Z nieznajomymi',
+            'Zła pogoda': 'Zła pogoda',
+            // Emergency
+            'Pogotowie ratunkowe': 'Pogotowie ratunkowe',
+            'Policja': 'Policja',
+            'Straż pożarna': 'Straż pożarna'
+        },
+        en: {
+            // Safety tips  
+            'Bezpieczeństwo na drodze': 'Road safety',
+            'W domu': 'At home',
+            'Z nieznajomymi': 'With strangers', 
+            'Zła pogoda': 'Bad weather',
+            // Emergency
+            'Pogotowie ratunkowe': 'Emergency services',
+            'Policja': 'Police',
+            'Straż pożarna': 'Fire department'
+        },
+        ua: {
+            // Safety tips
+            'Bezpieczeństwo na drodze': 'Безпека на дорозі',
+            'W domu': 'Вдома',
+            'Z nieznajomymi': 'З незнайомцями',
+            'Zła pogoda': 'Погана погода', 
+            // Emergency
+            'Pogotowie ratunkowe': 'Швидка допомога',
+            'Policja': 'Поліція',
+            'Straż pożarna': 'Пожежна служба'
+        }
+    };
+    
+    function updateCardTitles(lang) {
+        const titles = cardTitles[lang] || cardTitles.pl;
+        
+        // Update safety tip cards
+        document.querySelectorAll('.tip-card h4').forEach(h4 => {
+            const originalKey = h4.getAttribute('data-original') || h4.textContent;
+            if (!h4.getAttribute('data-original')) {
+                h4.setAttribute('data-original', originalKey);
+            }
+            if (titles[originalKey]) {
+                h4.textContent = titles[originalKey];
+            }
+        });
+        
+        // Update emergency cards  
+        document.querySelectorAll('.emergency-card h4').forEach(h4 => {
+            const originalKey = h4.getAttribute('data-original') || h4.textContent;
+            if (!h4.getAttribute('data-original')) {
+                h4.setAttribute('data-original', originalKey);
+            }
+            if (titles[originalKey]) {
+                h4.textContent = titles[originalKey];
+            }
+        });
+    }
+    
     function updateFooterLanguage(lang) {
         const messages = foundationMessages[lang] || foundationMessages.pl;
         const headerEl = document.getElementById('foundation-header');
@@ -712,6 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.classList.add('active');
             fetchAndDisplayAlerts(selectedLang);
             updateFooterLanguage(selectedLang);
+            updateCardTitles(selectedLang);
         });
     });
 
@@ -731,6 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMap();
     fetchAndDisplayAlerts(currentLang);
     initializeSpeech();
+    updateCardTitles(currentLang);
     
     // Powitanie po 2 sekundach (daj czas na załadowanie)
     setTimeout(() => {
@@ -750,16 +815,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = e.target.closest('.tip-card, .emergency-card');
         if (!card) return;
         
-        const title = card.querySelector('h4')?.textContent;
-        if (!title) return;
+        const h4 = card.querySelector('h4');
+        if (!h4) return;
+        
+        // Use original key (Polish) to find content, but display current language title
+        const originalKey = h4.getAttribute('data-original') || h4.textContent;
+        const displayTitle = h4.textContent;
         
         const content = safetyContent[currentLang] || safetyContent.pl;
         let message = '';
         
         if (card.classList.contains('tip-card')) {
-            message = content.tips[title];
+            message = content.tips[originalKey];
         } else if (card.classList.contains('emergency-card')) {
-            message = content.emergency[title];
+            message = content.emergency[originalKey];
         }
         
         if (message && speechEnabled) {
@@ -778,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const intro = currentLang === 'en' ? 'Let me tell you about ' : 
                              currentLang === 'ua' ? 'Розповім тобі про ' : 
                              'Opowiem ci o ';
-                mascotText.textContent = intro + title.toLowerCase();
+                mascotText.textContent = intro + displayTitle.toLowerCase();
             }
         }
     }
