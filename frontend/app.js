@@ -59,11 +59,61 @@ document.addEventListener('DOMContentLoaded', () => {
     function speakText(text, lang = 'pl') {
         if (!speechEnabled || !window.speechSynthesis) return;
         
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = lang === 'pl' ? 'pl-PL' : 'en-US';
-        utterance.rate = 0.8;
-        utterance.pitch = 1.1;
-        window.speechSynthesis.speak(utterance);
+        // Zatrzymaj poprzednią mowę
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+        
+        // Poczekaj chwilę, żeby mózg dziecka się przygotował
+        setTimeout(() => {
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Ustawienia dla dzieci
+            utterance.lang = lang === 'pl' ? 'pl-PL' : lang === 'en' ? 'en-US' : 'uk-UA';
+            utterance.rate = 0.7; // Wolniej dla dzieci
+            utterance.pitch = 1.2; // Wyżej, przyjazniej 
+            utterance.volume = 0.9; // Głośno, ale nie za głośno
+            
+            // Spróbuj znaleźć kobieci głos (bardziej przyjazny dla dzieci)
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => 
+                voice.lang.startsWith(utterance.lang.split('-')[0]) && 
+                (voice.name.toLowerCase().includes('female') || 
+                 voice.name.toLowerCase().includes('kobieta') ||
+                 voice.name.toLowerCase().includes('zofia') ||
+                 voice.name.toLowerCase().includes('anna'))
+            ) || voices.find(voice => voice.lang.startsWith(utterance.lang.split('-')[0]));
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+            
+            // Dodaj pauzę na końcu
+            utterance.onend = () => {
+                // Krótka pauza po skończeniu mówienia
+                setTimeout(() => {
+                    console.log('Mowa zakończona');
+                }, 500);
+            };
+            
+            // Animacja podczas mówienia
+            utterance.onstart = () => {
+                const mascot = document.querySelector('.mascot');
+                if (mascot) {
+                    mascot.classList.add('speaking');
+                }
+            };
+            
+            utterance.onend = () => {
+                const mascot = document.querySelector('.mascot');
+                if (mascot) {
+                    mascot.classList.remove('speaking');
+                }
+            };
+            
+            window.speechSynthesis.speak(utterance);
+            
+        }, 300); // Krótka pauza przed rozpoczęciem mowy
     }
 
     const locations = {
@@ -384,6 +434,72 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             );
         }
+    }
+
+    function handleLocationButtonClick() {
+        const locationBtn = document.getElementById('location-btn');
+        
+        // Pokaż że szukamy lokalizacji
+        locationBtn.innerHTML = '<span class="btn-icon">🔄</span><span class="btn-text">Szukam...</span>';
+        locationBtn.disabled = true;
+        
+        updateMascotMessage('loading');
+        
+        // Wywołaj funkcję geolokalizacji
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                // Sprawdź czy lokalizacja jest w Polsce
+                if (lat >= 48.9 && lat <= 55.0 && lng >= 14.0 && lng <= 24.2) {
+                    userLocation = [lat, lng];
+                    showUserLocationOnMap(lat, lng);
+                    
+                    // Znajdź najbliższe miasto
+                    const nearestCity = findNearestCity(lat, lng);
+                    if (nearestCity) {
+                        updateLocationFilterToNearest(nearestCity);
+                        locationBtn.innerHTML = `<span class="btn-icon">📍</span><span class="btn-text">Znaleziono: ${nearestCity}</span>`;
+                        
+                        // Płynna wypowiedź dla dzieci
+                        const message = `Znalazłem cię! Jesteś w ${nearestCity}. Pokazuję ci teraz alerty dla twojego miasta.`;
+                        setTimeout(() => {
+                            if (mascotText) mascotText.textContent = message;
+                            if (speechEnabled) speakText(message, currentLang);
+                        }, 1000);
+                        
+                    } else {
+                        locationBtn.innerHTML = '<span class="btn-icon">📍</span><span class="btn-text">Lokalizacja znaleziona</span>';
+                        const message = "Znalazłem twoją lokalizację na mapie!";
+                        if (mascotText) mascotText.textContent = message;
+                        if (speechEnabled) speakText(message, currentLang);
+                    }
+                    locationBtn.style.background = '#32D74B';
+                } else {
+                    locationBtn.innerHTML = '<span class="btn-icon">🌍</span><span class="btn-text">Poza Polską</span>';
+                    locationBtn.style.background = '#FF9500';
+                    const message = 'Twoja lokalizacja jest poza Polską. Pokazuję wszystkie alerty z Polski.';
+                    if (mascotText) mascotText.textContent = message;
+                    if (speechEnabled) speakText(message, currentLang);
+                }
+                locationBtn.disabled = false;
+            },
+            (error) => {
+                console.log('Błąd geolokalizacji:', error.message);
+                locationBtn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Nie można znaleźć</span>';
+                locationBtn.style.background = '#FF3B30';  
+                locationBtn.disabled = false;
+                
+                const message = 'Nie mogę znaleźć twojej lokalizacji. Sprawdź ustawienia przeglądarki albo wybierz miasto z listy.';
+                if (mascotText) mascotText.textContent = message;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0 // Zawsze pobierz świeżą lokalizację przy kliknięciu
+            }
+        );
     }
 
     notificationsBtn.addEventListener('click', () => {
