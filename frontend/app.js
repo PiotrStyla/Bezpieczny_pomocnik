@@ -4,11 +4,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationsBtn = document.getElementById('notifications-btn');
     const locationFilter = document.getElementById('location-filter');
     
-    const API_BASE_URL = '/api'; // Zmiana na ścieżkę względną
+    const API_BASE_URL = '/api'; 
     let currentLang = 'pl';
     let allAlerts = [];
     let map;
     let markersLayer;
+
+    // Text-to-Speech functionality
+    let speechEnabled = true;
+    let currentSpeech = null;
 
     const locations = {
         "Polska": [52.23, 21.01],

@@ -592,6 +592,78 @@ body {
     outline-offset: 2px;
 }
 
+/* Speech functionality styles */
+.speech-btn {
+    background: var(--primary-green) !important;
+    box-shadow: 0 4px 12px rgba(50, 215, 75, 0.3);
+}
+
+.speech-btn:hover {
+    box-shadow: 0 6px 20px rgba(50, 215, 75, 0.4);
+}
+
+.speech-btn:disabled {
+    background: var(--primary-orange) !important;
+    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+}
+
+.alert-card .speech-btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.alert-card .speech-btn:hover {
+    background: var(--primary-purple);
+    transform: scale(1.05);
+}
+
+/* Speaking animation */
+@keyframes speaking {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.1); 
+        opacity: 0.8; 
+    }
+}
+
+.speaking {
+    animation: speaking 1s ease-in-out infinite;
+}
+
+.mascot.speaking {
+    animation: speaking 1s ease-in-out infinite;
+}
+
+/* Accessibility enhancements for speech */
+.speech-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--primary-blue);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.speech-indicator.active {
+    opacity: 1;
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     :root {
