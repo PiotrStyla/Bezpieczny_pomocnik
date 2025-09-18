@@ -269,23 +269,28 @@ document.addEventListener('DOMContentLoaded', () => {
             locationFilter.value = nearestCity;
             displayFilteredAlerts();
             
-            // Poinformuj użytkownika
+            // Poinformuj użytkownika - czytelnie dla dzieci
             setTimeout(() => {
-                const cityEmoji = {
-                    'Warszawa': '🏛️',
-                    'Kraków': '🏰', 
-                    'Lublin': '🌸',
-                    'Białystok': '🌲'
+                const cityMessages = {
+                    'Warszawa': 'Znalazłem cię w Warszawie! Teraz pokażę ci, co dzieje się w twojej stolicy.',
+                    'Kraków': 'Znalazłem cię w Krakowie! Teraz pokażę ci, co dzieje się w twoim pięknym mieście.',
+                    'Lublin': 'Znalazłem cię w Lublinie! Teraz pokażę ci, co dzieje się w twoim mieście.',
+                    'Białystok': 'Znalazłem cię w Białymstoku! Teraz pokażę ci, co dzieje się w twoim mieście.'
                 };
-                const message = `Znalazłem cię! Pokazuję alerty dla ${cityEmoji[nearestCity] || '📍'} ${nearestCity}`;
-                updateMascotMessage('welcome'); // Temporarily use welcome
+                
+                const message = cityMessages[nearestCity] || `Znalazłem cię w ${nearestCity}! Teraz pokażę ci lokalne informacje.`;
+                
+                updateMascotMessage('welcome');
                 if (mascotText) {
                     mascotText.textContent = message;
                     if (speechEnabled) {
-                        speakText(message, currentLang);
+                        // Daj czas na przeczytanie przed mówieniem
+                        setTimeout(() => {
+                            speakText(message, currentLang);
+                        }, 800);
                     }
                 }
-            }, 2000);
+            }, 1500);
         }
     }
 
@@ -478,12 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         updateLocationFilterToNearest(nearestCity);
                         locationBtn.innerHTML = `<span class="btn-icon">📍</span><span class="btn-text">Znaleziono: ${nearestCity}</span>`;
                         
-                        // Płynna wypowiedź dla dzieci
-                        const message = `Znalazłem cię! Jesteś w ${nearestCity}. Pokazuję ci teraz alerty dla twojego miasta.`;
-                        setTimeout(() => {
-                            if (mascotText) mascotText.textContent = message;
-                            if (speechEnabled) speakText(message, currentLang);
-                        }, 1000);
+                        // Nie dodawaj własnej wiadomości - updateLocationFilterToNearest to zrobi
                         
                     } else {
                         locationBtn.innerHTML = '<span class="btn-icon">📍</span><span class="btn-text">Lokalizacja znaleziona</span>';
