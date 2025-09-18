@@ -246,25 +246,39 @@ document.addEventListener('DOMContentLoaded', () => {
             let preferredVoice = null;
             
             if (lang === 'en') {
-                // Angielski - szukaj natywnych głosów US/UK
+                console.log('🔍 Szukam głosu angielskiego...');
                 preferredVoice = voices.find(voice => 
                     (voice.lang === 'en-US' || voice.lang === 'en-GB') &&
                     (voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('zira') || voice.name.toLowerCase().includes('susan'))
                 ) || voices.find(voice => voice.lang.startsWith('en'));
+                console.log('🇺🇸 Znaleziony głos angielski:', preferredVoice?.name || 'BRAK');
             } else if (lang === 'ua') {
-                // Ukraiński - spróbuj ukraińskich głosów
+                console.log('🔍 Szukam głosu ukraińskiego...');
                 preferredVoice = voices.find(voice => 
                     voice.lang === 'uk-UA' || voice.lang.startsWith('uk')
-                ) || voices.find(voice => 
-                    // Fallback - rosyjski może być bardziej zrozumiały niż polski dla ukraińskiego tekstu
-                    voice.lang === 'ru-RU' || voice.lang.startsWith('ru')
                 );
-            } else {
-                // Polski - szukaj polskich głosów
+                console.log('🇺🇦 Znaleziony głos ukraiński:', preferredVoice?.name || 'BRAK');
+                
+                if (!preferredVoice) {
+                    console.log('🔍 Szukam fallback rosyjskiego...');
+                    preferredVoice = voices.find(voice => 
+                        voice.lang === 'ru-RU' || voice.lang.startsWith('ru')
+                    );
+                    console.log('🇷🇺 Znaleziony głos rosyjski:', preferredVoice?.name || 'BRAK');
+                }
+                
+                if (!preferredVoice) {
+                    console.log('⚠️ Brak głosu ukraińskiego/rosyjskiego, używam angielskiego');
+                    preferredVoice = voices.find(voice => voice.lang.startsWith('en'));
+                    console.log('🇺🇸 Fallback angielski:', preferredVoice?.name || 'BRAK');
+                }
+            } else { // 'pl'
+                console.log('🔍 Szukam głosu polskiego...');
                 preferredVoice = voices.find(voice => 
                     voice.lang === 'pl-PL' && 
                     (voice.name.toLowerCase().includes('paulina') || voice.name.toLowerCase().includes('zofia'))
                 ) || voices.find(voice => voice.lang.startsWith('pl'));
+                console.log('🇵🇱 Znaleziony głos polski:', preferredVoice?.name || 'BRAK');
             }
             
             if (preferredVoice) {
@@ -272,14 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('✅ Używam głosu:', preferredVoice.name, 'Lang:', preferredVoice.lang);
             } else {
                 console.log('⚠️ Brak głosu dla', lang, '- używam domyślnego');
-                // Jeśli nie ma głosu dla ukraińskiego, wymuś angielski zamiast polskiego
-                if (lang === 'ua') {
-                    const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
-                    if (englishVoice) {
-                        utterance.voice = englishVoice;
-                        console.log('🔄 Fallback na angielski dla ukraińskiego:', englishVoice.name);
-                    }
-                }
             }
             
             // Events
@@ -873,6 +879,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (message && speechEnabled) {
+            console.log('💬 Wiadomość do przeczytania:', message);
+            console.log('🔊 speechEnabled:', speechEnabled, 'currentLang:', currentLang);
+            
             // Visual feedback
             card.style.transform = 'scale(0.95)';
             setTimeout(() => {
@@ -881,6 +890,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Speak the content
             speakText(message, currentLang);
+        } else {
+            console.log('❌ Brak wiadomości lub speech wyłączony');
+            console.log('💬 Message:', message);
+            console.log('🔊 speechEnabled:', speechEnabled);
             
             // Update mascot
             updateMascotMessage('loading');
