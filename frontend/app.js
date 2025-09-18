@@ -304,13 +304,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (event.error === 'not-allowed') {
                     console.log('🔄 Spróbuję ponownie z defaultowym głosem...');
                     // Retry without voice selection
-                    const retryUtterance = new SpeechSynthesisUtterance(text);
-                    retryUtterance.lang = utterance.lang;
-                    retryUtterance.rate = 0.7;
-                    retryUtterance.pitch = 1.2;
-                    retryUtterance.volume = 0.9;
-                    // Don't set specific voice - use default
-                    window.speechSynthesis.speak(retryUtterance);
+                    setTimeout(() => {
+                        const retryUtterance = new SpeechSynthesisUtterance(text);
+                        retryUtterance.lang = utterance.lang;
+                        retryUtterance.rate = 0.7;
+                        retryUtterance.pitch = 1.2;
+                        retryUtterance.volume = 0.9;
+                        
+                        retryUtterance.onstart = () => {
+                            console.log('🎵 Retry: Mowa rozpoczęta');
+                            const mascot = document.querySelector('.mascot');
+                            if (mascot) mascot.classList.add('speaking');
+                        };
+                        
+                        retryUtterance.onend = () => {
+                            console.log('✅ Retry: Mowa zakończona');
+                            const mascot = document.querySelector('.mascot');
+                            if (mascot) mascot.classList.remove('speaking');
+                        };
+                        
+                        // Don't set specific voice - use default
+                        window.speechSynthesis.speak(retryUtterance);
+                        console.log('🚀 Retry: Komenda speak() wysłana bez konkretnego głosu');
+                    }, 500);
                 }
             };
             
@@ -823,15 +839,29 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Safety tip and emergency card click handlers
     function handleSafetyCardClick(e) {
+        console.log('🎯 Kliknięto kartę!', e.target);
+        
         const card = e.target.closest('.tip-card, .emergency-card');
-        if (!card) return;
+        if (!card) {
+            console.log('❌ Nie znaleziono karty');
+            return;
+        }
+        
+        console.log('✅ Znaleziono kartę:', card.className);
         
         const h4 = card.querySelector('h4');
-        if (!h4) return;
+        if (!h4) {
+            console.log('❌ Nie znaleziono h4');
+            return;
+        }
         
         // Use original key (Polish) to find content, but display current language title
         const originalKey = h4.getAttribute('data-original') || h4.textContent;
         const displayTitle = h4.textContent;
+        
+        console.log('🔑 Oryginalny klucz:', originalKey);
+        console.log('📝 Tytuł do wyświetlenia:', displayTitle);
+        console.log('🌍 Aktualny język:', currentLang);
         
         const content = safetyContent[currentLang] || safetyContent.pl;
         let message = '';
@@ -865,13 +895,18 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add event listeners for all interactive elements
     document.addEventListener('click', (e) => {
+        console.log('🖱️ Click na:', e.target, 'Klasy:', e.target.className);
+        
         if (e.target.id === 'speech-toggle-btn' || e.target.closest('#speech-toggle-btn')) {
+            console.log('🔊 Kliknięto przycisk mowy');
             toggleSpeech();
         }
         if (e.target.id === 'location-btn' || e.target.closest('#location-btn')) {
+            console.log('📍 Kliknięto przycisk lokalizacji');
             handleLocationButtonClick();
         }
         if (e.target.closest('.tip-card, .emergency-card')) {
+            console.log('🎯 Wykryto click na kartę bezpieczeństwa');
             handleSafetyCardClick(e);
         }
     });
