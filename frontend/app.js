@@ -41,6 +41,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
     
+    // Foundation footer messages
+    const foundationMessages = {
+        pl: {
+            header: "Stworzone z ❤️ przez",
+            note: "Ta aplikacja jest <strong>całkowicie bezpłatna</strong>.<br>Jeśli chcesz wspierać rozwój aplikacji,<br>możesz przekazać darowiznę na konto Fundacji.",
+            button: "🌟 Wspieraj Fundację"
+        },
+        en: {
+            header: "Created with ❤️ by",
+            note: "This app is <strong>completely free</strong>.<br>If you want to support app development,<br>you can donate to the Foundation.",
+            button: "🌟 Support Foundation"
+        },
+        ua: {
+            header: "Створено з ❤️",
+            note: "Цей додаток <strong>повністю безкоштовний</strong>.<br>Якщо ви хочете підтримати розвиток додатку,<br>ви можете зробити пожертву Фонду.",
+            button: "🌟 Підтримати Фонд"
+        }
+    };
+    
+    function updateFooterLanguage(lang) {
+        const messages = foundationMessages[lang] || foundationMessages.pl;
+        const headerEl = document.getElementById('foundation-header');
+        const noteEl = document.getElementById('foundation-note');
+        const buttonEl = document.getElementById('donation-btn');
+        
+        if (headerEl) headerEl.textContent = messages.header;
+        if (noteEl) noteEl.innerHTML = messages.note;
+        if (buttonEl) buttonEl.innerHTML = messages.button;
+    }
+    
     // Speech and mascot functions
     function updateMascotMessage(messageKey) {
         const messages = mascotMessages[currentLang] || mascotMessages.pl;
@@ -638,6 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
             langButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
             fetchAndDisplayAlerts(selectedLang);
+            updateFooterLanguage(selectedLang);
         });
     });
 

@@ -705,6 +705,127 @@ body {
     opacity: 1;
 }
 
+/* Foundation Footer Styles */
+.kids-footer {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+    color: white;
+    padding: 40px 20px;
+    margin-top: 60px;
+    text-align: center;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.foundation-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.foundation-logo {
+    font-size: 48px;
+    animation: gentle-pulse 3s ease-in-out infinite;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.foundation-text h4 {
+    font-family: 'Comic Neue', sans-serif;
+    font-size: 1.3rem;
+    margin: 0 0 10px 0;
+    color: #FFE55C;
+}
+
+.foundation-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+.foundation-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.foundation-note {
+    font-size: 1rem;
+    line-height: 1.4;
+    margin: 20px 0;
+    color: #E0E0E0;
+    font-family: 'Comic Neue', sans-serif;
+}
+
+.foundation-note strong {
+    color: #FFE55C;
+    font-weight: 700;
+}
+
+.donation-btn {
+    display: inline-block;
+    background: linear-gradient(45deg, #FFE55C, #FFA500);
+    color: #333;
+    text-decoration: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 229, 92, 0.3);
+    margin-top: 10px;
+}
+
+.donation-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 229, 92, 0.4);
+    background: linear-gradient(45deg, #FFA500, #FF8C00);
+}
+
+/* Mobile responsiveness for footer */
+@media (max-width: 768px) {
+    .kids-footer {
+        padding: 30px 15px;
+        margin-top: 40px;
+    }
+    
+    .foundation-logo {
+        font-size: 40px;
+    }
+    
+    .foundation-text h4 {
+        font-size: 1.1rem;
+    }
+    
+    .foundation-link {
+        font-size: 1.3rem;
+    }
+    
+    .foundation-note {
+        font-size: 0.9rem;
+    }
+    
+    .donation-btn {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     :root {
