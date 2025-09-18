@@ -399,17 +399,34 @@ body {
 }
 
 .tip-card {
-    background: white;
-    border-radius: 12px;
+    background: var(--card-bg);
     padding: 20px;
+    border-radius: 12px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.tip-card::after {
+    content: "🔊 Kliknij aby usłyszeć";
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 0.7rem;
+    color: var(--primary-blue);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .tip-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.tip-card:hover::after {
+    opacity: 1;
 }
 
 .tip-icon {
@@ -457,11 +474,28 @@ body {
     text-align: center;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.emergency-card::after {
+    content: "🔊 Kliknij aby usłyszeć";
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 0.7rem;
+    color: var(--primary-red);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .emergency-card:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: translateY(-2px);
+}
+
+.emergency-card:hover::after {
+    opacity: 1;
 }
 
 .emergency-icon {
