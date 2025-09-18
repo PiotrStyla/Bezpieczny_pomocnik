@@ -18,6 +18,53 @@ document.addEventListener('DOMContentLoaded', () => {
     // Geolocation functionality
     let userLocation = null;
     let userLocationMarker = null;
+    
+    // Get mascot text element
+    const mascotText = document.getElementById('mascot-text');
+    
+    // Mascot messages
+    const mascotMessages = {
+        pl: {
+            welcome: "Cześć! Jestem twoim pomocnikiem bezpieczeństwa. Sprawdź, co dzieje się w twojej okolicy! 🤖",
+            loading: "Szukam najnowszych informacji dla ciebie... 🔍",
+            noAlerts: "Super! W tej chwili wszystko jest bezpieczne w wybranej lokalizacji! 🌟"
+        }
+    };
+    
+    // Speech and mascot functions
+    function updateMascotMessage(messageKey) {
+        const messages = mascotMessages[currentLang] || mascotMessages.pl;
+        const message = messages[messageKey] || messages.welcome;
+        if (mascotText) {
+            mascotText.textContent = message;
+        }
+    }
+    
+    function toggleSpeech() {
+        speechEnabled = !speechEnabled;
+        const speechBtn = document.getElementById('speech-toggle-btn');
+        
+        if (speechEnabled) {
+            speechBtn.innerHTML = '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>';
+            speechBtn.style.background = '#32D74B';
+        } else {
+            speechBtn.innerHTML = '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie wyłączone</span>';
+            speechBtn.style.background = '#FF9500';
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+        }
+    }
+    
+    function speakText(text, lang = 'pl') {
+        if (!speechEnabled || !window.speechSynthesis) return;
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang === 'pl' ? 'pl-PL' : 'en-US';
+        utterance.rate = 0.8;
+        utterance.pitch = 1.1;
+        window.speechSynthesis.speak(utterance);
+    }
 
     const locations = {
         "Polska": [52.23, 21.01],
@@ -400,7 +447,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     locationFilter.addEventListener('change', displayFilteredAlerts);
-
+    
+    // Initialize app
     initMap();
     fetchAndDisplayAlerts(currentLang);
+    
+    // Add event listeners for speech and location buttons
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'speech-toggle-btn' || e.target.closest('#speech-toggle-btn')) {
+            toggleSpeech();
+        }
+        if (e.target.id === 'location-btn' || e.target.closest('#location-btn')) {
+            handleLocationButtonClick();
+        }
+    });
 });
