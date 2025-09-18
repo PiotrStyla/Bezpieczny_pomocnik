@@ -1,34 +1,22 @@
 import json
 import logging
+import pywebpush
+from py_vapid import Vapid01
 from pywebpush import webpush, WebPushException
-import base64
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives import serialization
 from .config import settings
 
-# --- Permanent Fix --- #
-# Generate VAPID keys on startup to bypass corrupted environment variables.
-private_key = ec.generate_private_key(ec.SECP256R1())
-public_key = private_key.public_key()
+# --- Use py-vapid library for proper VAPID key generation ---
+vapid = Vapid01()
+vapid.generate_keys()
 
-# Get the raw public key in uncompressed format for the browser (full 65 bytes)
-raw_public_key = public_key.public_bytes(
-    encoding=serialization.Encoding.X962,
-    format=serialization.PublicFormat.UncompressedPoint
-)
-# 65 bytes should encode to exactly 87 base64url characters
-# But we need to check why we're getting an extra character
-vapid_public_key = base64.urlsafe_b64encode(raw_public_key).rstrip(b'=').decode('utf-8')
+# Get the public key in the format expected by browsers
+vapid_public_key = vapid.public_key.public_key
 
-# Get the private key in PEM format for the webpush library
-vapid_private_key = private_key.private_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PrivateFormat.PKCS8,
-    encryption_algorithm=serialization.NoEncryption()
-).decode('utf-8')
+# Get the private key for pywebpush
+vapid_private_key = vapid.private_key.to_pem().decode('utf-8')
 
 logging.info("Generated in-memory VAPID keys for this session.")
-logging.info(f"Raw public key bytes length: {len(raw_public_key)}")
+logging.info(f"Raw public key bytes length: {len(vapid.public_key.public_bytes_raw())}")
 logging.info(f"VAPID public key length: {len(vapid_public_key)} chars")
 logging.info(f"VAPID public key: {vapid_public_key}")
 
