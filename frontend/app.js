@@ -65,40 +65,40 @@ document.addEventListener('DOMContentLoaded', () => {
         pl: {
             tips: {
                 'Bezpieczeństwo na drodze': 'Pamiętaj! Zawsze patrz w lewo i prawo przed przejściem przez ulicę. Najpierw patrz w lewo, potem w prawo, i znów w lewo. Jeśli nie ma samochodów, możesz przejść.',
-                'W domu': 'W domu zapamiętaj ważne numery telefonu. Numer do rodziców i numer alarmowy 112. Jeśli coś się stanie, zawsze możesz zadzwonić po pomoc.',
+                'W domu': 'W domu zapamiętaj ważne numery telefonu. Numer do rodziców i numer alarmowy jeden jeden dwa. Jeśli coś się stanie, zawsze możesz zadzwonić po pomoc.',
                 'Z nieznajomymi': 'Nigdy nie rozmawiaj z nieznajomymi ludźmi na ulicy. Nie chodź z nimi nigdzie i nie bierz od nich żadnych prezentów. Jeśli ktoś cię zaczepia, uciekaj do najbliższego dorosłego.',
                 'Zła pogoda': 'Gdy jest burza, zostań w domu lub w bezpiecznym budynku. Unikaj wysokich drzew i nie stój pod nimi. Pioruny mogą być bardzo niebezpieczne.'
             },
             emergency: {
-                'Pogotowie ratunkowe': 'Pogotowie ratunkowe to numer 112. Dzwoń gdy ktoś jest ranny, chory lub w niebezpieczeństwie. To jest najważniejszy numer który musisz zapamiętać.',
-                'Policja': 'Policja to numer 997. Dzwoń gdy widzisz przestępstwo lub ktoś cię straszy. Policjanci są po to żeby cię chronić.',
-                'Straż pożarna': 'Straż pożarna to numer 998. Dzwoń gdy widzisz pożar, kogoś trzeba ratować, lub gdy coś eksplodowało. Strażacy są bardzo odważni i pomogą.'
+                'Pogotowie ratunkowe': 'Pogotowie ratunkowe to numer jeden jeden dwa. Zapamiętaj: jeden, jeden, dwa. Dzwoń gdy ktoś jest ranny, chory lub w niebezpieczeństwie. To jest najważniejszy numer który musisz zapamiętać.',
+                'Policja': 'Policja to numer dziewięć dziewięć siedem. Zapamiętaj: dziewięć, dziewięć, siedem. Dzwoń gdy widzisz przestępstwo lub ktoś cię straszy. Policjanci są po to żeby cię chronić.',
+                'Straż pożarna': 'Straż pożarna to numer dziewięć dziewięć osiem. Zapamiętaj: dziewięć, dziewięć, osiem. Dzwoń gdy widzisz pożar, kogoś trzeba ratować, lub gdy coś eksplodowało. Strażacy są bardzo odważni i pomogą.'
             }
         },
         en: {
             tips: {
                 'Road safety': 'Remember! Always look left and right before crossing the street. First look left, then right, then left again. If there are no cars, you can cross.',
-                'At home': 'At home, remember important phone numbers. Your parents\' number and emergency number 112. If something happens, you can always call for help.',
+                'At home': 'At home, remember important phone numbers. Your parents\' number and emergency number one one two. If something happens, you can always call for help.',
                 'With strangers': 'Never talk to strangers on the street. Don\'t go anywhere with them and don\'t take any gifts from them. If someone bothers you, run to the nearest adult.',
                 'Bad weather': 'When there\'s a storm, stay at home or in a safe building. Avoid tall trees and don\'t stand under them. Lightning can be very dangerous.'
             },
             emergency: {
-                'Emergency services': 'Emergency services number is 112. Call when someone is hurt, sick or in danger. This is the most important number you must remember.',
-                'Police': 'Police number is 997. Call when you see a crime or someone scares you. Police officers are there to protect you.',
-                'Fire department': 'Fire department number is 998. Call when you see a fire, someone needs rescue, or something exploded. Firefighters are very brave and will help.'
+                'Emergency services': 'Emergency services number is one one two. Remember: one, one, two. Call when someone is hurt, sick or in danger. This is the most important number you must remember.',
+                'Police': 'Police number is nine nine seven. Remember: nine, nine, seven. Call when you see a crime or someone scares you. Police officers are there to protect you.',
+                'Fire department': 'Fire department number is nine nine eight. Remember: nine, nine, eight. Call when you see a fire, someone needs rescue, or something exploded. Firefighters are very brave and will help.'
             }
         },
         ua: {
             tips: {
                 'Безпека на дорозі': 'Пам\'ятай! Завжди дивися ліворуч і праворуч перед переходом через вулицю. Спочатку подивись ліворуч, потім праворуч, і знову ліворуч. Якщо немає машин, можеш переходити.',
-                'Вдома': 'Вдома запам\'ятай важливі номери телефонів. Номер батьків і екстрений номер 112. Якщо щось станеться, завжди можеш подзвонити по допомогу.',
+                'Вдома': 'Вдома запам\'ятай важливі номери телефонів. Номер батьків і екстрений номер один один два. Якщо щось станеться, завжди можеш подзвонити по допомогу.',
                 'З незнайомцями': 'Ніколи не розмовляй з незнайомими людьми на вулиці. Не йди з ними нікуди і не бери від них подарунки. Якщо хтось тебе чіпляє, біжи до найближчого дорослого.',
                 'Погана погода': 'Коли гроза, залишайся вдома або в безпечній будівлі. Уникай високих дерев і не стій під ними. Блискавки можуть бути дуже небезпечними.'
             },
             emergency: {
-                'Швидка допомога': 'Швидка допомога це номер 112. Дзвони коли хтось поранений, хворий або в небезпеці. Це найважливіший номер який ти маєш запам\'ятати.',
-                'Поліція': 'Поліція це номер 997. Дзвони коли бачиш злочин або хтось тебе лякає. Поліцейські тут щоб тебе захищати.',
-                'Пожежна служба': 'Пожежна служба це номер 998. Дзвони коли бачиш пожежу, когось треба рятувати, або щось вибухнуло. Пожежники дуже сміливі і допоможуть.'
+                'Швидка допомога': 'Швидка допомога це номер один один два. Запам\'ятай: один, один, два. Дзвони коли хтось поранений, хворий або в небезпеці. Це найважливіший номер який ти маєш запам\'ятати.',
+                'Поліція': 'Поліція це номер дев\'ять дев\'ять сім. Запам\'ятай: дев\'ять, дев\'ять, сім. Дзвони коли бачиш злочин або хтось тебе лякає. Поліцейські тут щоб тебе захищати.',
+                'Пожежна служба': 'Пожежна служба це номер дев\'ять дев\'ять вісім. Запам\'ятай: дев\'ять, дев\'ять, вісім. Дзвони коли бачиш пожежу, когось треба рятувати, або щось вибухнуло. Пожежники дуже сміливі і допоможуть.'
             }
         }
     };
