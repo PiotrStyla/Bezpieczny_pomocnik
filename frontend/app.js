@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emergency: {
                 'Pogotowie ratunkowe': 'Pogotowie ratunkowe to numer jeden jeden dwa. Zapamiętaj: jeden, jeden, dwa. Dzwoń gdy ktoś jest ranny, chory lub w niebezpieczeństwie. To jest najważniejszy numer który musisz zapamiętać.',
                 'Policja': 'Policja to numer dziewięć dziewięć siedem. Zapamiętaj: dziewięć, dziewięć, siedem. Dzwoń gdy widzisz przestępstwo lub ktoś cię straszy. Policjanci są po to żeby cię chronić.',
-                'Straż pożarna': 'Straż pożarna to numer dziewięć dziewięć osiem. Zapamiętaj: dziewięć, dziewięć, osiem. Dzwoń gdy widzisz pożar, kogoś trzeba ratować, lub gdy coś eksplodowało. Strażacy są bardzo odważni i pomogą.'
+                'Straż pożarna': 'Straż pożarna to numer dziewięć dziewięć osiem. Zapamiętaj: dziewięć, dziewięć, osiem. Dzwoń gdy widzisz ogień, dym, lub ktoś potrzebuje ratunku. Strażacy są bardzo odważni i pomogą.'
             }
         },
         en: {
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emergency: {
                 'Emergency services': 'Emergency services number is one one two. Remember: one, one, two. Call when someone is hurt, sick or in danger. This is the most important number you must remember.',
                 'Police': 'Police number is nine nine seven. Remember: nine, nine, seven. Call when you see a crime or someone scares you. Police officers are there to protect you.',
-                'Fire department': 'Fire department number is nine nine eight. Remember: nine, nine, eight. Call when you see a fire, someone needs rescue, or something exploded. Firefighters are very brave and will help.'
+                'Fire department': 'Fire department number is nine nine eight. Remember: nine, nine, eight. Call when you see fire, smoke, or someone needs rescue. Firefighters are very brave and will help.'
             }
         },
         ua: {
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
             emergency: {
                 'Швидка допомога': 'Швидка допомога це номер один один два. Запам\'ятай: один, один, два. Дзвони коли хтось поранений, хворий або в небезпеці. Це найважливіший номер який ти маєш запам\'ятати.',
                 'Поліція': 'Поліція це номер дев\'ять дев\'ять сім. Запам\'ятай: дев\'ять, дев\'ять, сім. Дзвони коли бачиш злочин або хтось тебе лякає. Поліцейські тут щоб тебе захищати.',
-                'Пожежна служба': 'Пожежна служба це номер дев\'ять дев\'ять вісім. Запам\'ятай: дев\'ять, дев\'ять, вісім. Дзвони коли бачиш пожежу, когось треба рятувати, або щось вибухнуло. Пожежники дуже сміливі і допоможуть.'
+                'Пожежна служба': 'Пожежна служба це номер дев\'ять дев\'ять вісім. Запам\'ятай: дев\'ять, дев\'ять, вісім. Дзвони коли бачиш вогонь, дим, або комусь потрібна допомога. Пожежники дуже сміливі і допоможуть.'
             }
         }
     };
