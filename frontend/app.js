@@ -301,6 +301,17 @@ document.addEventListener('DOMContentLoaded', () => {
             
             utterance.onerror = (event) => {
                 console.log('❌ Błąd mowy:', event.error);
+                if (event.error === 'not-allowed') {
+                    console.log('🔄 Spróbuję ponownie z defaultowym głosem...');
+                    // Retry without voice selection
+                    const retryUtterance = new SpeechSynthesisUtterance(text);
+                    retryUtterance.lang = utterance.lang;
+                    retryUtterance.rate = 0.7;
+                    retryUtterance.pitch = 1.2;
+                    retryUtterance.volume = 0.9;
+                    // Don't set specific voice - use default
+                    window.speechSynthesis.speak(retryUtterance);
+                }
             };
             
             try {
