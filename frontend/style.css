@@ -607,6 +607,47 @@ body {
     box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
 }
 
+/* Location button styles */
+.location-btn {
+    background: var(--primary-blue) !important;
+    box-shadow: 0 4px 12px rgba(74, 144, 255, 0.3);
+}
+
+.location-btn:hover {
+    box-shadow: 0 6px 20px rgba(74, 144, 255, 0.4);
+}
+
+.location-btn:disabled {
+    background: var(--primary-orange) !important;
+    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3);
+    cursor: not-allowed;
+}
+
+/* User location marker styles */
+.user-location-marker {
+    animation: locationPulse 2s infinite;
+}
+
+@keyframes locationPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.2); 
+        opacity: 0.7; 
+    }
+}
+
+/* Poland-focused map styles */
+.kids-map {
+    height: 400px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border: 3px solid var(--primary-blue);
+}
+
 .alert-card .speech-btn {
     padding: 8px 16px;
     font-size: 0.9rem;

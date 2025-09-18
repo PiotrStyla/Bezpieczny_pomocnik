@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Text-to-Speech functionality
     let speechEnabled = true;
     let currentSpeech = null;
+    const speechSynthesis = window.speechSynthesis;
+    
+    // Geolocation functionality
+    let userLocation = null;
+    let userLocationMarker = null;
 
     const locations = {
         "Polska": [52.23, 21.01],
@@ -23,12 +28,152 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function initMap() {
-        map = L.map('map').setView([52.0, 19.5], 6);
+        // Skupiamy mapę na Polsce z odpowiednim przybliżeniem
+        map = L.map('map').setView([52.1, 19.2], 6);
+        
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
+            minZoom: 5, // Minimum zoom, aby nie oddalać się zbytnio od Polski
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
+        
+        // Ograniczamy widok mapy do granic Polski
+        const polandBounds = [
+            [48.9, 14.0], // SW corner 
+            [55.0, 24.2]  // NE corner
+        ];
+        map.setMaxBounds(polandBounds);
+        map.fitBounds(polandBounds);
+        
         markersLayer = L.layerGroup().addTo(map);
+        
+        // Automatycznie spróbuj uzyskać lokalizację użytkownika
+        getUserLocation();
+    }
+
+    // Funkcja geolokalizacji
+    function getUserLocation() {
+        if (!navigator.geolocation) {
+            console.log('Geolokalizacja nie jest wspierana przez tę przeglądarkę');
+            return;
+        }
+
+        const options = {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000 // 5 minut cache
+        };
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                // Sprawdź czy lokalizacja jest w Polsce
+                if (lat >= 48.9 && lat <= 55.0 && lng >= 14.0 && lng <= 24.2) {
+                    userLocation = [lat, lng];
+                    showUserLocationOnMap(lat, lng);
+                    updateMascotMessage('locationFound');
+                    
+                    // Znajdź najbliższe miasto
+                    const nearestCity = findNearestCity(lat, lng);
+                    if (nearestCity) {
+                        updateLocationFilterToNearest(nearestCity);
+                    }
+                } else {
+                    console.log('Lokalizacja poza Polską');
+                }
+            },
+            (error) => {
+                console.log('Błąd geolokalizacji:', error.message);
+                // Nie pokazujemy błędu dzieciom - po prostu kontynuujemy bez geolokalizacji
+            },
+            options
+        );
+    }
+
+    function showUserLocationOnMap(lat, lng) {
+        // Usuń poprzedni marker użytkownika
+        if (userLocationMarker) {
+            map.removeLayer(userLocationMarker);
+        }
+
+        // Dodaj nowy marker użytkownika
+        userLocationMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'user-location-marker',
+                html: '<div style="background: #4A90FF; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            })
+        }).addTo(map);
+
+        userLocationMarker.bindPopup(`
+            <div style="text-align: center; font-family: 'Comic Neue', sans-serif;">
+                <div style="font-size: 24px; margin-bottom: 8px;">📍</div>
+                <b>Twoja lokalizacja</b><br>
+                <span style="color: #666;">Tutaj jesteś!</span>
+            </div>
+        `);
+
+        // Delikatnie przesuń mapę aby pokazać lokalizację użytkownika
+        map.setView([lat, lng], 8, { animate: true, duration: 1 });
+    }
+
+    function findNearestCity(userLat, userLng) {
+        let nearest = null;
+        let minDistance = Infinity;
+
+        Object.keys(locations).forEach(city => {
+            if (city === 'Polska') return; // Pomiń ogólną lokalizację Polski
+            
+            const [cityLat, cityLng] = locations[city];
+            const distance = calculateDistance(userLat, userLng, cityLat, cityLng);
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearest = city;
+            }
+        });
+
+        return minDistance < 100 ? nearest : null; // Tylko jeśli w promieniu 100km
+    }
+
+    function calculateDistance(lat1, lng1, lat2, lng2) {
+        const R = 6371; // Promień Ziemi w km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    function updateLocationFilterToNearest(nearestCity) {
+        // Automatycznie ustaw filtr na najbliższe miasto
+        if (locationFilter && nearestCity) {
+            locationFilter.value = nearestCity;
+            displayFilteredAlerts();
+            
+            // Poinformuj użytkownika
+            setTimeout(() => {
+                const cityEmoji = {
+                    'Warszawa': '🏛️',
+                    'Kraków': '🏰', 
+                    'Lublin': '🌸',
+                    'Białystok': '🌲'
+                };
+                const message = `Znalazłem cię! Pokazuję alerty dla ${cityEmoji[nearestCity] || '📍'} ${nearestCity}`;
+                updateMascotMessage('welcome'); // Temporarily use welcome
+                if (mascotText) {
+                    mascotText.textContent = message;
+                    if (speechEnabled) {
+                        speakText(message, currentLang);
+                    }
+                }
+            }, 2000);
+        }
     }
 
     function updateMapMarkers(alerts) {
@@ -125,6 +270,73 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Błąd podczas subskrypcji powiadomień:', error);
             notificationsBtn.textContent = 'Błąd subskrypcji';
         }
+        // Add speech toggle button event listener
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'speech-toggle-btn' || e.target.closest('#speech-toggle-btn')) {
+                toggleSpeech();
+            }
+            if (e.target.id === 'location-btn' || e.target.closest('#location-btn')) {
+                handleLocationButtonClick();
+            }
+        });
+
+        function handleLocationButtonClick() {
+            const locationBtn = document.getElementById('location-btn');
+            
+            // Pokaż że szukamy lokalizacji
+            locationBtn.innerHTML = '<span class="btn-icon">🔄</span><span class="btn-text">Szukam...</span>';
+            locationBtn.disabled = true;
+            
+            updateMascotMessage('loading');
+            
+            // Wywołaj funkcję geolokalizacji
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Sprawdź czy lokalizacja jest w Polsce
+                    if (lat >= 48.9 && lat <= 55.0 && lng >= 14.0 && lng <= 24.2) {
+                        userLocation = [lat, lng];
+                        showUserLocationOnMap(lat, lng);
+                        
+                        // Znajdź najbliższe miasto
+                        const nearestCity = findNearestCity(lat, lng);
+                        if (nearestCity) {
+                            updateLocationFilterToNearest(nearestCity);
+                            locationBtn.innerHTML = `<span class="btn-icon">📍</span><span class="btn-text">Znaleziono: ${nearestCity}</span>`;
+                        } else {
+                            locationBtn.innerHTML = '<span class="btn-icon">📍</span><span class="btn-text">Lokalizacja znaleziona</span>';
+                        }
+                        locationBtn.style.background = '#32D74B';
+                    } else {
+                        locationBtn.innerHTML = '<span class="btn-icon">🌍</span><span class="btn-text">Poza Polską</span>';
+                        locationBtn.style.background = '#FF9500';
+                        updateMascotMessage('welcome');
+                        if (mascotText) {
+                            mascotText.textContent = 'Twoja lokalizacja jest poza Polską. Pokazuję wszystkie alerty.';
+                        }
+                    }
+                    locationBtn.disabled = false;
+                },
+                (error) => {
+                    console.log('Błąd geolokalizacji:', error.message);
+                    locationBtn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Nie można znaleźć</span>';
+                    locationBtn.style.background = '#FF3B30';  
+                    locationBtn.disabled = false;
+                    
+                    updateMascotMessage('welcome');
+                    if (mascotText) {
+                        mascotText.textContent = 'Nie mogę znaleźć Twojej lokalizacji. Sprawdź ustawienia przeglądarki lub wybierz miasto ręcznie.';
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 15000,
+                    maximumAge: 0 // Zawsze pobierz świeżą lokalizację przy kliknięciu
+                }
+            );
+        }
     }
 
     notificationsBtn.addEventListener('click', () => {
@@ -136,7 +348,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function renderAlert(alert) {
-        const card = document.createElement('div');
+        // ... (rest of the code remains the same)
         card.className = `alert-card ${alert.severity}`;
         let tipsHtml = '';
         if (alert.tips && alert.tips.length > 0) {
