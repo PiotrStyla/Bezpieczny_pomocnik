@@ -24,7 +24,7 @@ import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from .schema import Alert, SeverityLevel
-from .data_sources import fetch_all_alerts
+from .data_sources import fetch_all_alerts, fetch_alerts_for_location, get_location_coverage_info
 from .ai_processor import simplify_text, generate_tips
 from .push_notifications import get_vapid_public_key, add_subscription, send_notification_to_all
 
@@ -113,6 +113,131 @@ def get_vapid_key():
 def subscribe(subscription: Dict[str, Any] = Body(...)):
     add_subscription(subscription)
     return {"message": "Subskrypcja zapisana."}
+
+@app.get("/api/alerts/location", response_model=List[Alert], summary="Pobierz alerty dla konkretnej lokalizacji")
+async def get_alerts_for_location(
+    lat: float = Query(..., description="Szerokość geograficzna (latitude)"),
+    lon: float = Query(..., description="Długość geograficzna (longitude)"), 
+    lang: Literal['pl', 'en', 'ua'] = Query('pl', description="Język uproszczonych treści.")
+):
+    """
+    Pobierz alerty relevantne dla konkretnej lokalizacji w Polsce.
+    System automatycznie dobierze źródła alertów na podstawie współrzędnych:
+    - Alerty ogólnopolskie (RCB, IMGW)  
+    - Alerty wojewódzkie dla danego województwa
+    - Alerty miejskie jeśli dostępne dla tego miasta
+    """
+    cache_key = f"alerts_location_{lat}_{lon}_{lang}"
+    if cache_key in cache: 
+        return cache[cache_key]
+    
+    try:
+        # Fetch location-specific alerts
+        raw_alerts = fetch_alerts_for_location(lat, lon)
+        processed_alerts = await process_alerts(raw_alerts, lang)
+        sorted_alerts = sorted(processed_alerts, key=lambda x: x.timestamp, reverse=True)
+        
+        cache[cache_key] = sorted_alerts
+        return sorted_alerts
+    except Exception as e:
+        logging.error(f"Error fetching location alerts for {lat}, {lon}: {e}")
+        raise HTTPException(status_code=500, detail=f"Błąd pobierania alertów dla lokalizacji: {str(e)}")
+
+@app.get("/api/coverage", summary="Informacje o pokryciu alertami")
+def get_coverage_info():
+    """
+    Pobierz informacje o aktualnym pokryciu Polski alertami:
+    - Liczba źródeł alertów
+    - Pokryte lokalizacje (województwa, miasta) 
+    - Szczegóły każdego źródła
+    """
+    try:
+        coverage = get_location_coverage_info()
+        return {
+            "status": "success",
+            "coverage": coverage,
+            "description": "Pokrycie alertami dla Polski",
+            "total_voivodeships": 16,
+            "total_major_cities": len(coverage["source_details"])
+        }
+    except Exception as e:
+        logging.error(f"Error getting coverage info: {e}")
+        raise HTTPException(status_code=500, detail=f"Błąd pobierania informacji o pokryciu: {str(e)}")
+
+@app.post("/api/update-location", summary="Aktualizuj źródła alertów dla nowej lokalizacji")
+def update_location_sources(
+    lat: float = Query(..., description="Szerokość geograficzna"), 
+    lon: float = Query(..., description="Długość geograficzna")
+):
+    """
+    Aktualizuj konfigurację źródeł alertów na podstawie nowej lokalizacji użytkownika.
+    Przydatne gdy użytkownik zmienił lokalizację i chce otrzymywać lokalne alerty.
+    """
+    try:
+        # Update sources for new location
+        settings.update_sources_for_location(lat, lon)
+        
+        # Clear relevant cache entries
+        keys_to_remove = [key for key in cache.keys() if key.startswith('alerts_')]
+        for key in keys_to_remove:
+            del cache[key]
+        
+        # Get updated coverage info
+        coverage = get_location_coverage_info()
+        
+        return {
+            "status": "success", 
+            "message": "Źródła alertów zaktualizowane dla nowej lokalizacji",
+            "location": {"lat": lat, "lon": lon},
+            "updated_coverage": coverage
+        }
+    except Exception as e:
+        logging.error(f"Error updating location sources: {e}")
+        raise HTTPException(status_code=500, detail=f"Błąd aktualizacji źródeł dla lokalizacji: {str(e)}")
+
+@app.get("/api/poland-info", summary="Informacje o podziale administracyjnym Polski")
+def get_poland_administrative_info():
+    """
+    Pobierz informacje o podziale administracyjnym Polski pokrytym przez system alertów.
+    """
+    try:
+        from .poland_locations import WOJEWODZTWA, MAJOR_CITIES
+        
+        return {
+            "voivodeships": {
+                "count": len(WOJEWODZTWA),
+                "list": [
+                    {
+                        "code": code,
+                        "name": info["name"], 
+                        "capital": info["capital"],
+                        "imgw_code": info["imgw_code"]
+                    }
+                    for code, info in WOJEWODZTWA.items()
+                ]
+            },
+            "major_cities": {
+                "count": len(MAJOR_CITIES),
+                "list": [
+                    {
+                        "code": code,
+                        "name": info["name"],
+                        "voivodeship": info["wojewodztwo"], 
+                        "population": info["population"],
+                        "coordinates": {"lat": info["lat"], "lon": info["lon"]}
+                    }
+                    for code, info in MAJOR_CITIES.items()
+                ]
+            },
+            "coverage_summary": {
+                "total_administrative_levels": 3,
+                "levels": ["national", "voivodeship", "city"],
+                "description": "System pokrywa alerty na poziomie krajowym (RCB, IMGW), wojewódzkim (16 województw) i miejskim (największe miasta)"
+            }
+        }
+    except Exception as e:
+        logging.error(f"Error getting Poland info: {e}")
+        raise HTTPException(status_code=500, detail=f"Błąd pobierania informacji o Polsce: {str(e)}")
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
 

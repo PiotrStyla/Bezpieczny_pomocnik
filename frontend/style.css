@@ -945,10 +945,161 @@ body {
     line-height: 1.4;
 }
 
+.rights-reserved {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Location Coverage Info Popup */
+.coverage-info-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border: 3px solid #4A90FF;
+    z-index: 25000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 500px;
+    width: 90%;
+    font-family: 'Comic Neue', sans-serif;
+}
+
+.coverage-info-popup.show {
+    opacity: 1;
+}
+
+.coverage-info-popup h3 {
+    color: #4A90FF;
+    margin: 0 0 20px 0;
+    font-family: 'Fredoka', sans-serif;
+    text-align: center;
+    font-size: 1.3rem;
+}
+
+.coverage-stats {
+    background: linear-gradient(135deg, #F0F8FF, #E8F5E8);
+    padding: 20px;
+    border-radius: 12px;
+    margin: 15px 0;
+    border: 2px solid #E3F2FD;
+}
+
+.stat-item {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #4A90FF;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 600;
+}
+
+.stat-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.stat-mini {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    border: 1px solid #ddd;
+}
+
+.stat-mini strong {
+    color: #4A90FF;
+    font-size: 1.2rem;
+    display: block;
+}
+
+.covered-locations {
+    margin: 20px 0;
+}
+
+.covered-locations h4 {
+    color: #333;
+    margin: 0 0 10px 0;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.location-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.location-tag {
+    background: linear-gradient(135deg, #4A90FF, #357AE8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.coverage-info-popup .btn-ok {
+    background: #4A90FF;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto 0;
+    font-family: 'Fredoka', sans-serif;
+}
+
+.coverage-info-popup .btn-ok:hover {
+    background: #357AE8;
+}
+
+/* Responsive coverage popup */
+@media (max-width: 480px) {
+    .coverage-info-popup {
+        padding: 20px;
+        font-size: 0.9rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .stat-breakdown {
+        grid-template-columns: 1fr;
+    }
+    
+    .location-tag {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+}
+
 .copyright-notice .rights-reserved {
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.6);
-    font-weight: 600;
+    font-style: italic;
+    opacity: 0.8;
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }

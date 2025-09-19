@@ -419,28 +419,56 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 
-                // Sprawdź czy lokalizacja jest w Polsce
-                if (lat >= 48.9 && lat <= 55.0 && lng >= 14.0 && lng <= 24.2) {
-                    userLocation = [lat, lng];
-                    showUserLocationOnMap(lat, lng);
-                    updateMascotMessage('locationFound');
-                    
-                    // Znajdź najbliższe miasto
-                    const nearestCity = findNearestCity(lat, lng);
-                    if (nearestCity) {
-                        updateLocationFilterToNearest(nearestCity);
-                    }
-                } else {
-                    console.log('Lokalizacja poza Polską');
+                // Zapisz lokalizację użytkownika
+                userLocation = { lat: lat, lon: lng };
+                
+                // Wyśrodkuj mapę na lokalizacji użytkownika
+                map.setView([lat, lng], 10);
+                
+                // Usuń poprzedni marker użytkownika
+                if (userLocationMarker) {
+                    map.removeLayer(userLocationMarker);
                 }
+                
+                // Dodaj marker lokalizacji użytkownika
+                userLocationMarker = L.marker([lat, lng], {
+                    icon: L.divIcon({
+                        className: 'user-location-marker',
+                        html: '<div class="user-marker">📍</div>',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    })
+                }).addTo(map);
+                
+                userLocationMarker.bindPopup('Twoja lokalizacja').openPopup();
+                
+                console.log(`Lokalizacja użytkownika: ${lat}, ${lng}`);
+                
+                // Aktualizuj źródła alertów dla nowej lokalizacji
+                try {
+                    const updateResult = await updateLocationSources(lat, lng);
+                    if (updateResult && updateResult.status === 'success') {
+                        console.log('Źródła alertów zaktualizowane dla lokalizacji:', updateResult.location);
+                        
+                        // Odśwież alerty z nowymi źródłami
+                        await fetchAndDisplayAlerts(currentLang);
+                        
+                        // Pokaż informacje o pokryciu
+                        showLocationCoverageInfo(updateResult.updated_coverage);
+                    }
+                } catch (error) {
+                    console.error('Błąd aktualizacji źródeł alertów:', error);
+                }
+                
+                updateMascotMessage('welcome');
             },
             (error) => {
-                console.log('Błąd geolokalizacji:', error.message);
-                // Nie pokazujemy błędu dzieciom - po prostu kontynuujemy bez geolokalizacji
+                console.error('Błąd geolokalizacji:', error);
+                updateMascotMessage('welcome');
             },
             options
         );
@@ -814,14 +842,141 @@ document.addEventListener('DOMContentLoaded', function() {
         updateMapMarkers(filtered);
     }
 
+    // Fetch alerts - now with location support
+    async function fetchAlerts(userLocation = null) {
+        const lang = document.documentElement.lang || 'pl';
+        
+        if (userLocation && userLocation.lat && userLocation.lon) {
+            // Fetch location-specific alerts
+            const response = await fetch(`${API_BASE_URL}/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lon}&lang=${lang}`);
+            return await response.json();
+        } else {
+            // Fetch all Poland alerts (fallback)
+            const response = await fetch(`${API_BASE_URL}/alerts?lang=${lang}`);
+            return await response.json();
+        }
+    }
+
+    // Get coverage information
+    async function getCoverageInfo() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/coverage`);
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching coverage info:', error);
+            return null;
+        }
+    }
+
+    // Update location sources
+    async function updateLocationSources(lat, lon) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/update-location?lat=${lat}&lon=${lon}`, {
+                method: 'POST'
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Error updating location sources:', error);
+            return null;
+        }
+    }
+
+    // Show location coverage information
+    function showLocationCoverageInfo(coverage) {
+        if (!coverage) return;
+
+        const coverageMessages = {
+            pl: {
+                title: "📍 Pokrycie alertami dla Twojej lokalizacji",
+                sources: "Aktywne źródła alertów:",
+                national: "🇵🇱 Ogólnopolskie",
+                voivodeship: "🏛️ Wojewódzkie", 
+                city: "🏙️ Miejskie",
+                locations: "Monitorowane obszary:",
+                total: "Łączna liczba źródeł"
+            },
+            en: {
+                title: "📍 Alert coverage for your location", 
+                sources: "Active alert sources:",
+                national: "🇵🇱 National",
+                voivodeship: "🏛️ Regional",
+                city: "🏙️ City-level",
+                locations: "Monitored areas:",
+                total: "Total number of sources"
+            },
+            ua: {
+                title: "📍 Покриття сповіщеннями для вашої локації",
+                sources: "Активні джерела сповіщень:",
+                national: "🇵🇱 Національні",
+                voivodeship: "🏛️ Регіональні", 
+                city: "🏙️ Міські",
+                locations: "Моніторинг областей:",
+                total: "Загальна кількість джерел"
+            }
+        };
+
+        const messages = coverageMessages[currentLang] || coverageMessages.pl;
+        
+        const popup = document.createElement('div');
+        popup.className = 'coverage-info-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>${messages.title}</h3>
+                
+                <div class="coverage-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">${coverage.total_sources}</span>
+                        <span class="stat-label">${messages.total}</span>
+                    </div>
+                    <div class="stat-breakdown">
+                        <div class="stat-mini">
+                            ${messages.national}: <strong>${coverage.national_sources}</strong>
+                        </div>
+                        <div class="stat-mini">
+                            ${messages.voivodeship}: <strong>${coverage.voivodeship_sources}</strong>
+                        </div>
+                        <div class="stat-mini">
+                            ${messages.city}: <strong>${coverage.city_sources}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="covered-locations">
+                    <h4>${messages.locations}</h4>
+                    <div class="location-tags">
+                        ${coverage.covered_locations.map(loc => 
+                            `<span class="location-tag">${loc}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+
+                <button onclick="this.parentElement.parentElement.remove()" class="btn-ok">
+                    OK
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(popup);
+        setTimeout(() => popup.classList.add('show'), 100);
+        
+        // Auto-remove after 8 seconds
+        setTimeout(() => {
+            if (popup.parentNode) {
+                popup.remove();
+            }
+        }, 8000);
+    }
+
     async function fetchAndDisplayAlerts(lang = 'pl') {
         alertsContainer.innerHTML = `<div class="loader-container"><div class="loader"></div><p>Ładowanie danych...</p></div>`;
         currentLang = lang;
         try {
-            const response = await fetch(`${API_BASE_URL}/alerts?lang=${lang}`);
-            if (!response.ok) throw new Error(`Błąd sieci: ${response.statusText}`);
-            allAlerts = await response.json();
+            const alerts = await fetchAlerts(userLocation);
+            allAlerts = alerts;
             displayFilteredAlerts();
+            
+            // Update mascot message based on alerts
+            updateMascotMessage(alerts.length === 0 ? 'noAlerts' : 'welcome');
         } catch (error) {
             console.error('Nie udało się pobrać alertów:', error);
             alertsContainer.innerHTML = '<p>Wystąpił błąd podczas ładowania danych.</p>';

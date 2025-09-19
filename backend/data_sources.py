@@ -119,12 +119,76 @@ PARSER_MAP = {
 }
 
 def fetch_all_alerts() -> List[Dict[str, Any]]:
+    """Fetch alerts from all configured sources"""
     all_alerts = []
-    for source_name, config in settings.SOURCES.items():
+    
+    # Use current sources (may be location-specific or all-Poland)
+    current_sources = settings.get_current_sources()
+    
+    for source_name, config in current_sources.items():
         parser_func = PARSER_MAP.get(config["type"])
         if parser_func:
             try:
-                all_alerts.extend(parser_func(config["url"], config["location"]))
+                alerts = parser_func(config["url"], config["location"])
+                
+                # Add metadata to each alert
+                for alert in alerts:
+                    alert.update({
+                        "source_name": source_name,
+                        "source_level": config.get("level", "unknown"),
+                        "source_priority": config.get("priority", "medium"),
+                        "voivodeship_code": config.get("voivodeship_code", None)
+                    })
+                
+                all_alerts.extend(alerts)
+                logging.info(f"Pobrano {len(alerts)} alertów z {source_name} ({config['location']})")
+                
             except Exception as e:
                 logging.error(f"Błąd podczas przetwarzania źródła {source_name}: {e}")
+    
+    logging.info(f"Łączna liczba pobranych alertów: {len(all_alerts)}")
     return all_alerts
+
+def fetch_alerts_for_location(lat: float, lon: float) -> List[Dict[str, Any]]:
+    """Fetch alerts relevant to specific location"""
+    # Update sources for this location
+    settings.update_sources_for_location(lat, lon)
+    
+    # Fetch alerts using location-specific sources
+    return fetch_all_alerts()
+
+def get_location_coverage_info() -> Dict[str, Any]:
+    """Get information about current alert coverage"""
+    current_sources = settings.get_current_sources()
+    
+    coverage = {
+        "total_sources": len(current_sources),
+        "national_sources": 0,
+        "voivodeship_sources": 0, 
+        "city_sources": 0,
+        "covered_locations": set(),
+        "source_details": []
+    }
+    
+    for source_name, config in current_sources.items():
+        level = config.get("level", "unknown")
+        location = config.get("location", "Unknown")
+        
+        coverage["covered_locations"].add(location)
+        coverage["source_details"].append({
+            "name": source_name,
+            "location": location,
+            "level": level,
+            "priority": config.get("priority", "medium")
+        })
+        
+        if level == "national":
+            coverage["national_sources"] += 1
+        elif level == "voivodeship":
+            coverage["voivodeship_sources"] += 1
+        elif level == "city":
+            coverage["city_sources"] += 1
+    
+    coverage["covered_locations"] = sorted(list(coverage["covered_locations"]))
+    
+    return coverage
