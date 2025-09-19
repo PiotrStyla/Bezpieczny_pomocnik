@@ -222,6 +222,105 @@
     outline-offset: 3px;
 }
 
+/* Adult Verification Form */
+.adult-verification {
+    background: linear-gradient(135deg, #E8F5E8, #F0F8FF);
+    padding: 25px;
+    border-radius: 15px;
+    border: 3px solid #4A90FF;
+    margin: 20px 0;
+    display: none;
+}
+
+.adult-verification h3 {
+    color: #4A90FF;
+    margin: 0 0 20px 0;
+    font-family: 'Fredoka', sans-serif;
+    text-align: center;
+}
+
+.verification-step {
+    margin: 20px 0;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid #E3F2FD;
+}
+
+.verification-step label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.verification-step input[type="email"],
+.verification-step input[type="number"],
+.verification-step select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s;
+}
+
+.verification-step input:focus,
+.verification-step select:focus {
+    outline: none;
+    border-color: #4A90FF;
+    box-shadow: 0 0 0 3px rgba(74, 144, 255, 0.1);
+}
+
+.verification-step small {
+    display: block;
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.adult-question {
+    border-color: #FF9500;
+    background: #FFF8E1;
+}
+
+.adult-question #math-question {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #FF9500;
+    margin: 10px 0;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid #FF9500;
+}
+
+.verification-step label input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.btn-send-email {
+    background: linear-gradient(135deg, #4A90FF, #357AE8);
+    color: white;
+    border-color: #4A90FF;
+    grid-column: span 2;
+}
+
+.btn-send-email:hover {
+    background: linear-gradient(135deg, #357AE8, #2E6DB5);
+}
+
+.btn-send-email:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* Access Denied */
 .access-denied {
     background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
@@ -283,6 +382,100 @@
 
 .btn-ok:hover {
     background: #28B946;
+}
+
+/* Email Sent & Error Popups */
+.email-sent-popup,
+.error-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    z-index: 30000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    max-width: 500px;
+    width: 90%;
+}
+
+.email-sent-popup.show,
+.error-popup.show {
+    opacity: 1;
+}
+
+.email-sent-popup {
+    border: 3px solid #32D74B;
+}
+
+.error-popup {
+    border: 3px solid #FF6B6B;
+}
+
+.popup-content h3 {
+    margin: 0 0 15px 0;
+    font-family: 'Fredoka', sans-serif;
+    text-align: center;
+}
+
+.email-sent-popup h3 {
+    color: #32D74B;
+}
+
+.error-popup h3 {
+    color: #FF6B6B;
+}
+
+.email-address {
+    background: #F0F8FF;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #4A90FF;
+    margin: 10px 0;
+}
+
+.test-verification {
+    background: #FFF8E1;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px dashed #FF9500;
+}
+
+.btn-test {
+    background: #FF9500;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-test:hover {
+    background: #E8850A;
+}
+
+/* Verified Consent Confirmation */
+.consent-confirmation.verified {
+    border-color: #32D74B;
+}
+
+.consent-confirmation.verified h3 {
+    color: #32D74B;
+}
+
+.consent-confirmation.verified .confirmation-content {
+    text-align: center;
+}
+
+.consent-confirmation.verified strong {
+    color: #4A90FF;
 }
 
 /* Responsive Design */

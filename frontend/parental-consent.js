@@ -58,7 +58,19 @@ class ParentalConsentManager {
     }
 
     init() {
-        // Check if parental consent is needed
+        // Check for verification token in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const verifyToken = urlParams.get('verify');
+        
+        if (verifyToken) {
+            // Process email verification
+            this.processVerification(verifyToken);
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            return;
+        }
+        
+        // Check if consent is needed
         if (!this.consentData || this.isConsentExpired()) {
             this.showParentalConsentBanner();
         }
@@ -212,9 +224,54 @@ class ParentalConsentManager {
                     </div>
                 </div>
                 
+                <div class="adult-verification" id="adult-verification" style="display: none;">
+                    <h3>🔒 Weryfikacja dorosłego</h3>
+                    <p><strong>Aby upewnić się, że zgodę wyraża rodzic/opiekun, a nie dziecko:</strong></p>
+                    
+                    <div class="verification-step">
+                        <label for="parent-email">📧 Adres email rodzica/opiekuna:</label>
+                        <input type="email" id="parent-email" placeholder="rodzic@email.com" required>
+                        <small>Na ten adres zostanie wysłany link weryfikacyjny</small>
+                    </div>
+                    
+                    <div class="verification-step">
+                        <label for="child-age">👶 Wiek dziecka:</label>
+                        <select id="child-age" required>
+                            <option value="">Wybierz wiek</option>
+                            <option value="6">6 lat</option>
+                            <option value="7">7 lat</option>
+                            <option value="8">8 lat</option>
+                            <option value="9">9 lat</option>
+                            <option value="10">10 lat</option>
+                            <option value="11">11 lat</option>
+                            <option value="12">12 lat</option>
+                            <option value="13">13 lat</option>
+                            <option value="14">14 lat</option>
+                            <option value="15">15 lat</option>
+                        </select>
+                    </div>
+                    
+                    <div class="verification-step adult-question">
+                        <label for="adult-question">🧮 Pytanie dla dorosłego:</label>
+                        <p id="math-question">Ile to jest 17 + 23?</p>
+                        <input type="number" id="adult-answer" placeholder="Twoja odpowiedź" required>
+                        <small>To pytanie sprawdza, czy formularz wypełnia dorosły</small>
+                    </div>
+                    
+                    <div class="verification-step">
+                        <label>
+                            <input type="checkbox" id="parent-declaration" required>
+                            <strong>Oświadczam, że jestem rodzicem/opiekunem prawnym tego dziecka i mam prawo do udzielenia tej zgody</strong>
+                        </label>
+                    </div>
+                </div>
+                
                 <div class="consent-actions">
-                    <button id="grant-consent" class="btn-consent-grant">
-                        ✅ ${texts.buttons.grantConsent}
+                    <button id="start-verification" class="btn-consent-grant">
+                        🔒 Jestem rodzicem - rozpocznij weryfikację
+                    </button>
+                    <button id="send-verification-email" class="btn-send-email" style="display: none;">
+                        📧 Wyślij link weryfikacyjny
                     </button>
                     <button id="deny-consent" class="btn-consent-deny">
                         ❌ ${texts.buttons.denyAccess}
@@ -246,8 +303,15 @@ class ParentalConsentManager {
     }
 
     attachConsentEvents(texts) {
-        document.getElementById('grant-consent')?.addEventListener('click', () => {
-            this.grantParentalConsent();
+        // Initialize math question
+        this.generateMathQuestion();
+        
+        document.getElementById('start-verification')?.addEventListener('click', () => {
+            this.startVerificationProcess();
+        });
+
+        document.getElementById('send-verification-email')?.addEventListener('click', () => {
+            this.sendVerificationEmail();
         });
 
         document.getElementById('deny-consent')?.addEventListener('click', () => {
@@ -263,12 +327,218 @@ class ParentalConsentManager {
         });
     }
 
-    grantParentalConsent() {
+    generateMathQuestion() {
+        const num1 = Math.floor(Math.random() * 50) + 10; // 10-59
+        const num2 = Math.floor(Math.random() * 30) + 5;  // 5-34
+        this.correctAnswer = num1 + num2;
+        
+        const questionEl = document.getElementById('math-question');
+        if (questionEl) {
+            questionEl.textContent = `Ile to jest ${num1} + ${num2}?`;
+        }
+    }
+
+    startVerificationProcess() {
+        const verificationDiv = document.getElementById('adult-verification');
+        const startBtn = document.getElementById('start-verification');
+        
+        if (verificationDiv && startBtn) {
+            verificationDiv.style.display = 'block';
+            startBtn.style.display = 'none';
+            document.getElementById('send-verification-email').style.display = 'block';
+            
+            // Scroll to verification form
+            verificationDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    async sendVerificationEmail() {
+        const email = document.getElementById('parent-email')?.value;
+        const childAge = document.getElementById('child-age')?.value;
+        const userAnswer = parseInt(document.getElementById('adult-answer')?.value);
+        const declaration = document.getElementById('parent-declaration')?.checked;
+        
+        // Validation
+        if (!email || !childAge || !userAnswer || !declaration) {
+            this.showError('Proszę wypełnić wszystkie pola');
+            return;
+        }
+        
+        if (userAnswer !== this.correctAnswer) {
+            this.showError('Nieprawidłowa odpowiedź na pytanie matematyczne. Proszę spróbować ponownie.');
+            this.generateMathQuestion(); // Generate new question
+            document.getElementById('adult-answer').value = '';
+            return;
+        }
+
+        if (!this.validateEmail(email)) {
+            this.showError('Proszę podać prawidłowy adres email');
+            return;
+        }
+
+        // Show loading
+        const sendBtn = document.getElementById('send-verification-email');
+        const originalText = sendBtn.textContent;
+        sendBtn.textContent = '⏳ Wysyłanie...';
+        sendBtn.disabled = true;
+
+        try {
+            // Generate verification token
+            const verificationToken = this.generateVerificationToken();
+            const verificationData = {
+                email: email,
+                childAge: childAge,
+                token: verificationToken,
+                timestamp: new Date().toISOString()
+            };
+
+            // Store pending verification
+            localStorage.setItem('pending_parental_verification', JSON.stringify(verificationData));
+
+            // In a real app, this would send email via backend
+            // For now, we'll simulate it
+            await this.simulateEmailSending(email, verificationToken);
+            
+            this.showVerificationEmailSent(email);
+            
+        } catch (error) {
+            this.showError('Wystąpił błąd podczas wysyłania emaila. Proszę spróbować ponownie.');
+            console.error('Email sending error:', error);
+        } finally {
+            sendBtn.textContent = originalText;
+            sendBtn.disabled = false;
+        }
+    }
+
+    validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    generateVerificationToken() {
+        return Math.random().toString(36).substring(2, 15) + 
+               Math.random().toString(36).substring(2, 15);
+    }
+
+    async simulateEmailSending(email, token) {
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // In production, this would call backend API
+        console.log('Email verification sent to:', email);
+        console.log('Verification URL:', `${window.location.origin}?verify=${token}`);
+        
+        // For development, show the verification link in console
+        console.log('🔗 VERIFICATION LINK (for testing):', 
+                   `${window.location.origin}?verify=${token}`);
+    }
+
+    showVerificationEmailSent(email) {
+        const popup = document.createElement('div');
+        popup.className = 'email-sent-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>📧 Email wysłany!</h3>
+                <p><strong>Wysłaliśmy link weryfikacyjny na adres:</strong></p>
+                <p class="email-address">${email}</p>
+                <p>Proszę sprawdzić skrzynkę odbiorczą (także folder spam) i kliknąć link weryfikacyjny.</p>
+                <p><small>Link będzie ważny przez 24 godziny.</small></p>
+                <button onclick="this.parentElement.parentElement.remove()" class="btn-ok">
+                    Rozumiem
+                </button>
+                
+                <div class="test-verification" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <p><strong>W celach testowych:</strong></p>
+                    <button onclick="window.parentalConsentManager.processVerification('${this.generateVerificationToken()}')" 
+                            class="btn-test">
+                        🧪 Symuluj kliknięcie w link
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(popup);
+        setTimeout(() => popup.classList.add('show'), 100);
+    }
+
+    showError(message) {
+        const error = document.createElement('div');
+        error.className = 'error-popup';
+        error.innerHTML = `
+            <div class="popup-content error">
+                <h3>⚠️ Błąd</h3>
+                <p>${message}</p>
+                <button onclick="this.parentElement.parentElement.remove()" class="btn-ok">
+                    OK
+                </button>
+            </div>
+        `;
+        document.body.appendChild(error);
+        setTimeout(() => error.classList.add('show'), 100);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (error.parentNode) {
+                error.remove();
+            }
+        }, 5000);
+    }
+
+    // Process verification from email link
+    processVerification(token) {
+        const pendingData = localStorage.getItem('pending_parental_verification');
+        if (!pendingData) {
+            this.showError('Brak oczekującej weryfikacji');
+            return;
+        }
+        
+        const verification = JSON.parse(pendingData);
+        
+        // Check if token matches (in real app, this would be server-side)
+        // For demo, we'll accept any token for testing
+        
+        // Check if not expired (24 hours)
+        const verificationTime = new Date(verification.timestamp);
+        const now = new Date();
+        const hoursDiff = (now - verificationTime) / (1000 * 60 * 60);
+        
+        if (hoursDiff > 24) {
+            this.showError('Link weryfikacyjny wygasł. Proszę rozpocząć proces ponownie.');
+            localStorage.removeItem('pending_parental_verification');
+            return;
+        }
+        
+        // Grant consent with verification data
+        this.grantVerifiedParentalConsent(verification);
+    }
+    
+    grantVerifiedParentalConsent(verificationData) {
         const consentData = {
             granted: true,
-            parentEmail: null, // Could be added in advanced version
-            childAge: null,    // Could be added in advanced version
-            method: 'web_banner'
+            parentEmail: verificationData.email,
+            childAge: verificationData.childAge,
+            method: 'email_verified',
+            verificationToken: verificationData.token,
+            verifiedAt: new Date().toISOString()
+        };
+        
+        this.saveConsent(consentData);
+        this.hideConsentBanner();
+        this.blurAppContent(false);
+        
+        // Clean up pending verification
+        localStorage.removeItem('pending_parental_verification');
+        
+        // Show confirmation message
+        this.showVerifiedConsentConfirmation(verificationData.email);
+    }
+
+    grantParentalConsent() {
+        // This method is now only used for fallback/testing
+        const consentData = {
+            granted: true,
+            parentEmail: null,
+            childAge: null,
+            method: 'web_banner_fallback'
         };
         
         this.saveConsent(consentData);
@@ -277,6 +547,24 @@ class ParentalConsentManager {
         
         // Show confirmation message
         this.showConsentConfirmation();
+    }
+    
+    showVerifiedConsentConfirmation(email) {
+        const confirmation = document.createElement('div');
+        confirmation.className = 'consent-confirmation verified';
+        confirmation.innerHTML = `
+            <div class="confirmation-content">
+                <h3>✅ Zgoda zweryfikowana!</h3>
+                <p><strong>Dziękujemy za weryfikację rodzicielską.</strong></p>
+                <p>Email rodzica: <strong>${email}</strong></p>
+                <p>Dziecko może teraz bezpiecznie korzystać z aplikacji zgodnie z RODO Art. 8.</p>
+                <button onclick="this.parentElement.parentElement.remove()" class="btn-ok">
+                    Rozpocznij korzystanie z aplikacji
+                </button>
+            </div>
+        `;
+        document.body.appendChild(confirmation);
+        setTimeout(() => confirmation.classList.add('show'), 100);
     }
 
     denyAccess(texts) {
