@@ -878,6 +878,11 @@ document.addEventListener('DOMContentLoaded', () => {
             message = content.emergency[originalKey];
         }
         
+        console.log('🔍 Sprawdzam content lookup:');
+        console.log('content.tips keys:', Object.keys(content.tips || {}));
+        console.log('content.emergency keys:', Object.keys(content.emergency || {}));
+        console.log('Looking for key:', originalKey);
+        
         if (message && speechEnabled) {
             console.log('💬 Wiadomość do przeczytania:', message);
             console.log('🔊 speechEnabled:', speechEnabled, 'currentLang:', currentLang);
@@ -890,10 +895,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Speak the content
             speakText(message, currentLang);
-        } else {
-            console.log('❌ Brak wiadomości lub speech wyłączony');
-            console.log('💬 Message:', message);
-            console.log('🔊 speechEnabled:', speechEnabled);
             
             // Update mascot
             updateMascotMessage('loading');
@@ -903,12 +904,46 @@ document.addEventListener('DOMContentLoaded', () => {
                              'Opowiem ci o ';
                 mascotText.textContent = intro + displayTitle.toLowerCase();
             }
+        } else {
+            console.log('❌ Brak wiadomości lub speech wyłączony');
+            console.log('💬 Message:', message);
+            console.log('🔊 speechEnabled:', speechEnabled);
         }
     }
+    
+    // Phone number click counter for double-click detection
+    const phoneClickCounter = {};
     
     // Add event listeners for all interactive elements
     document.addEventListener('click', (e) => {
         console.log('🖱️ Click na:', e.target, 'Klasy:', e.target.className);
+        
+        // Handle phone number clicks
+        if (e.target.classList.contains('emergency-number')) {
+            e.preventDefault(); // Prevent immediate call
+            console.log('📞 Kliknięto numer telefonu:', e.target.textContent);
+            
+            const phoneNumber = e.target.textContent;
+            const currentTime = Date.now();
+            
+            if (!phoneClickCounter[phoneNumber]) {
+                phoneClickCounter[phoneNumber] = { count: 1, lastClick: currentTime };
+                
+                // Show popup
+                showCallPopup(phoneNumber, e.target);
+                
+                // Reset counter after 3 seconds
+                setTimeout(() => {
+                    delete phoneClickCounter[phoneNumber];
+                }, 3000);
+            } else if (currentTime - phoneClickCounter[phoneNumber].lastClick < 1000) {
+                // Second click within 1 second - make the call
+                console.log('📞 Drugi klik - wykonuję połączenie');
+                window.location.href = `tel:${phoneNumber}`;
+                delete phoneClickCounter[phoneNumber];
+            }
+            return; // Don't trigger card handler
+        }
         
         if (e.target.id === 'speech-toggle-btn' || e.target.closest('#speech-toggle-btn')) {
             console.log('🔊 Kliknięto przycisk mowy');
@@ -918,11 +953,46 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('📍 Kliknięto przycisk lokalizacji');
             handleLocationButtonClick();
         }
-        if (e.target.closest('.tip-card, .emergency-card')) {
+        if (e.target.closest('.tip-card, .emergency-card') && !e.target.classList.contains('emergency-number')) {
             console.log('🎯 Wykryto click na kartę bezpieczeństwa');
             handleSafetyCardClick(e);
         }
     });
+    
+    // Show call confirmation popup
+    function showCallPopup(phoneNumber, targetElement) {
+        // Remove existing popup
+        const existingPopup = document.querySelector('.call-popup');
+        if (existingPopup) existingPopup.remove();
+        
+        const popup = document.createElement('div');
+        popup.className = 'call-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <div class="popup-icon">📞</div>
+                <div class="popup-text">
+                    ${currentLang === 'en' ? 'Click again to call' : 
+                      currentLang === 'ua' ? 'Клікни ще раз щоб зателефонувати' : 
+                      'Kliknij ponownie aby zadzwonić'}<br>
+                    <strong>${phoneNumber}</strong>
+                </div>
+            </div>
+        `;
+        
+        // Position near clicked element
+        const rect = targetElement.getBoundingClientRect();
+        popup.style.position = 'fixed';
+        popup.style.left = rect.left + 'px';
+        popup.style.top = (rect.top - 80) + 'px';
+        popup.style.zIndex = '10000';
+        
+        document.body.appendChild(popup);
+        
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            if (popup.parentNode) popup.remove();
+        }, 3000);
+    }
 });
 
 // Globalna funkcja testowa dla przycisku
