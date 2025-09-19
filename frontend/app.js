@@ -20,14 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const locationFilter = document.getElementById('location-filter');
     
     const API_BASE_URL = '/api'; 
-    let currentLang = 'pl';
     let allAlerts = [];
-    let map;
-    let markersLayer;
-
-    // Text-to-Speech functionality
-    let speechEnabled = true;
-    let currentSpeech = null;
+    let currentLang = 'pl';
+    let speechEnabled = false;
+    let currentLocation = null;
+    let isOffline = false;
+    let offlineData = null;
     const speechSynthesis = window.speechSynthesis;
     
     // Geolocation functionality

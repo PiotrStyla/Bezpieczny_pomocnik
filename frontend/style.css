@@ -320,9 +320,9 @@ body {
     background: white;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border-left: 6px solid;
-    transition: all 0.3s ease;
+    margin: 15px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #3367D6;
 }
 
 .alert-card:hover {
@@ -604,6 +604,10 @@ body {
     
     .emergency-contacts {
         grid-template-columns: 1fr;
+    }
+    
+    .kids-map {
+        height: 300px;
     }
 }
 
