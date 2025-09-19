@@ -872,16 +872,57 @@ document.addEventListener('DOMContentLoaded', () => {
         const content = safetyContent[currentLang] || safetyContent.pl;
         let message = '';
         
-        if (card.classList.contains('tip-card')) {
-            message = content.tips[originalKey];
-        } else if (card.classList.contains('emergency-card')) {
-            message = content.emergency[originalKey];
-        }
+        // Map Polish keys to current language keys
+        const keyMapping = {
+            pl: {
+                // Safety tips
+                'Bezpieczeństwo na drodze': 'Bezpieczeństwo na drodze',
+                'W domu': 'W domu',
+                'Z nieznajomymi': 'Z nieznajomymi', 
+                'Zła pogoda': 'Zła pogoda',
+                // Emergency
+                'Pogotowie ratunkowe': 'Pogotowie ratunkowe',
+                'Policja': 'Policja',
+                'Straż pożarna': 'Straż pożarna'
+            },
+            en: {
+                // Safety tips
+                'Bezpieczeństwo na drodze': 'Road safety',
+                'W domu': 'At home',
+                'Z nieznajomymi': 'With strangers',
+                'Zła pogoda': 'Bad weather', 
+                // Emergency
+                'Pogotowie ratunkowe': 'Emergency services',
+                'Policja': 'Police',
+                'Straż pożarna': 'Fire department'
+            },
+            ua: {
+                // Safety tips
+                'Bezpieczeństwo na drodze': 'Безпека на дорозі',
+                'W domu': 'Вдома',
+                'Z nieznajomymi': 'З незнайомцями',
+                'Zła pogoda': 'Погана погода',
+                // Emergency  
+                'Pogotowie ratunkowe': 'Швидка допомога',
+                'Policja': 'Поліція',
+                'Straż pożarna': 'Пожежна служба'
+            }
+        };
+        
+        const mapping = keyMapping[currentLang] || keyMapping.pl;
+        const contentKey = mapping[originalKey] || originalKey;
         
         console.log('🔍 Sprawdzam content lookup:');
         console.log('content.tips keys:', Object.keys(content.tips || {}));
         console.log('content.emergency keys:', Object.keys(content.emergency || {}));
-        console.log('Looking for key:', originalKey);
+        console.log('Original key (Polish):', originalKey);
+        console.log('Mapped key (Current lang):', contentKey);
+        
+        if (card.classList.contains('tip-card')) {
+            message = content.tips[contentKey];
+        } else if (card.classList.contains('emergency-card')) {
+            message = content.emergency[contentKey];
+        }
         
         if (message && speechEnabled) {
             console.log('💬 Wiadomość do przeczytania:', message);
