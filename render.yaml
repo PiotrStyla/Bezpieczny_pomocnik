@@ -3,11 +3,12 @@ services:
     name: bezpieczny-pomocnik
     env: python
     plan: free
-    buildCommand: "pip install -r backend/requirements.txt"
+    runtime: python
+    buildCommand: "chmod +x build.sh && ./build.sh"
     startCommand: "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.4
+        value: "3.11.9"
     disks:
       - name: data
         mountPath: /app/backend/data
