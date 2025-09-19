@@ -1,4 +1,19 @@
-document.addEventListener('DOMContentLoaded', () => {
+/*
+ * Bezpieczny Pomocnik - Child Safety Application
+ * Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
+ * All Rights Reserved. Proprietary and Confidential.
+ * 
+ * This software is the exclusive property of:
+ * Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
+ * 30-404 Kraków, ul. Cegielniana 6B/45
+ * Tel. +48 735 749 618 | Email: kontakt@fundacja-hospicjum.org
+ * KRS: 0001063161 | NIP: 6793279476 | REGON: 526664276
+ * 
+ * Unauthorized copying, distribution, or use is strictly prohibited.
+ * For licensing inquiries: kontakt@fundacja-hospicjum.org
+ */
+
+document.addEventListener('DOMContentLoaded', function() {
     const alertsContainer = document.getElementById('alerts-container');
     const langButtons = document.querySelectorAll('.lang-btn');
     const notificationsBtn = document.getElementById('notifications-btn');

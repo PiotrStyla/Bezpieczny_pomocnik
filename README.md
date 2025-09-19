@@ -1,6 +1,57 @@
-# Bezpieczny Pomocnik
+# 🛡️ Bezpieczny Pomocnik - Child Safety Application
 
-"Bezpieczny Pomocnik" to aplikacja webowa (PWA) z backendem API, która pobiera, upraszcza i dystrybuuje oficjalne komunikaty bezpieczeństwa. Aplikacja jest zoptymalizowana pod kątem szybkości, stabilności i łatwości wdrożenia.
+**Created with ❤️ for children's safety by Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**
+
+---
+
+## 📋 **About**
+
+Bezpieczny Pomocnik is a comprehensive child safety application designed to help children and parents stay informed about weather alerts and safety warnings across Poland. The application features:
+
+- 🌦️ **Real-time weather alerts and safety warnings**
+- 🗣️ **Multilingual text-to-speech** (Polish, English, Ukrainian)
+- 🎯 **Interactive safety education** for children
+- 📞 **Emergency contact system** with smart calling
+- 🗺️ **Location-based alerts** and mapping
+- 👶 **Child-friendly interface** with mascot interactions
+
+## 🏛️ **Copyright & Ownership**
+
+**© 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**  
+**All Rights Reserved. Proprietary and Confidential.**
+
+### 📞 **Foundation Contact**
+- **Full Name:** Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
+- **Address:** 30-404 Kraków, ul. Cegielniana 6B/45
+- **Phone:** +48 735 749 618
+- **Email:** kontakt@fundacja-hospicjum.org
+- **Website:** https://fundacja-hospicjum.org/
+
+### 📄 **Legal Information**
+- **KRS:** 0001063161
+- **NIP:** 6793279476  
+- **REGON:** 526664276
+
+## 🔒 **License**
+
+This software is proprietary and confidential. All rights are reserved by Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie. 
+
+**Unauthorized copying, distribution, modification, or use is strictly prohibited.**
+
+For licensing inquiries, please contact: kontakt@fundacja-hospicjum.org
+
+## 🛡️ **Security**
+
+Please refer to [SECURITY.md](SECURITY.md) for our security policy and responsible disclosure guidelines.
+
+## 🎯 **Mission**
+
+Our mission is to provide innovative technology solutions that enhance child safety and support families across Poland. This application represents our commitment to combining technology with compassionate care for children and their families.
+
+---
+
+*Developed with love and dedication to child safety.*  
+*Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie* 💝
 
 ## ✨ Kluczowe Funkcjonalności
 
