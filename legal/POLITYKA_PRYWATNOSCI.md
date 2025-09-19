@@ -1,6 +1,7 @@
 # POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
-**Zgodna z RODO | Obowiązuje od: 19 stycznia 2025 r.**
+**Zgodna z RODO | Obowiązuje od: 19 września 2025 r.**
+**Aktualizacja: Rozszerzone funkcje geolokalizacji i pełne pokrycie Polski**
 
 ---
 
@@ -23,10 +24,14 @@
 ### 🔍 **WERSJA PODSTAWOWA (bez rejestracji):**
 
 #### **Dane lokalizacyjne (opcjonalnie):**
-- **Współrzędne geograficzne** (szerokość/długość geograficzna)
-- **Przybliżone miasto** (na podstawie współrzędnych)
-- **Cel:** Wyświetlanie lokalnych alertów pogodowych i ostrzeżeń
+- **Współrzędne geograficzne** (szerokość/długość geograficzna) - **TYLKO w przeglądarce użytkownika**
+- **Identyfikacja lokalizacji:** województwo, powiat, najbliższe miasto
+- **Cel:** Automatyczne dopasowanie alertów lokalnych (wojewódzkich i miejskich) 
+- **Zakres pokrycia:** Wszystkie 16 województw, 380 powiatów, wszystkie gminy Polski
+- **Przechowywanie:** WYŁĄCZNIE w localStorage przeglądarki (NIE na serwerach Fundacji)
+- **Źródła alertów:** RCB (krajowe), IMGW (wojewódzkie), władze miejskie (lokalne)
 - **Podstawa prawna:** Zgoda (art. 6 ust. 1 lit. a RODO)
+- **Szczególna ochrona dzieci:** Zgodnie z art. 8 RODO - wymagana zgoda rodzica/opiekuna
 
 #### **Preferencje użytkownika:**
 - **Wybrany język** interfejsu (polski/angielski/ukraiński)  

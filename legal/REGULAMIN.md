@@ -1,6 +1,7 @@
 # REGULAMIN UŻYTKOWANIA APLIKACJI "BEZPIECZNY POMOCNIK"
 
-**Obowiązuje od: 19 stycznia 2025 r.**
+**Obowiązuje od: 19 września 2025 r.**
+**Aktualizacja: Dodano funkcję geolokalizacji i kompletne pokrycie Polski**
 
 ---
 
@@ -17,11 +18,14 @@
 ## § 2. PRZEZNACZENIE I FUNKCJONALNOŚCI
 
 2.1. **Wersja podstawowa** Aplikacji dostępna jest bez rejestracji i obejmuje:
-- Przeglądanie alertów pogodowych i ostrzeżeń bezpieczeństwa
-- Lokalizację najbliższych alertów (z zgodą Użytkownika)
+- Przeglądanie alertów pogodowych i ostrzeżeń bezpieczeństwa dla całej Polski
+- **Automatyczne wykrywanie lokalizacji** (z wyraźną zgodą Użytkownika) dla wszystkich gmin, miast i województw Polski
+- **Inteligentne dopasowanie źródeł alertów** - krajowe (RCB, IMGW), wojewódzkie i miejskie
+- **Kompletne pokrycie Polski** - 16 województw, 380 powiatów, wszystkie gminy
 - Edukacyjne treści o bezpieczeństwie dla dzieci
-- Informacje o numerach alarmowych
+- Informacje o numerach alarmowych  
 - Funkcje text-to-speech w językach polskim, angielskim i ukraińskim
+- **Weryfikacja zgody rodzicielskiej** zgodna z RODO Art. 8
 
 2.2. **Moduły rozszerzone** (planowane) będą dostępne po rejestracji Rodzica/Opiekuna i mogą obejmować dodatkowe funkcjonalności edukacyjne i personalizacyjne.
 
@@ -48,7 +52,16 @@ Użytkownikom zabrania się:
 4.1. **Ochrona prywatności:**
 - Aplikacja nie zawiera funkcji komunikacji między użytkownikami
 - Nie są udostępniane fora, czaty ani inne narzędzia komunikacyjne
-- Dane lokalizacyjne są przetwarzane lokalnie w przeglądarce
+- **Dane lokalizacyjne** są przetwarzane lokalnie w przeglądarce i NIE są przesyłane na serwery Fundacji
+- **System geolokalizacji** działa wyłącznie za wyraźną zgodą i służy tylko dopasowaniu lokalnych źródeł alertów
+
+4.1a. **Funkcja geolokalizacji:**
+- **Cel:** automatyczne dopasowanie alertów do lokalizacji Użytkownika (gmina, powiat, województwo)
+- **Zakres:** współrzędne GPS używane wyłącznie do identyfikacji najbliższego miasta i województwa
+- **Przechowywanie:** lokalizacja zapisywana jedynie w przeglądarce Użytkownika (localStorage)
+- **Bez zgody:** aplikacja korzysta z alertów ogólnopolskich (cała Polska)
+- **Ze zgodą:** dodawane alerty wojewódzkie i miejskie dla lokalizacji Użytkownika
+- **Możliwość wycofania:** Użytkownik może w każdej chwili wyłączyć geolokalizację
 
 4.2. **Treści edukacyjne:**
 - Wszystkie treści są dostosowane do wieku dzieci
