@@ -190,6 +190,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (headerEl) headerEl.textContent = messages.header;
         if (noteEl) noteEl.innerHTML = messages.note;
         if (buttonEl) buttonEl.innerHTML = messages.button;
+        
+        // Update copyright text 
+        const copyrightTexts = {
+            pl: 'Wszelkie prawa zastrzeżone. Własność i poufność.',
+            en: 'All Rights Reserved. Proprietary and Confidential.',
+            ua: 'Усі права захищені. Власність та конфіденційність.'
+        };
+        
+        const rightsEl = document.querySelector('.rights-reserved');
+        if (rightsEl) {
+            rightsEl.textContent = copyrightTexts[lang] || copyrightTexts.pl;
+        }
     }
     
     // Speech and mascot functions

@@ -929,11 +929,56 @@ body {
     font-weight: 600;
 }
 
+/* Copyright Notice */
+.copyright-notice {
+    text-align: center;
+    padding: 20px 10px 10px 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.copyright-notice p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.copyright-notice .rights-reserved {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Mobile responsive copyright */
+@media (max-width: 768px) {
+    .copyright-notice {
+        font-size: 0.75rem;
+        padding: 15px 5px 10px 5px;
+    }
+    
+    .copyright-notice .rights-reserved {
+        font-size: 0.7rem;
+    }
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     :root {
         --card-bg: white;
         --text-dark: black;
         --text-light: #333;
+    }
+    
+    .copyright-notice {
+        color: white;
+        border-top-color: white;
+    }
+    
+    .copyright-notice .rights-reserved {
+        color: #FFD700;
     }
 }
