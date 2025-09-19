@@ -6,7 +6,7 @@
 
 ## § 1. POSTANOWIENIA OGÓLNE
 
-1.1. **Administratorem** aplikacji "Bezpieczny Pomocnik" jest **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie** z siedzibą w Krakowie (30-404), ul. Cegielniana 6B/45, wpisana do Krajowego Rejestru Sądowego pod numerem KRS 0001063161, NIP: 6793279476, REGON: 526664276, zwana dalej **"Fundacją"**.
+1.1. **Administratorem** aplikacji "Bezpieczny Pomocnik" jest **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie** z siedzibą w Krakowie 30-404, ul. Cegielniana 6B/45, wpisana do Krajowego Rejestru Sądowego pod numerem KRS 0001063161, NIP: 6793279476, REGON: 526664276, zwana dalej **"Fundacją"**.
 
 1.2. **Aplikacja** "Bezpieczny Pomocnik" to internetowa aplikacja przeznaczona dla dzieci i ich rodziców/opiekunów prawnych, udostępniająca informacje o alertach pogodowych, ostrzeżeniach bezpieczeństwa oraz edukację w zakresie bezpieczeństwa dzieci na terenie Polski.
 
@@ -30,7 +30,7 @@
 3.1. **Wiek Użytkowników:**
 - Aplikacja przeznaczona jest dla dzieci w wieku 6-16 lat
 - Dzieci poniżej 16. roku życia mogą korzystać z Aplikacji wyłącznie za zgodą i pod nadzorem Rodzica/Opiekuna
-- Fundacja zaleca aktywny udział Rodzica/Opiekuna podczas korzystania z Aplikacji przez dziecko
+- Fundacja zaleca aktywny udział Rodzica/Opiekuna podczas nauki korzystania z Aplikacji
 
 3.2. **Akceptacja Regulaminu:**
 - Korzystanie z Aplikacji oznacza akceptację niniejszego Regulaminu
@@ -62,7 +62,7 @@ Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adre
 
 5.1. **Fundacja:**
 - Dokłada wszelkich starań, aby informacje w Aplikacji były aktualne i rzetelne
-- Nie ponosi odpowiedzialności za skutki działań podjętych na podstawie informacji z Aplikacji
+- Nie ponosi odpowiedzialności za niewłaściwe działania i ich skutki
 - Zaleca zawsze weryfikację krytycznych informacji z oficjalnymi źródłami
 
 5.2. **Użytkownik/Rodzic/Opiekun:**
@@ -75,6 +75,8 @@ Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adre
 6.1. Fundacja dokłada wszelkich starań, aby Aplikacja była dostępna 24/7, jednak nie gwarantuje ciągłości działania.
 
 6.2. Fundacja zastrzega sobie prawo do czasowego wyłączenia Aplikacji w celu przeprowadzenia prac technicznych, o czym będzie informować z odpowiednim wyprzedzeniem.
+
+6.3. Fundacja nie ponosi odpowiedzialności za przerwy w działaniu Aplikacji wynikające z niezależnych zakłóceń u dostawców usług chmurowych, internetowych oraz innych usług technicznych świadczonych przez podmioty trzecie.
 
 ## § 7. ZMIANY REGULAMINU
 
