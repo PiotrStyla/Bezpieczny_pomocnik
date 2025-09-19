@@ -4,7 +4,6 @@ openai==1.3.7
 feedparser==6.0.10
 requests==2.31.0
 beautifulsoup4==4.12.2
-lxml==4.9.3
 cachetools==5.3.2
 pywebpush==1.13.0
 apscheduler==3.10.4

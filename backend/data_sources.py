@@ -37,7 +37,7 @@ def _parse_web_warszawa(url: str, location: str) -> List[Dict[str, Any]]:
     try:
         response = requests.get(url, timeout=10, headers=HEADERS)
         response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'lxml')
+        soup = BeautifulSoup(response.content, 'html.parser')
         articles = soup.find_all('div', class_='article-item')
         for article in articles:
             title_tag = article.find('h3')
@@ -60,7 +60,7 @@ def _parse_web_lublin(url: str, location: str) -> List[Dict[str, Any]]:
     try:
         response = requests.get(url, timeout=10, headers=HEADERS)
         response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'lxml')
+        soup = BeautifulSoup(response.content, 'html.parser')
         content_div = soup.find('div', class_='tresc-artykulu')
         if not content_div: return []
         for link in content_div.find_all('a', href=True):
@@ -71,7 +71,7 @@ def _parse_web_lublin(url: str, location: str) -> List[Dict[str, Any]]:
             try:
                 article_res = requests.get(article_url, timeout=10, headers=HEADERS)
                 article_res.raise_for_status()
-                article_soup = BeautifulSoup(article_res.content, 'lxml')
+                article_soup = BeautifulSoup(article_res.content, 'html.parser')
                 article_content_div = article_soup.find('div', class_='tresc-artykulu')
                 content = article_content_div.get_text(strip=True) if article_content_div else "Brak treści."
                 alerts.append({"id": _generate_id(title, dt_object.isoformat()), "source": url, "title": title, "content": content, "timestamp": dt_object, "location": location})
@@ -90,7 +90,7 @@ def _parse_web_bialystok(url: str, location: str) -> List[Dict[str, Any]]:
     try:
         response = requests.get(url, timeout=10, headers=HEADERS)
         response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'lxml')
+        soup = BeautifulSoup(response.content, 'html.parser')
         for item in soup.find_all('div', class_='news-item'):
             link_tag = item.find('a', class_='title')
             if not link_tag: continue
@@ -98,7 +98,7 @@ def _parse_web_bialystok(url: str, location: str) -> List[Dict[str, Any]]:
             try:
                 article_res = requests.get(article_url, timeout=10, headers=HEADERS)
                 article_res.raise_for_status()
-                article_soup = BeautifulSoup(article_res.content, 'lxml')
+                article_soup = BeautifulSoup(article_res.content, 'html.parser')
                 title = article_soup.find('h1').get_text(strip=True)
                 date_str = article_soup.find('div', class_='date').get_text(strip=True).replace('Dodana: ', '')
                 content = article_soup.find('div', class_='lead').get_text(strip=True)
