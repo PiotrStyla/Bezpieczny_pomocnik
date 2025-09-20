@@ -924,11 +924,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('🦸‍♂️ Initializing hero system with data:', heroesData);
         
-        // AUTO-CLOSE Foundation modal to clear the view for heroes
-        const foundationModal = document.querySelector('.modal-overlay, .foundation-modal, [class*="foundation"], [class*="hospicjum"]');
-        if (foundationModal) {
-            console.log('🚫 Auto-closing Foundation modal for better Heroes visibility');
-            foundationModal.remove();
+        // ONLY close if it's specifically blocking heroes (not the info modal)
+        const blockingModal = document.querySelector('[class*="hospicjum"] .modal-overlay');
+        if (blockingModal) {
+            console.log('🚫 Auto-closing blocking modal for better Heroes visibility');
+            blockingModal.remove();
         }
         
         // First time setup - choose hero

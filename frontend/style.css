@@ -1207,29 +1207,31 @@ body {
 
 /* GAMIFICATION SYSTEM STYLING - HEROES MODAL */
 
-/* Hero Progress Bar - Make it MORE VISIBLE */
+/* Hero Progress Bar - CENTERED AND VISIBLE */
 .hero-progress {
     position: fixed !important;
     bottom: 20px !important;
-    left: 20px !important;
-    right: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 90% !important;
+    max-width: 600px !important;
     background: rgba(255, 255, 255, 0.95) !important;
     border-radius: 15px !important;
     padding: 15px !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
     backdrop-filter: blur(10px) !important;
-    z-index: 50000 !important;
+    z-index: 5000 !important;
     border: 2px solid #FF6B35 !important;
     animation: heroUISlideUp 0.6s ease-out !important;
 }
 
 @keyframes heroUISlideUp {
     from {
-        transform: translateY(100%);
+        transform: translateX(-50%) translateY(100%);
         opacity: 0;
     }
     to {
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
         opacity: 1;
     }
 }
@@ -1307,8 +1309,7 @@ body {
 /* Mobile responsive for hero progress */
 @media (max-width: 768px) {
     .hero-progress {
-        left: 10px !important;
-        right: 10px !important;
+        width: 95% !important;
         bottom: 10px !important;
         padding: 12px !important;
     }
