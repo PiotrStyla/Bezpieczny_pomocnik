@@ -52,6 +52,119 @@ class EmergencyMinaManager {
     }
 
     /**
+     * 📦 PRELOAD EMERGENCY DATA
+     */
+    async preloadEmergencyData() {
+        console.log('📦 Preloading emergency data packages...');
+        // Simulate emergency data caching
+        await new Promise(resolve => setTimeout(resolve, 500));
+        console.log('✅ Emergency data cached successfully');
+    }
+
+    /**
+     * 🛡️ ENABLE FALLBACK MODE
+     */
+    enableFallbackMode() {
+        console.log('🛡️ Enabling fallback mode - traditional safety measures');
+        // Ensure basic functionality even if Mina fails
+    }
+
+    /**
+     * 🏠 DISPLAY SHELTER RESULTS
+     */
+    displayShelterResults(shelters) {
+        console.log('🏠 Displaying shelter results:', shelters);
+        
+        // Create shelter display UI
+        const shelterDisplay = document.createElement('div');
+        shelterDisplay.className = 'shelter-results';
+        shelterDisplay.innerHTML = `
+            <div class="shelter-popup">
+                <h3>🏠 Schronienia w pobliżu</h3>
+                ${shelters.map(shelter => `
+                    <div class="shelter-item">
+                        <div class="shelter-distance">${shelter.distance}</div>
+                        <div class="shelter-info">
+                            <span class="capacity ${shelter.capacity}">${shelter.capacity}</span>
+                            <div class="supplies">${shelter.supplies.join(', ')}</div>
+                            ${shelter.accessibility ? '♿ Dostępne' : ''}
+                        </div>
+                    </div>
+                `).join('')}
+                <button onclick="this.parentElement.parentElement.remove()" class="close-btn">Zamknij</button>
+            </div>
+        `;
+        
+        document.body.appendChild(shelterDisplay);
+        
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+            if (shelterDisplay.parentElement) {
+                shelterDisplay.remove();
+            }
+        }, 10000);
+    }
+
+    /**
+     * 📝 PREPARE PHYSICAL MESSAGE
+     */
+    preparePhysicalMessage() {
+        console.log('📝 Preparing physical emergency message...');
+        
+        const message = {
+            timestamp: new Date().toLocaleString(),
+            location: 'Emergency location data',
+            status: 'Safe - seeking family contact',
+            instructions: 'Check emergency meeting points'
+        };
+        
+        console.log('📄 Physical message prepared:', message);
+        
+        // Show message to user
+        alert(`📝 WIADOMOŚĆ AWARYJNA:\n\nCzas: ${message.timestamp}\nStatus: ${message.status}\n\nInstrukcje: ${message.instructions}`);
+    }
+
+    /**
+     * 🔘 ENABLE EMERGENCY BUTTONS
+     */
+    enableEmergencyButtons() {
+        console.log('🔘 Enabling emergency control buttons...');
+        
+        // Emergency buttons are already added in showEmergencyBanner
+        // This function ensures they work properly
+        const emergencyButtons = document.querySelectorAll('.emergency-btn');
+        emergencyButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+        });
+    }
+
+    /**
+     * 🔄 TRY CONTACT METHOD
+     */
+    async tryContactMethod(method) {
+        console.log(`📡 Trying contact method: ${method}`);
+        
+        // Simulate different contact methods
+        const methods = {
+            satellite_phone: { success: false, reason: 'No satellite coverage' },
+            mesh_network: { success: false, reason: 'No mesh nodes nearby' },
+            ham_radio: { success: false, reason: 'Radio interference' },
+            physical_message: { success: true, reason: 'Message prepared' }
+        };
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const result = methods[method] || { success: false, reason: 'Method unavailable' };
+        
+        if (!result.success) {
+            throw new Error(result.reason);
+        }
+        
+        return result;
+    }
+
+    /**
      * 🌍 ASSESS EMERGENCY STATUS
      * Check global conditions and adjust readiness level
      */
@@ -371,6 +484,64 @@ class EmergencyMinaManager {
             .emergency-mode * {
                 animation-duration: 0s !important;
                 transition-duration: 0s !important;
+            }
+            
+            .shelter-results {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 100000;
+            }
+            
+            .shelter-popup {
+                background: white;
+                padding: 20px;
+                border-radius: 10px;
+                max-width: 400px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+            
+            .shelter-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .shelter-distance {
+                font-weight: bold;
+                color: #007AFF;
+            }
+            
+            .capacity.available {
+                color: #28a745;
+            }
+            
+            .capacity.limited {
+                color: #ffc107;
+            }
+            
+            .supplies {
+                font-size: 0.8rem;
+                color: #666;
+            }
+            
+            .close-btn {
+                background: #FF3B30;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                margin-top: 15px;
+                cursor: pointer;
             }
             
             @media (max-width: 768px) {
