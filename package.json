@@ -4,12 +4,21 @@
   "description": "**Created with ❤️ for children's safety by Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "compile:mina": "tsc src/mina-real-integration.ts --outDir frontend/compiled --target ES2020 --module ESNext",
+    "dev:real-mina": "tsc --watch src/emergency-mina-real.ts --outDir frontend/compiled",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "python -m http.server 8000 --directory frontend"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "o1js": "^2.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "typescript": "^5.9.2"
   }
 }

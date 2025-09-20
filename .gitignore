@@ -28,3 +28,6 @@ venv/
 
 # Pliki tymczasowe
 generate_keys.py
+
+# Local Netlify folder
+.netlify
