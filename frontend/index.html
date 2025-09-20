@@ -201,5 +201,58 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="parental-consent.js"></script>
     <script src="app.js"></script>
+    
+    <!-- 🚨 MINA EMERGENCY INTEGRATION - CRITICAL! -->
+    <!-- Times are not safe - immediate emergency preparedness required -->
+    <script src="mina-safety-core.js"></script>
+    <script type="module" src="emergency-mina-integration.js"></script>
+    
+    <script>
+        // 🛡️ EMERGENCY DETECTION
+        window.addEventListener('load', () => {
+            console.log('🚨 Emergency Mina system loading...');
+            console.log('⚔️ Times are not safe - privacy protection active');
+            
+            // Check for crisis conditions
+            const isLowBattery = navigator.getBattery?.()?.then(b => b.level < 0.3);
+            const isOffline = !navigator.onLine;
+            const isSlowConnection = navigator.connection?.effectiveType === 'slow-2g' || 
+                                   navigator.connection?.effectiveType === '2g';
+            
+            if (isOffline || isLowBattery || isSlowConnection) {
+                console.log('🚨 Crisis conditions detected - activating emergency mode');
+                if (window.emergencyMina) {
+                    window.emergencyMina.enableEmergencyMode();
+                }
+            }
+        });
+        
+        // 🔋 BATTERY MONITORING
+        if (navigator.getBattery) {
+            navigator.getBattery().then(battery => {
+                battery.addEventListener('levelchange', () => {
+                    if (battery.level < 0.2 && window.emergencyMina) {
+                        console.log('🔋 Low battery - activating emergency mode');
+                        window.emergencyMina.enableEmergencyMode();
+                    }
+                });
+            });
+        }
+        
+        // 📡 NETWORK MONITORING
+        window.addEventListener('offline', () => {
+            console.log('📡 Network lost - activating offline mode');
+            if (window.emergencyMina) {
+                window.emergencyMina.enableEmergencyMode();
+            }
+        });
+        
+        window.addEventListener('online', () => {
+            console.log('📡 Network restored - attempting Mina sync');
+            if (window.emergencyMina) {
+                window.emergencyMina.syncSatellite();
+            }
+        });
+    </script>
 </body>
 </html>
