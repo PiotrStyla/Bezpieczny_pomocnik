@@ -26,6 +26,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentLocation = null;
     let isOffline = false;
     let offlineData = null;
+    let heroesData = null;
+    let playerProgress = {
+        current_hero: null,
+        xp: 0,
+        level: 1,
+        achievements: [],
+        daily_streak: 0,
+        last_login: null
+    };
     const speechSynthesis = window.speechSynthesis;
     
     // Geolocation functionality
@@ -1004,10 +1013,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Initialize offline mode
+    function initializeOfflineMode() {
+        // Offline mode initialization code here
+    }
+    
     // Initialize app
     initMap();
     fetchAndDisplayAlerts(currentLang);
     initializeSpeech();
+    initializeOfflineMode();
     updateCardTitles(currentLang);
     
     // Powitanie po 2 sekundach (daj czas na załadowanie)

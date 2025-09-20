@@ -1,0 +1,192 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2025-09-20",
+  "heroes": {
+    "wicher": {
+      "id": "wicher",
+      "name": "Wicher",
+      "age_group": "8-12",
+      "specialty": "Burze i wiatry",
+      "personality": "Energiczny, trochę szalony, ale odpowiedzialny",
+      "voice_style": "Młody chłopak, szybko mówi podczas burz",
+      "catchPhrase": "Hej! Wicher tu! Słyszysz ten wiatr? To ja lecę na ratunek!",
+      "avatar": "🌪️",
+      "color_primary": "#4A90E2",
+      "color_secondary": "#87CEEB",
+      "powers": [
+        "Przewiduje burze 30min wcześniej",
+        "Pokazuje najlepsze schrony",
+        "Uspokaja hałasem wiatru"
+      ],
+      "levels": {
+        "1": { "title": "Młody Obserwator Nieba", "xp_required": 0 },
+        "5": { "title": "Łowca Chmur", "xp_required": 500 },
+        "10": { "title": "Mistrz Burz", "xp_required": 2000 },
+        "20": { "title": "Pogromca Tornad", "xp_required": 10000 }
+      },
+      "emergency_types": ["storm", "tornado", "strong_wind", "hail"],
+      "comfort_phrases": [
+        "Nie martw się, to tylko wiatr się bawi!",
+        "Schowamy się razem w bezpiecznym miejscu!",
+        "Jestem z tobą, będzie dobrze!"
+      ]
+    },
+    
+    "kropla": {
+      "id": "kropla", 
+      "name": "Kropla",
+      "age_group": "6-10",
+      "specialty": "Woda i powodzie",
+      "personality": "Spokojna, mądra, opiekuńcza",
+      "voice_style": "Łagodna dziewczynka, mówi powoli i wyraźnie",
+      "catchPhrase": "Cześć, jestem Kropla! Woda może być przyjacielem, ale trzeba uważać...",
+      "avatar": "🌊",
+      "color_primary": "#2196F3",
+      "color_secondary": "#B3E5FC",
+      "powers": [
+        "Pokazuje levels powodzi na mapie",
+        "Nauczy pływania w VR",
+        "Ma boat mode dla ewakuacji"
+      ],
+      "levels": {
+        "1": { "title": "Mała Kropelka", "xp_required": 0 },
+        "5": { "title": "Strażniczka Wody", "xp_required": 400 },
+        "10": { "title": "Władczyni Fal", "xp_required": 1800 },
+        "20": { "title": "Oceańska Królowa", "xp_required": 9000 }
+      },
+      "collectibles": [
+        "Krople deszczu (points)",
+        "Ratownicze koła",
+        "Wodne zwierzątka"
+      ],
+      "emergency_types": ["flood", "heavy_rain", "water_damage"],
+      "comfort_phrases": [
+        "Woda czasem jest niegrzeczna, ale ja cię chronię!",
+        "Wspinaj się wysoko jak kotek na drzewo!",
+        "Razem znajdziemy suche i bezpieczne miejsce!"
+      ]
+    },
+    
+    "plomyk": {
+      "id": "plomyk",
+      "name": "Płomyk", 
+      "age_group": "7-11",
+      "specialty": "Pożary i bezpieczeństwo",
+      "personality": "Odważny ale ostrożny, nie lubi żartów z ogniem",
+      "voice_style": "Pewny siebie, ale serious gdy trzeba",
+      "catchPhrase": "Płomyk reporting! Pamiętaj - ogień to nie zabawka!",
+      "avatar": "🔥",
+      "color_primary": "#F44336", 
+      "color_secondary": "#FFCDD2",
+      "powers": [
+        "Smoke detector simulation",
+        "Escape route planning",
+        "Fire extinguisher training"
+      ],
+      "levels": {
+        "1": { "title": "Mały Strażak", "xp_required": 0 },
+        "5": { "title": "Ratownik Ogniowy", "xp_required": 450 },
+        "10": { "title": "Mistrz Gaśnic", "xp_required": 1900 },
+        "20": { "title": "Legendarny Strażak", "xp_required": 9500 }
+      },
+      "achievements": [
+        "Stop, Drop, Roll Master",
+        "Smoke Detector Detective", 
+        "Family Fire Plan Creator"
+      ],
+      "emergency_types": ["fire", "smoke", "gas_leak", "electrical"],
+      "comfort_phrases": [
+        "Ogień to nie zabawka, ale nie bój się - ja tu jestem!",
+        "Wychodzimy szybko ale ostrożnie, jak prawdziwi strażacy!",
+        "Jesteś bardzo odważny! Razem damy radę!"
+      ]
+    }
+  },
+  
+  "xp_system": {
+    "daily_actions": {
+      "hero_checkin": { "xp": 5, "description": "Codzienny check-in z bohaterem" },
+      "listen_alert": { "xp": 10, "description": "Przesłuchaj dzienny alert summary" },
+      "read_safety_tip": { "xp": 15, "description": "Przeczytaj safety tip" },
+      "complete_mini_game": { "xp": 25, "description": "Ukończ mini-grę" }
+    },
+    
+    "weekly_challenges": {
+      "create_emergency_plan": { "xp": 100, "description": "Stwórz family emergency plan" },
+      "prepare_emergency_kit": { "xp": 150, "description": "Przygotuj emergency kit" },
+      "teach_parent": { "xp": 200, "description": "Nauczz rodzica nowej umiejętności" },
+      "share_alert": { "xp": 250, "description": "Podziel się alertem z sąsiadem" }
+    },
+    
+    "achievements": {
+      "first_hero_meeting": { "xp": 50, "title": "Pierwsze Spotkanie", "description": "Poznaj swojego pierwszego bohatera" },
+      "safety_expert": { "xp": 100, "title": "Ekspert Bezpieczeństwa", "description": "Przesłuchaj 10 alertów" },
+      "weather_master": { "xp": 150, "title": "Mistrz Pogody", "description": "Rozpoznaj 5 rodzajów ostrzeżeń" },
+      "family_guardian": { "xp": 200, "title": "Strażnik Rodziny", "description": "Podziel się alertem z rodzicami" },
+      "evacuation_master": { "xp": 300, "title": "Master Ewakuacji", "description": "Ukończ symulację ewakuacji" }
+    }
+  },
+  
+  "seasonal_events": {
+    "halloween": {
+      "name": "🎃 Halloween: Zombie Evacuation Drill",
+      "duration": "October 25-31",
+      "special_hero": "plomyk",
+      "bonus_xp": 1.5,
+      "special_achievements": ["Zombie Escape Master", "Spooky Safety Hero"]
+    },
+    
+    "winter": {
+      "name": "❄️ Zima: Blizzard Survival Challenge", 
+      "duration": "December 15 - February 15",
+      "special_hero": "wicher",
+      "bonus_xp": 2.0,
+      "special_achievements": ["Winter Warrior", "Blizzard Survivor"]
+    },
+    
+    "spring": {
+      "name": "🌸 Wiosna: Flood Preparedness Week",
+      "duration": "March 15 - April 15", 
+      "special_hero": "kropla",
+      "bonus_xp": 1.8,
+      "special_achievements": ["Spring Safety Scout", "Flood Fighter"]
+    },
+    
+    "summer": {
+      "name": "☀️ Lato: Heat Wave Hero Challenge",
+      "duration": "June 15 - August 15",
+      "special_hero": "all",
+      "bonus_xp": 1.3,
+      "special_achievements": ["Summer Safety Star", "Heat Hero"]
+    }
+  },
+  
+  "mini_games": {
+    "pack_emergency_bag": {
+      "type": "drag_drop",
+      "title": "🎒 Pakuj plecak awaryjny",
+      "hero": "all",
+      "xp_reward": 30,
+      "items": ["latarka", "radio", "woda", "jedzenie", "koc", "apteczka"],
+      "time_limit": 60
+    },
+    
+    "find_safe_spot": {
+      "type": "puzzle",
+      "title": "🏠 Znajdź bezpieczne miejsce", 
+      "hero": "all",
+      "xp_reward": 35,
+      "scenarios": ["earthquake", "fire", "storm"],
+      "difficulty": "medium"
+    },
+    
+    "recognize_sirens": {
+      "type": "audio_quiz",
+      "title": "🚨 Rozpoznaj syreny alarmowe",
+      "hero": "wicher",
+      "xp_reward": 25,
+      "sounds": ["fire_alarm", "tornado_siren", "evacuation_alert"],
+      "difficulty": "easy"
+    }
+  }
+}

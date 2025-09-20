@@ -796,6 +796,10 @@ body {
     color: #FFE55C;
 }
 
+.foundation-text .contact-icon {
+    margin: 0 0 10px 0;
+}
+
 .foundation-link {
     color: white;
     text-decoration: none;
