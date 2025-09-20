@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const API_BASE_URL = '/api'; 
     let allAlerts = [];
     let currentLang = 'pl';
-    let speechEnabled = false;
+    let speechEnabled = localStorage.getItem('speech_enabled') === 'true' || false;
     let currentLocation = null;
     let isOffline = false;
     let offlineData = null;
@@ -222,6 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function toggleSpeech() {
         speechEnabled = !speechEnabled;
+        localStorage.setItem('speech_enabled', speechEnabled);
         const speechBtn = document.getElementById('speech-toggle-btn');
         
         if (speechEnabled) {
@@ -1451,6 +1452,23 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeOfflineMode();
     updateCardTitles(currentLang);
     
+    // Initialize speech button UI based on saved state
+    function initializeSpeechButton() {
+        const speechBtn = document.getElementById('speech-toggle-btn');
+        if (speechBtn) {
+            if (speechEnabled) {
+                speechBtn.innerHTML = '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>';
+                speechBtn.style.background = '#32D74B';
+            } else {
+                speechBtn.innerHTML = '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie wyłączone</span>';
+                speechBtn.style.background = '#FF9500';
+            }
+        }
+    }
+    
+    // Initialize UI immediately
+    initializeSpeechButton();
+    
     // Powitanie po 2 sekundach (daj czas na załadowanie)
     setTimeout(() => {
         updateMascotMessage('welcome');
@@ -1458,7 +1476,9 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             const messages = mascotMessages[currentLang] || mascotMessages.pl;
             const welcomeMessage = messages.welcome;
+            console.log('🔊 Auto-welcome check: speechEnabled =', speechEnabled);
             if (speechEnabled && mascotText) {
+                console.log('🎤 Auto-speaking welcome message:', welcomeMessage);
                 speakText(welcomeMessage, currentLang);
             }
         }, 1000);
