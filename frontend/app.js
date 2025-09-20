@@ -1087,6 +1087,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 speakText(welcomeMessage, currentLang);
             }
         }, 1000);
+        
+        // 🎮 Initialize Heroes System after welcome
+        setTimeout(() => {
+            console.log('🎮 Starting Heroes System initialization...');
+            loadHeroesSystem();
+        }, 1500);
     }, 2000);
     
     // Safety tip and emergency card click handlers
@@ -1307,15 +1313,4 @@ window.testSpeech = function() {
     }
 };
 
-// 🎮 Initialize Heroes System on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait a bit for other systems to initialize first
-    setTimeout(() => {
-        console.log('🎮 Starting Heroes System initialization...');
-        if (typeof loadHeroesSystem === 'function') {
-            loadHeroesSystem();
-        } else {
-            console.error('❌ loadHeroesSystem function not found!');
-        }
-    }, 2000);
-});
+// Remove the separate DOMContentLoaded - will add call inside main one
