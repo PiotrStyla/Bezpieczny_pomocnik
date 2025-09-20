@@ -89,7 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Bezpieczeństwo na drodze': 'Pamiętaj! Zawsze patrz w lewo i prawo przed przejściem przez ulicę. Najpierw patrz w lewo, potem w prawo, i znów w lewo. Jeśli nie ma samochodów, możesz przejść.',
                 'W domu': 'W domu zapamiętaj ważne numery telefonu. Numer do rodziców i numer alarmowy jeden jeden dwa. Jeśli coś się stanie, zawsze możesz zadzwonić po pomoc.',
                 'Z nieznajomymi': 'Nigdy nie rozmawiaj z nieznajomymi ludźmi na ulicy. Nie chodź z nimi nigdzie i nie bierz od nich żadnych prezentów. Jeśli ktoś cię zaczepia, uciekaj do najbliższego dorosłego.',
-                'Zła pogoda': 'Gdy jest burza, zostań w domu lub w bezpiecznym budynku. Unikaj wysokich drzew i nie stój pod nimi. Pioruny mogą być bardzo niebezpieczne.'
+                'Zła pogoda': 'Gdy jest burza, zostań w domu lub w bezpiecznym budynku. Unikaj wysokich drzew i nie stój pod nimi. Pioruny mogą być bardzo niebezpieczne.',
+                'Hulajnogi elektryczne': 'ZAWSZE noś kask na hulajnodze! Jedź maksymalnie 20 km/h i uważaj na pieszych. Nie jeździj po chodniku w okolicy ludzi. Zatrzymaj się przy przejściach dla pieszych. Pamiętaj: hulajnoga to pojazd, nie zabawka!'
             },
             emergency: {
                 'Pogotowie ratunkowe': 'Pogotowie ratunkowe to numer jeden jeden dwa. Zapamiętaj: jeden, jeden, dwa. Dzwoń gdy ktoś jest ranny, chory lub w niebezpieczeństwie. To jest najważniejszy numer który musisz zapamiętać.',
@@ -102,7 +103,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Road safety': 'Remember! Always look left and right before crossing the street. First look left, then right, then left again. If there are no cars, you can cross.',
                 'At home': 'At home, remember important phone numbers. Your parents\' number and emergency number one one two. If something happens, you can always call for help.',
                 'With strangers': 'Never talk to strangers on the street. Don\'t go anywhere with them and don\'t take any gifts from them. If someone bothers you, run to the nearest adult.',
-                'Bad weather': 'When there\'s a storm, stay at home or in a safe building. Avoid tall trees and don\'t stand under them. Lightning can be very dangerous.'
+                'Bad weather': 'When there\'s a storm, stay at home or in a safe building. Avoid tall trees and don\'t stand under them. Lightning can be very dangerous.',
+                'Electric scooters': 'ALWAYS wear a helmet on a scooter! Ride maximum 20 km/h and watch out for pedestrians. Don\'t ride on sidewalks near people. Stop at pedestrian crossings. Remember: scooter is a vehicle, not a toy!'
             },
             emergency: {
                 'Emergency services': 'Emergency services number is one one two. Remember: one, one, two. Call when someone is hurt, sick or in danger. This is the most important number you must remember.',
@@ -115,7 +117,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Безпека на дорозі': 'Пам\'ятай! Завжди дивися ліворуч і праворуч перед переходом через вулицю. Спочатку подивись ліворуч, потім праворуч, і знову ліворуч. Якщо немає машин, можеш переходити.',
                 'Вдома': 'Вдома запам\'ятай важливі номери телефонів. Номер батьків і екстрений номер один один два. Якщо щось станеться, завжди можеш подзвонити по допомогу.',
                 'З незнайомцями': 'Ніколи не розмовляй з незнайомими людьми на вулиці. Не йди з ними нікуди і не бери від них подарунки. Якщо хтось тебе чіпляє, біжи до найближчого дорослого.',
-                'Погана погода': 'Коли гроза, залишайся вдома або в безпечній будівлі. Уникай високих дерев і не стій під ними. Блискавки можуть бути дуже небезпечними.'
+                'Погана погода': 'Коли гроза, залишайся вдома або в безпечній будівлі. Уникай високих дерев і не стій під ними. Блискавки можуть бути дуже небезпечними.',
+                'Електричні самокати': 'ЗАВЖДИ носи шолом на самокаті! Їзди максимум 20 км/год і уважай на пішоходів. Не їзди тротуаром біля людей. Зупиняйся на пішохідних переходах. Пам\'ятай: самокат це транспорт, не іграшка!'
             },
             emergency: {
                 'Швидка допомога': 'Швидка допомога це номер один один два. Запам\'ятай: один, один, два. Дзвони коли хтось поранений, хворий або в небезпеці. Це найважливіший номер який ти маєш запам\'ятати.',
