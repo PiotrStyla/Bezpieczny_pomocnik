@@ -128,12 +128,12 @@
   },
   
   "seasonal_events": {
-    "halloween": {
-      "name": "🎃 Halloween: Zombie Evacuation Drill",
-      "duration": "October 25-31",
+    "autumn": {
+      "name": "🍂 Jesień: Wyzwanie Bezpiecznego Domu",
+      "duration": "September 22 - November 21",
       "special_hero": "plomyk",
       "bonus_xp": 1.5,
-      "special_achievements": ["Zombie Escape Master", "Spooky Safety Hero"]
+      "special_achievements": ["Mistrz Bezpiecznego Domu", "Jesienny Bohater Bezpieczeństwa"]
     },
     
     "winter": {
