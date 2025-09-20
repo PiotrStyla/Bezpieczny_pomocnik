@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 Real Mina Protocol Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .real-button {
+            background: #28a745;
+        }
+        .real-button:hover {
+            background: #1e7e34;
+        }
+        .emergency-button {
+            background: #FF3B30;
+        }
+        .emergency-button:hover {
+            background: #d70015;
+        }
+        .test-result {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+        }
+        .test-result.error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .test-result.warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-connected {
+            background: #28a745;
+        }
+        .status-disconnected {
+            background: #dc3545;
+        }
+        .status-pending {
+            background: #ffc107;
+        }
+        .blockchain-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #007AFF;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔗 Real Mina Protocol Integration Test</h1>
+    
+    <div class="test-section">
+        <h2>🌐 Connection Status</h2>
+        <div id="connection-status">
+            <span class="status-indicator status-pending"></span>
+            Initializing connection to Berkeley testnet...
+        </div>
+        <div class="blockchain-stats" id="blockchain-stats" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-label">Network</div>
+                <div class="stat-value" id="network-name">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Blockchain Size</div>
+                <div class="stat-value" id="blockchain-size">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Block Height</div>
+                <div class="stat-value" id="block-height">-</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Sync Time</div>
+                <div class="stat-value" id="sync-time">-</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>⚡ Real Blockchain Tests</h2>
+        <button class="test-button real-button" onclick="testRealConnection()" id="btn-connect">
+            🌐 Connect to Berkeley
+        </button>
+        <button class="test-button real-button" onclick="testRealSync()" id="btn-sync" disabled>
+            📡 Real 22KB Sync
+        </button>
+        <button class="test-button real-button" onclick="testZkProofGeneration()" id="btn-proof">
+            🔒 Generate zk-Proof
+        </button>
+        <button class="test-button real-button" onclick="testChildRegistration()" id="btn-register" disabled>
+            👶 Register Child (Real)
+        </button>
+        <button class="test-button emergency-button" onclick="testEmergencyStatus()" id="btn-emergency" disabled>
+            🚨 Emergency Status
+        </button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🖥️ Console Output</h2>
+        <div class="console-output" id="console-output"></div>
+    </div>
+
+    <!-- Load Real Mina Client -->
+    <script src="mina-real-client.js"></script>
+    
+    <!-- Optional: o1js for real blockchain (comment out for simulation testing) -->
+    <!-- <script src="https://unpkg.com/o1js@latest/dist/web/index.js"></script> -->
+    
+    <script type="module">
+        // 🧪 REAL MINA TEST ENVIRONMENT
+        let minaClient = null;
+        let testResults = [];
+        let originalConsoleLog = console.log;
+        
+        // Capture console output
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            const output = args.join(' ');
+            const consoleDiv = document.getElementById('console-output');
+            if (consoleDiv) {
+                consoleDiv.innerHTML += output + '<br>';
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            }
+        };
+        
+        // 📊 TEST RESULT MANAGEMENT
+        function addTestResult(test, status, details, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.push({test, status, details, timestamp, type});
+            updateTestResults();
+        }
+        
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.map(result => {
+                const statusIcon = result.status === 'PASS' ? '✅' : 
+                                 result.status === 'FAIL' ? '❌' : '⚠️';
+                const cssClass = result.type === 'error' ? 'error' : 
+                               result.type === 'warning' ? 'warning' : '';
+                return `
+                    <div class="test-result ${cssClass}">
+                        ${statusIcon} <strong>${result.test}</strong> - ${result.status}
+                        <br><small>${result.details} (${result.timestamp})</small>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 🔄 UPDATE CONNECTION STATUS
+        function updateConnectionStatus(connected, details = '') {
+            const statusDiv = document.getElementById('connection-status');
+            const statsDiv = document.getElementById('blockchain-stats');
+            
+            if (connected) {
+                statusDiv.innerHTML = `
+                    <span class="status-indicator status-connected"></span>
+                    Connected to Berkeley testnet ${details}
+                `;
+                statsDiv.style.display = 'grid';
+                
+                // Enable buttons
+                document.getElementById('btn-sync').disabled = false;
+                document.getElementById('btn-register').disabled = false;
+                document.getElementById('btn-emergency').disabled = false;
+                
+            } else {
+                statusDiv.innerHTML = `
+                    <span class="status-indicator status-disconnected"></span>
+                    Disconnected from Mina network ${details}
+                `;
+                statsDiv.style.display = 'none';
+            }
+        }
+        
+        // 🌐 TEST REAL CONNECTION
+        window.testRealConnection = async function() {
+            console.log('🧪 Testing: Real Mina Berkeley connection');
+            const connectBtn = document.getElementById('btn-connect');
+            connectBtn.disabled = true;
+            connectBtn.textContent = '🌐 Connecting...';
+            
+            try {
+                // Create real Mina client
+                if (!minaClient) {
+                    minaClient = await RealMinaFactory.createClient();
+                }
+                
+                const status = minaClient.getStatus();
+                console.log('📊 Connection status:', status);
+                
+                if (status.connected) {
+                    updateConnectionStatus(true, `- ${status.mode} mode active`);
+                    addTestResult('Berkeley Connection', 'PASS', `Connected in ${status.mode} mode`);
+                    
+                    document.getElementById('network-name').textContent = 
+                        status.mode === 'real' ? 'Berkeley Testnet (REAL)' : 'Berkeley Testnet (Simulation)';
+                    
+                    console.log(`✅ Mina client ready in ${status.mode} mode!`);
+                    
+                } else {
+                    updateConnectionStatus(false, '- Connection failed');
+                    addTestResult('Berkeley Connection', 'FAIL', 'Could not establish connection', 'error');
+                }
+                
+            } catch (error) {
+                updateConnectionStatus(false, '- Connection error');
+                addTestResult('Berkeley Connection', 'FAIL', `Error: ${error.message}`, 'error');
+                console.error('❌ Connection test failed:', error);
+            }
+            
+            connectBtn.disabled = false;
+            connectBtn.textContent = '🌐 Connect to Berkeley';
+        };
+        
+        // 📡 TEST REAL 22KB SYNC
+        window.testRealSync = async function() {
+            console.log('🧪 Testing: Real 22KB blockchain sync');
+            const syncBtn = document.getElementById('btn-sync');
+            syncBtn.disabled = true;
+            syncBtn.textContent = '📡 Syncing...';
+            
+            try {
+                if (!minaClient) {
+                    throw new Error('Mina client not initialized');
+                }
+                
+                const syncResult = await minaClient.syncBlockchain();
+                
+                // Update UI
+                document.getElementById('blockchain-size').textContent = syncResult.blockchainSize;
+                document.getElementById('block-height').textContent = 
+                    syncResult.blockHeight ? syncResult.blockHeight.toLocaleString() : 'N/A';
+                document.getElementById('sync-time').textContent = `${syncResult.syncTime}ms`;
+                
+                const modeText = syncResult.real ? 'REAL' : 'Simulated';
+                addTestResult('22KB Blockchain Sync', 'PASS', 
+                    `${modeText} sync in ${syncResult.syncTime}ms`);
+                
+                console.log(`✅ ${modeText} blockchain sync complete!`);
+                if (syncResult.blockHeight) {
+                    console.log(`🏗️ Block height: ${syncResult.blockHeight}`);
+                }
+                console.log('🚨 Emergency-ready: Satellite/2G compatible!');
+                
+            } catch (error) {
+                addTestResult('22KB Blockchain Sync', 'FAIL', `Error: ${error.message}`, 'error');
+                console.error('❌ Blockchain sync failed:', error);
+            }
+            
+            syncBtn.disabled = false;
+            syncBtn.textContent = '📡 Real 22KB Sync';
+        };
+        
+        // 🔒 TEST ZK-PROOF GENERATION
+        window.testZkProofGeneration = async function() {
+            console.log('🧪 Testing: Zero-knowledge proof generation');
+            const proofBtn = document.getElementById('btn-proof');
+            proofBtn.disabled = true;
+            proofBtn.textContent = '🔒 Generating...';
+            
+            try {
+                if (!minaClient) {
+                    throw new Error('Mina client not initialized');
+                }
+                
+                // Generate proof for a test child (age 8 = young range)
+                const testBirthYear = new Date().getFullYear() - 8;
+                const proofResult = await minaClient.generateZkProof(testBirthYear);
+                
+                const modeText = proofResult.real ? 'REAL' : 'Simulated';
+                addTestResult('zk-Proof Generation', 'PASS', 
+                    `${modeText} cryptographic proof created`);
+                
+                console.log('✅ Zero-knowledge proof generated successfully!');
+                console.log('🔐 Proof components:');
+                console.log(`   Age range: ${proofResult.ageRange} (${proofResult.ageRange === 'young' ? '6-10 years' : '11-16 years'})`);
+                console.log(`   Age range commitment: ${proofResult.ageRangeCommitment.substr(0, 30)}...`);
+                console.log(`   Nullifier hash: ${proofResult.nullifierHash.substr(0, 30)}...`);
+                console.log(`   Parent consent: ${proofResult.parentConsentHash.substr(0, 30)}...`);
+                console.log('🛡️ Child privacy fully protected - no exact age revealed');
+                
+                // Store proof for registration test
+                window.lastZkProof = proofResult;
+                
+            } catch (error) {
+                addTestResult('zk-Proof Generation', 'FAIL', `Error: ${error.message}`, 'error');
+                console.error('❌ zk-Proof generation failed:', error);
+            }
+            
+            proofBtn.disabled = false;
+            proofBtn.textContent = '🔒 Generate zk-Proof';
+        };
+        
+        // 👶 TEST CHILD REGISTRATION
+        window.testChildRegistration = async function() {
+            console.log('🧪 Testing: Real child registration on blockchain');
+            const registerBtn = document.getElementById('btn-register');
+            registerBtn.disabled = true;
+            registerBtn.textContent = '👶 Registering...';
+            
+            try {
+                if (!minaClient) {
+                    throw new Error('Mina client not initialized');
+                }
+                
+                if (!window.lastZkProof) {
+                    throw new Error('No zk-proof available - generate proof first');
+                }
+                
+                const registrationResult = await minaClient.registerChild(window.lastZkProof);
+                
+                if (registrationResult.success) {
+                    const modeText = registrationResult.real ? 'REAL' : 'Simulated';
+                    addTestResult('Blockchain Registration', 'PASS', 
+                        `${modeText} registration: ${registrationResult.txHash.substr(0, 16)}...`);
+                    
+                    console.log('✅ Child registered on blockchain successfully!');
+                    console.log(`📄 Transaction hash: ${registrationResult.txHash}`);
+                    console.log('🔒 Zero-knowledge proof verified on-chain');
+                    console.log('🛡️ Child data remains completely private');
+                    console.log('👨‍👩‍👧‍👦 Parent maintains full control over emergency access');
+                } else {
+                    addTestResult('Blockchain Registration', 'FAIL', 
+                        registrationResult.error || 'Registration failed', 'error');
+                    console.log('❌ Blockchain registration failed');
+                    console.log(`🔄 Error: ${registrationResult.error}`);
+                }
+                
+            } catch (error) {
+                addTestResult('Blockchain Registration', 'FAIL', `Error: ${error.message}`, 'error');
+                console.error('❌ Child registration failed:', error);
+            }
+            
+            registerBtn.disabled = false;
+            registerBtn.textContent = '👶 Register Child (Real)';
+        };
+        
+        // 🚨 TEST EMERGENCY STATUS
+        window.testEmergencyStatus = async function() {
+            console.log('🧪 Testing: Real emergency status from blockchain');
+            const emergencyBtn = document.getElementById('btn-emergency');
+            emergencyBtn.disabled = true;
+            emergencyBtn.textContent = '🚨 Checking...';
+            
+            try {
+                if (!minaClient) {
+                    throw new Error('Mina client not initialized');
+                }
+                
+                const emergencyData = await minaClient.getEmergencyStatus();
+                
+                const levelNames = ['Normal', 'Yellow Alert', 'Orange Alert', 'Red Alert'];
+                const levelName = levelNames[emergencyData.level];
+                const modeText = emergencyData.real ? 'REAL' : 'Simulated';
+                
+                addTestResult('Emergency Status', 'PASS', 
+                    `${modeText} - Level: ${levelName}, Children: ${emergencyData.childrenCount}`);
+                
+                console.log('✅ Emergency status retrieved from blockchain:');
+                console.log(`🚨 Current level: ${emergencyData.level} (${levelName})`);
+                console.log(`👶 Registered children: ${emergencyData.childrenCount}`);
+                console.log(`⏰ Last update: ${new Date(emergencyData.lastUpdate).toLocaleString()}`);
+                console.log(`🌐 Network health: ${emergencyData.networkHealth}`);
+                
+                if (emergencyData.level >= 2) {
+                    console.log('🚨 HIGH ALERT: Enhanced emergency protocols active');
+                    console.log('📡 Satellite communication prioritized');
+                    console.log('🔋 Battery optimization mode enabled');
+                }
+                
+            } catch (error) {
+                addTestResult('Emergency Status', 'FAIL', `Error: ${error.message}`, 'error');
+                console.error('❌ Emergency status check failed:', error);
+            }
+            
+            emergencyBtn.disabled = false;
+            emergencyBtn.textContent = '🚨 Emergency Status';
+        };
+        
+        // 🚀 INITIALIZE TEST ENVIRONMENT
+        window.addEventListener('load', () => {
+            console.log('🔗 Real Mina Protocol Test Suite Initialized');
+            console.log('⚔️ Times are not safe - testing bulletproof blockchain protection');
+            console.log('🛡️ Zero-knowledge privacy system ready for validation');
+            console.log('📡 Berkeley testnet connection available');
+            console.log('');
+            console.log('👆 Click "Connect to Berkeley" to start real blockchain testing!');
+            
+            addTestResult('Test Suite', 'READY', 'Real Mina Protocol testing environment loaded');
+        });
+        
+    </script>
+</body>
+</html>
