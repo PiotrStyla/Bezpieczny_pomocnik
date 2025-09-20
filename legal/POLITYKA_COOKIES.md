@@ -20,6 +20,10 @@
 | `speech_enabled` | Ustawienie włączenia/wyłączenia głosu | 12 miesięcy | localStorage |
 | `location_consent` | Zgoda na lokalizację | Do cofnięcia | localStorage |
 | `cookie_consent` | Status zgody na cookies | 12 miesięcy | localStorage |
+| **🎮 GAMIFICATION** | **System bohaterów i osiągnięć** | **Do usunięcia** | **localStorage** |
+| `bezpieczny_pomocnik_progress` | Postęp gracza: XP, poziom, osiągnięcia, bohater | Do ręcznego usunięcia | localStorage |
+| `hero_selection_data` | Wybrany bohater bezpieczeństwa | Do ręcznego usunięcia | localStorage |
+| `daily_achievements` | Dzienne osiągnięcia i streaki | Do ręcznego usunięcia | localStorage |
 | **🚨 EMERGENCY CACHE** | **Cache awaryjnych danych offline** | **Do usunięcia cache** | **Service Worker** |
 | `emergency_contacts` | Numery alarmowe (112,997,998,999) offline | Cache przeglądarki | Service Worker |
 | `safety_instructions` | Instrukcje bezpieczeństwa offline | Cache przeglądarki | Service Worker |

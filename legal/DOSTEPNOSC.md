@@ -50,6 +50,8 @@
 #### 🧠 **Zrozumiałość (Understandable):**
 - **Język:** Oznaczenie języka strony (pl, en, ua)
 - **Proste słownictwo:** Dostosowane do wieku dzieci 6-16 lat
+- **🎮 Gamification:** Bohaterowie bezpieczeństwa używają przyjaznego, zrozumiałego języka
+- **Edukacyjna gamifikacja:** System XP i osiągnięć motywuje do nauki bez przytłaczania
 - **Przewidywalność:** Spójna nawigacja i layout
 - **Pomoc w błędach:** Jasne komunikaty o problemach
 

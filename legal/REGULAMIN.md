@@ -72,10 +72,20 @@ Użytkownikom zabrania się:
 - **Bezpieczeństwo dzieci:** funkcja kluczowa dla ochrony życia dzieci podczas sytuacji kryzysowych
 - **Zgodność RODO:** podstawa prawna - żywotny interes osoby fizycznej (art. 6 ust. 1 lit. d RODO)
 
-4.2. **Treści edukacyjne:**
+4.2. **🎮 System gamifikacji (bohaterowie bezpieczeństwa):**
+- **Cel:** motywacja dzieci do aktywnego uczenia się zasad bezpieczeństwa
+- **Bohaterowie:** Wicher (burze), Kropla (powodzie), Płomyk (pożary) - wiek 6-12 lat
+- **System XP:** punkty doświadczenia za działania edukacyjne (czytanie alertów, słuchanie porad)
+- **Przechowywanie:** TYLKO lokalnie w przeglądarce dziecka (localStorage)
+- **Osiągnięcia:** lokalne badges motywujące do nauki bezpieczeństwa
+- **Treści:** wszystkie bohaterowie używają przyjaznego, uspokajającego języka
+- **Bezpieczeństwo:** system nie zbiera danych osobowych ani nie łączy się z zewnętrznymi sieciami
+
+4.3. **Treści edukacyjne:**
 - Wszystkie treści są dostosowane do wieku dzieci
 - Informacje o bezpieczeństwie są przedstawiane w sposób przystępny, bez wywoływania niepokoju
 - Numery alarmowe są prezentowane z odpowiednimi instrukcjami
+- Bohaterowie bezpieczeństwa używają pozytywnego wzmocnienia i gamifikacji
 
 4.3. **Zgłaszanie problemów:**
 Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adres: kontakt@fundacja-hospicjum.org

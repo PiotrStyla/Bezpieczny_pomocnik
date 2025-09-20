@@ -39,6 +39,16 @@
 - **Cel:** Personalizacja doświadczenia użytkownika
 - **Podstawa prawna:** Prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO)
 
+#### **🎮 Gamification System (Heroes & Achievements):**
+- **Wybrany bohater** bezpieczeństwa (Wicher/Kropla/Płomyk) - TYLKO lokalnie
+- **Postęp gracza** (XP, poziom, osiągnięcia) - TYLKO w localStorage przeglądarki
+- **Dzienne logowania** (streak counter) - TYLKO lokalnie dla motywacji
+- **Historia działań** (dla naliczania XP) - TYLKO lokalne, nie przesyłane na serwery
+- **Cel:** Zwiększenie zaangażowania dzieci w naukę bezpieczeństwa przez gamifikację
+- **Przechowywanie:** WYŁĄCZNIE w localStorage przeglądarki (NIE na serwerach Fundacji)
+- **Podstawa prawna:** Prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO)
+- **Uzasadnienie:** Motywacja dzieci do aktywnego uczenia się bezpieczeństwa
+
 #### **Dane techniczne (automatycznie):**
 - **Typ przeglądarki** i wersja
 - **System operacyjny**
