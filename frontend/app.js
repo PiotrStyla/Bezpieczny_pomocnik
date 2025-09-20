@@ -914,6 +914,358 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.body.appendChild(notification);
     }
+    
+    // Initialize hero system
+    function initializeHeroSystem() {
+        if (!heroesData) {
+            console.error('❌ Heroes data not loaded');
+            return;
+        }
+        
+        console.log('🦸‍♂️ Initializing hero system with data:', heroesData);
+        
+        // First time setup - choose hero
+        if (!playerProgress.current_hero) {
+            console.log('🆕 New player - showing hero selection');
+            showHeroSelection();
+        } else {
+            console.log('🔄 Returning player - updating display');
+            // Show current hero status
+            updateHeroDisplay();
+            checkDailyLogin();
+        }
+        
+        // Add gamification UI to mascot section
+        addGamificationUI();
+        
+        console.log('✅ Hero system initialized successfully');
+    }
+    
+    // Show hero selection for new players
+    function showHeroSelection() {
+        console.log('🎯 Creating hero selection modal');
+        const modal = document.createElement('div');
+        modal.className = 'hero-selection-modal';
+        modal.innerHTML = `
+            <div class="hero-selection-content">
+                <h2>🦸‍♂️ Wybierz swojego Bohatera Bezpieczeństwa!</h2>
+                <p>Każdy bohater pomoże ci w różnych sytuacjach awaryjnych:</p>
+                
+                <div class="heroes-grid">
+                    ${Object.values(heroesData.heroes).map(hero => `
+                        <div class="hero-card" onclick="selectHero('${hero.id}')" style="border-color: ${hero.color_primary}">
+                            <div class="hero-avatar" style="font-size: 4rem">${hero.avatar}</div>
+                            <h3 style="color: ${hero.color_primary}">${hero.name}</h3>
+                            <div class="hero-specialty">${hero.specialty}</div>
+                            <div class="hero-age">Wiek: ${hero.age_group} lat</div>
+                            <div class="hero-phrase">"${hero.catchPhrase}"</div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <p><em>Nie martw się - później będziesz mógł poznać wszystkich bohaterów!</em></p>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        console.log('✅ Hero selection modal created');
+    }
+    
+    // Select hero
+    window.selectHero = function(heroId) {
+        console.log('🎯 Hero selected:', heroId);
+        playerProgress.current_hero = heroId;
+        playerProgress.last_login = new Date().toISOString();
+        saveProgress();
+        
+        // Remove selection modal
+        const modal = document.querySelector('.hero-selection-modal');
+        if (modal) modal.remove();
+        
+        // Welcome message from hero
+        const hero = heroesData.heroes[heroId];
+        if (mascotText) {
+            mascotText.textContent = `Cześć! Jestem ${hero.name}! ${hero.catchPhrase}`;
+        }
+        
+        if (speechEnabled) {
+            speakText(`Witaj! Jestem ${hero.name}, twój bohater bezpieczeństwa! ${hero.catchPhrase}`, currentLang);
+        }
+        
+        // Award first meeting achievement
+        addXP(50, `Pierwsze spotkanie z ${hero.name}`);
+        
+        updateHeroDisplay();
+        addGamificationUI();
+        
+        console.log(`🦸‍♂️ Hero selected: ${hero.name}`);
+    };
+    
+    // Save player progress
+    function saveProgress() {
+        localStorage.setItem('bezpieczny_pomocnik_progress', JSON.stringify(playerProgress));
+        console.log('💾 Progress saved:', playerProgress);
+    }
+    
+    // Add XP to player
+    function addXP(amount, reason = '') {
+        if (!heroesData) return;
+        
+        const oldXP = playerProgress.xp;
+        playerProgress.xp += amount;
+        
+        // Check for level up
+        const currentHero = heroesData.heroes[playerProgress.current_hero];
+        if (currentHero) {
+            const levels = Object.keys(currentHero.levels).map(Number).sort((a, b) => b - a);
+            for (let level of levels) {
+                if (playerProgress.xp >= currentHero.levels[level].xp_required && level > playerProgress.level) {
+                    levelUp(level);
+                    break;
+                }
+            }
+        }
+        
+        // Show XP notification
+        showXPNotification(amount, reason);
+        saveProgress();
+        
+        console.log(`🎮 +${amount} XP: ${reason}. Total: ${playerProgress.xp}`);
+    }
+    
+    // Level up system
+    function levelUp(newLevel) {
+        const oldLevel = playerProgress.level;
+        playerProgress.level = newLevel;
+        
+        const currentHero = heroesData.heroes[playerProgress.current_hero];
+        const levelInfo = currentHero.levels[newLevel];
+        
+        // Show level up celebration
+        showLevelUpCelebration(oldLevel, newLevel, levelInfo.title);
+        
+        // Hero congratulates
+        if (speechEnabled && currentHero) {
+            const message = `Gratulacje! Awansowałeś na poziom ${newLevel}: ${levelInfo.title}! ${currentHero.catchPhrase}`;
+            setTimeout(() => speakText(message, currentLang), 1000);
+        }
+        
+        console.log(`🎉 LEVEL UP! ${oldLevel} → ${newLevel}: ${levelInfo.title}`);
+    }
+    
+    // Show XP notification
+    function showXPNotification(xp, reason) {
+        const notification = document.createElement('div');
+        notification.className = 'xp-notification';
+        notification.innerHTML = `
+            <div class="xp-content">
+                <div class="xp-amount">+${xp} XP</div>
+                <div class="xp-reason">${reason}</div>
+            </div>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animate
+        setTimeout(() => notification.classList.add('show'), 100);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    }
+    
+    // Show level up celebration
+    function showLevelUpCelebration(oldLevel, newLevel, title) {
+        const celebration = document.createElement('div');
+        celebration.className = 'level-up-modal';
+        celebration.innerHTML = `
+            <div class="celebration-content">
+                <div class="celebration-header">
+                    <div class="level-up-icon">🎉</div>
+                    <h2>AWANS!</h2>
+                </div>
+                <div class="level-progression">
+                    <div class="old-level">Poziom ${oldLevel}</div>
+                    <div class="arrow">➡️</div>
+                    <div class="new-level">Poziom ${newLevel}</div>
+                </div>
+                <div class="new-title">${title}</div>
+                ${playerProgress.current_hero ? `
+                    <div class="hero-celebration">
+                        <div class="hero-avatar">${heroesData.heroes[playerProgress.current_hero].avatar}</div>
+                        <div class="hero-message">${heroesData.heroes[playerProgress.current_hero].name} jest z ciebie dumny!</div>
+                    </div>
+                ` : ''}
+                <button onclick="this.parentElement.parentElement.remove()" class="celebrate-btn">
+                    🎊 Świetnie!
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(celebration);
+        
+        // Auto-remove after 10 seconds
+        setTimeout(() => {
+            if (celebration.parentNode) {
+                celebration.remove();
+            }
+        }, 10000);
+    }
+    
+    // Update hero display in mascot section
+    function updateHeroDisplay() {
+        if (!playerProgress.current_hero || !heroesData) return;
+        
+        const hero = heroesData.heroes[playerProgress.current_hero];
+        const mascot = document.querySelector('.mascot');
+        if (mascot) {
+            mascot.textContent = hero.avatar;
+            mascot.style.color = hero.color_primary;
+        }
+    }
+    
+    // Add gamification UI
+    function addGamificationUI() {
+        if (!playerProgress.current_hero || !heroesData) return;
+        
+        const hero = heroesData.heroes[playerProgress.current_hero];
+        const mascotSection = document.querySelector('.mascot-section');
+        
+        if (mascotSection && !document.querySelector('.hero-progress')) {
+            const progressUI = document.createElement('div');
+            progressUI.className = 'hero-progress';
+            progressUI.innerHTML = `
+                <div class="hero-info">
+                    <div class="hero-name-level">
+                        <strong>${hero.name}</strong>
+                        <span class="hero-level">Poziom ${playerProgress.level}</span>
+                    </div>
+                    <div class="hero-xp">
+                        <span>${playerProgress.xp} XP</span>
+                        <div class="xp-bar">
+                            <div class="xp-fill" style="background: ${hero.color_primary}; width: ${getXPProgress()}%"></div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="showHeroStats()" class="hero-stats-btn" style="background: ${hero.color_primary}">
+                    📊 Statystyki
+                </button>
+            `;
+            
+            mascotSection.appendChild(progressUI);
+        }
+    }
+    
+    // Get XP progress percentage
+    function getXPProgress() {
+        if (!playerProgress.current_hero || !heroesData) return 0;
+        
+        const hero = heroesData.heroes[playerProgress.current_hero];
+        const levels = Object.keys(hero.levels).map(Number).sort((a, b) => a - b);
+        
+        const currentLevel = playerProgress.level;
+        const nextLevel = levels.find(l => l > currentLevel);
+        
+        if (!nextLevel) return 100; // Max level
+        
+        const currentLevelXP = hero.levels[currentLevel].xp_required;
+        const nextLevelXP = hero.levels[nextLevel].xp_required;
+        const progress = ((playerProgress.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
+        
+        return Math.min(Math.max(progress, 0), 100);
+    }
+    
+    // Check daily login
+    function checkDailyLogin() {
+        const today = new Date().toDateString();
+        const lastLogin = playerProgress.last_login ? new Date(playerProgress.last_login).toDateString() : null;
+        
+        if (lastLogin !== today) {
+            // Daily login bonus
+            playerProgress.daily_streak = lastLogin === new Date(Date.now() - 86400000).toDateString() ? 
+                playerProgress.daily_streak + 1 : 1;
+            playerProgress.last_login = new Date().toISOString();
+            
+            addXP(5, `Dzienny check-in (${playerProgress.daily_streak} dni z rzędu)`);
+            saveProgress();
+        }
+    }
+    
+    // Show hero stats modal
+    window.showHeroStats = function() {
+        if (!playerProgress.current_hero || !heroesData) return;
+        
+        const hero = heroesData.heroes[playerProgress.current_hero];
+        const modal = document.createElement('div');
+        modal.className = 'hero-stats-modal';
+        modal.innerHTML = `
+            <div class="hero-stats-content">
+                <h2>${hero.avatar} ${hero.name} - Statystyki</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${playerProgress.level}</div>
+                        <div class="stat-label">Poziom</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${playerProgress.xp}</div>
+                        <div class="stat-label">Doświadczenie</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${playerProgress.achievements.length}</div>
+                        <div class="stat-label">Osiągnięcia</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${playerProgress.daily_streak}</div>
+                        <div class="stat-label">Dni z rzędu</div>
+                    </div>
+                </div>
+                
+                <div class="hero-powers">
+                    <h3>🦸‍♂️ Moce ${hero.name}:</h3>
+                    <ul>
+                        ${hero.powers.map(power => `<li>${power}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="daily-quests">
+                    <h3>📋 Dzisiejsze zadania:</h3>
+                    <button onclick="completeQuest('hero_checkin')" class="quest-btn">
+                        ✅ Check-in z ${hero.name} (+5 XP)
+                    </button>
+                    <button onclick="completeQuest('read_safety_tip')" class="quest-btn">
+                        📚 Przeczytaj poradę bezpieczeństwa (+15 XP)
+                    </button>
+                </div>
+                
+                <button onclick="this.parentElement.parentElement.remove()" class="close-stats-btn">
+                    Zamknij
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    };
+    
+    // Complete quest
+    window.completeQuest = function(questId) {
+        if (!heroesData.xp_system.daily_actions[questId]) return;
+        
+        const quest = heroesData.xp_system.daily_actions[questId];
+        addXP(quest.xp, quest.description);
+        
+        // Disable button
+        event.target.disabled = true;
+        event.target.textContent = '✅ Ukończone!';
+        event.target.style.background = '#4CAF50';
+        
+        // Hero encouragement
+        if (speechEnabled && playerProgress.current_hero) {
+            const hero = heroesData.heroes[playerProgress.current_hero];
+            const encouragement = `Świetna robota! ${quest.description} ukończone!`;
+            setTimeout(() => speakText(encouragement, currentLang), 500);
+        }
+    };
 
     // Get coverage information
     async function getCoverageInfo() {
