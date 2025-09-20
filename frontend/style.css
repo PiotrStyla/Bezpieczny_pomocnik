@@ -1204,3 +1204,133 @@ body {
         color: #FFD700;
     }
 }
+
+/* GAMIFICATION SYSTEM STYLING - HEROES MODAL */
+
+/* Hero Selection Modal - HIGHEST Z-INDEX */
+.hero-selection-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999 !important;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.hero-selection-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 20px;
+    text-align: center;
+    animation: slideUp 0.6s ease-out;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-selection-content h2 {
+    color: white;
+    margin-bottom: 20px;
+    font-size: 28px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.heroes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.hero-card {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border: 3px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.hero-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border-color: currentColor;
+}
+
+.hero-card .hero-avatar {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    animation: bounce 2s infinite;
+}
+
+.hero-card h3 {
+    font-size: 24px;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.hero-specialty {
+    font-size: 16px;
+    color: #666;
+    margin: 8px 0;
+    font-weight: 500;
+}
+
+.hero-age {
+    font-size: 14px;
+    color: #888;
+    margin: 5px 0;
+}
+
+.hero-phrase {
+    font-style: italic;
+    font-size: 14px;
+    color: #555;
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .hero-selection-content {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .heroes-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .hero-card {
+        padding: 20px;
+    }
+}
