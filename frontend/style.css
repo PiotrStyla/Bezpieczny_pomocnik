@@ -1207,6 +1207,123 @@ body {
 
 /* GAMIFICATION SYSTEM STYLING - HEROES MODAL */
 
+/* Hero Progress Bar - Make it MORE VISIBLE */
+.hero-progress {
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 15px !important;
+    padding: 15px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(10px) !important;
+    z-index: 50000 !important;
+    border: 2px solid #FF6B35 !important;
+    animation: heroUISlideUp 0.6s ease-out !important;
+}
+
+@keyframes heroUISlideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.hero-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.hero-name-level {
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-name-level strong {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.hero-level {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.hero-xp {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.hero-xp span {
+    font-size: 14px;
+    color: #FF6B35;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.xp-bar {
+    width: 200px;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.xp-fill {
+    height: 100%;
+    background: #FF6B35;
+    transition: width 0.5s ease;
+    border-radius: 4px;
+}
+
+.hero-stats-btn {
+    background: #FF6B35 !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 25px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 14px !important;
+}
+
+.hero-stats-btn:hover {
+    background: #E55A2B !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4) !important;
+}
+
+/* Mobile responsive for hero progress */
+@media (max-width: 768px) {
+    .hero-progress {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        padding: 12px !important;
+    }
+    
+    .hero-name-level strong {
+        font-size: 16px;
+    }
+    
+    .xp-bar {
+        width: 150px;
+    }
+}
+
+/* 🎮 HEROES MODAL */
+
 /* Hero Selection Modal - HIGHEST Z-INDEX */
 .hero-selection-modal {
     position: fixed;

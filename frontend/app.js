@@ -924,6 +924,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('🦸‍♂️ Initializing hero system with data:', heroesData);
         
+        // AUTO-CLOSE Foundation modal to clear the view for heroes
+        const foundationModal = document.querySelector('.modal-overlay, .foundation-modal, [class*="foundation"], [class*="hospicjum"]');
+        if (foundationModal) {
+            console.log('🚫 Auto-closing Foundation modal for better Heroes visibility');
+            foundationModal.remove();
+        }
+        
         // First time setup - choose hero
         if (!playerProgress.current_hero) {
             console.log('🆕 New player - showing hero selection');
