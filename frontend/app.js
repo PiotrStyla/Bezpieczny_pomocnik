@@ -864,6 +864,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Load heroes data
+    async function loadHeroesSystem() {
+        console.log('🎮 Starting heroes system initialization...');
+        try {
+            console.log('📥 Fetching heroes data from /data/heroes-system.json');
+            const response = await fetch('/data/heroes-system.json');
+            
+            if (!response.ok) {
+                throw new Error(`Failed to fetch heroes data: ${response.status} ${response.statusText}`);
+            }
+            
+            heroesData = await response.json();
+            console.log('✅ Heroes system loaded successfully:', heroesData);
+            
+            // Load player progress from localStorage
+            const saved = localStorage.getItem('bezpieczny_pomocnik_progress');
+            if (saved) {
+                console.log('📊 Loading saved progress:', saved);
+                playerProgress = { ...playerProgress, ...JSON.parse(saved) };
+            } else {
+                console.log('🆕 No saved progress found - new player');
+            }
+            
+            // Initialize hero system
+            console.log('🚀 Initializing hero system...');
+            initializeHeroSystem();
+            
+        } catch (error) {
+            console.error('❌ Failed to load heroes system:', error);
+            console.error('❌ Error details:', error.message, error.stack);
+            
+            // Show error to user
+            showHeroSystemError();
+        }
+    }
+    
+    // Show error when heroes system fails to load
+    function showHeroSystemError() {
+        const notification = document.createElement('div');
+        notification.className = 'hero-system-error';
+        notification.innerHTML = `
+            <div class="error-content">
+                <h3>🚨 Problem z systemem bohaterów</h3>
+                <p>System gamifikacji nie mógł się załadować. Spróbuj odświeżyć stronę.</p>
+                <button onclick="location.reload()" class="retry-btn">🔄 Odśwież stronę</button>
+                <button onclick="this.parentElement.parentElement.remove()" class="close-error-btn">✕</button>
+            </div>
+        `;
+        document.body.appendChild(notification);
+    }
+
     // Get coverage information
     async function getCoverageInfo() {
         try {
@@ -1243,11 +1294,11 @@ window.testSpeech = function() {
         utterance.rate = 0.8;
         utterance.pitch = 1.1;
         utterance.volume = 1.0;
-        
+                
         utterance.onstart = () => console.log('🎵 Test mowy rozpoczęty');
         utterance.onend = () => console.log('✅ Test mowy zakończony');
         utterance.onerror = (e) => console.log('❌ Błąd test mowy:', e.error);
-        
+                
         window.speechSynthesis.speak(utterance);
         console.log('🚀 Test speak() wysłany');
     } else {
@@ -1255,3 +1306,16 @@ window.testSpeech = function() {
         alert('Twoja przeglądarka nie obsługuje mowy!');
     }
 };
+
+// 🎮 Initialize Heroes System on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for other systems to initialize first
+    setTimeout(() => {
+        console.log('🎮 Starting Heroes System initialization...');
+        if (typeof loadHeroesSystem === 'function') {
+            loadHeroesSystem();
+        } else {
+            console.error('❌ loadHeroesSystem function not found!');
+        }
+    }, 2000);
+});
