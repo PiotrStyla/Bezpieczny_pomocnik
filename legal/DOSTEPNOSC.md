@@ -29,6 +29,17 @@
 - **Tekst alternatywny:** Wszystkie ikony i obrazy mają opisy alt
 - **Responsive design:** Aplikacja dostosowuje się do różnych rozmiarów ekranu
 - **Skalowanie:** Tekst można powiększyć do 200% bez utraty funkcjonalności
+- **📱 **OFFLINE ACCESS (Dostęp offline)**
+
+✅ **ZAIMPLEMENTOWANO - dostępne od 20 września 2025:**
+- **🚨 Emergency Offline Mode** - pełne funkcje awaryjne bez internetu
+- **📞 Emergency Contacts** - numery alarmowe (112,997,998,999) dostępne offline
+- **🛡️ Safety Instructions** - instrukcje bezpieczeństwa dla dzieci offline
+- **🎯 Auto-Detection** - automatyczne przełączanie na tryb awaryjny gdy brak internetu
+- **📦 Service Worker Cache** - niezbędne dane awaryjne cache'owane lokalnie
+- **👶 Child-Friendly** - interfejs dostosowany do dzieci podczas sytuacji kryzysowych
+- **🔊 Offline TTS** - działające czytanie na głos bez internetu (Web Speech API)
+- **Progressive Web App (PWA)** - możliwość instalacji na urządzeniach
 
 #### ⌨️ **Operacyjność (Operable):**
 - **Nawigacja klawiaturą:** Wszystkie funkcje dostępne przez klawiaturę

@@ -20,6 +20,10 @@
 | `speech_enabled` | Ustawienie włączenia/wyłączenia głosu | 12 miesięcy | localStorage |
 | `location_consent` | Zgoda na lokalizację | Do cofnięcia | localStorage |
 | `cookie_consent` | Status zgody na cookies | 12 miesięcy | localStorage |
+| **🚨 EMERGENCY CACHE** | **Cache awaryjnych danych offline** | **Do usunięcia cache** | **Service Worker** |
+| `emergency_contacts` | Numery alarmowe (112,997,998,999) offline | Cache przeglądarki | Service Worker |
+| `safety_instructions` | Instrukcje bezpieczeństwa offline | Cache przeglądarki | Service Worker |
+| `offline_app_core` | Podstawowe pliki aplikacji | Cache przeglądarki | Service Worker |
 
 **Dlaczego są niezbędne?** 
 - Bez tych cookies aplikacja nie mogłaby zapamiętać Twoich podstawowych ustawień

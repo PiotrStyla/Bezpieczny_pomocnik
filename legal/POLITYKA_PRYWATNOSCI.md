@@ -44,8 +44,18 @@
 - **System operacyjny**
 - **Adres IP** (anonimizowany)
 - **Logi błędów** (bez danych osobowych)
+- **Status połączenia** (online/offline) - TYLKO do przełączania trybu awaryjnego
 - **Cel:** Zapewnienie poprawnego działania aplikacji
 - **Podstawa prawna:** Prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO)
+
+#### **🚨 Offline Emergency Cache (Service Worker):**
+- **Emergency contacts data** (112, 997, 998, 999) - TYLKO lokalnie w przeglądarce
+- **Safety instructions** (instrukcje bezpieczeństwa) - TYLKO lokalnie w przeglądarce
+- **App core files** (HTML/CSS/JS) - cache dla działania offline
+- **Cel:** Zapewnienie działania aplikacji podczas katastrof gdy brak internetu
+- **Przechowywanie:** WYŁĄCZNIE w cache przeglądarki (NIE na serwerach Fundacji)
+- **Podstawa prawna:** Żywotny interes osoby fizycznej (art. 6 ust. 1 lit. d RODO)
+- **Szczególne uzasadnienie:** Bezpieczeństwo dzieci podczas sytuacji awaryjnych
 
 ### 👨‍👩‍👧‍👦 **MODUŁY ROZSZERZONE (planowane - po rejestracji Rodzica/Opiekuna):**
 

@@ -63,6 +63,15 @@ Użytkownikom zabrania się:
 - **Ze zgodą:** dodawane alerty wojewódzkie i miejskie dla lokalizacji Użytkownika
 - **Możliwość wycofania:** Użytkownik może w każdej chwili wyłączyć geolokalizację
 
+4.1b. **🚨 Funkcja offline emergency (tryb awaryjny):**
+- **Cel:** zapewnienie działania aplikacji podczas katastrof naturalnych gdy brak internetu
+- **Zakres:** automatyczne cache'owanie niezbędnych danych awaryjnych w przeglądarce
+- **Cache zawiera:** numery alarmowe (112,997,998,999), instrukcje bezpieczeństwa, podstawowe pliki aplikacji
+- **Przechowywanie:** TYLKO w cache Service Worker przeglądarki (NIE na serwerach Fundacji)
+- **Aktywacja:** automatyczna gdy aplikacja wykryje brak połączenia internetowego
+- **Bezpieczeństwo dzieci:** funkcja kluczowa dla ochrony życia dzieci podczas sytuacji kryzysowych
+- **Zgodność RODO:** podstawa prawna - żywotny interes osoby fizycznej (art. 6 ust. 1 lit. d RODO)
+
 4.2. **Treści edukacyjne:**
 - Wszystkie treści są dostosowane do wieku dzieci
 - Informacje o bezpieczeństwie są przedstawiane w sposób przystępny, bez wywoływania niepokoju
