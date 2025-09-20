@@ -1205,42 +1205,74 @@ body {
     }
 }
 
-/* GAMIFICATION SYSTEM STYLING - HEROES MODAL */
+/* 🎮 GAMIFICATION SYSTEM STYLING */
 
-/* Hero Progress Bar - CENTERED AND VISIBLE */
-.hero-progress {
-    position: fixed !important;
-    bottom: 20px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 90% !important;
-    max-width: 600px !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    border-radius: 15px !important;
-    padding: 15px !important;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
-    backdrop-filter: blur(10px) !important;
-    z-index: 5000 !important;
-    border: 2px solid #FF6B35 !important;
-    animation: heroUISlideUp 0.6s ease-out !important;
+/* Heroes Section - Normal Card Flow */
+.heroes-section {
+    margin: 24px 0;
 }
 
-@keyframes heroUISlideUp {
+.hero-progress-card {
+    background: linear-gradient(135deg, #FF6B35, #F7931E);
+    color: white;
+    border: none;
+    animation: heroCardSlideIn 0.8s ease-out;
+}
+
+@keyframes heroCardSlideIn {
     from {
-        transform: translateX(-50%) translateY(100%);
+        transform: translateY(30px);
         opacity: 0;
     }
     to {
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
         opacity: 1;
     }
 }
 
-.hero-info {
+.hero-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.hero-avatar-large {
+    font-size: 4rem;
+    animation: bounce 2s infinite;
+}
+
+.hero-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-description {
+    margin: 0;
+    font-size: 1rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+.hero-progress-details {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    gap: 20px;
+}
+
+.xp-section {
+    flex-grow: 1;
+}
+
+.xp-label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    opacity: 0.9;
+    font-weight: 500;
 }
 
 .hero-name-level {
@@ -1274,52 +1306,66 @@ body {
 }
 
 .xp-bar {
-    width: 200px;
-    height: 8px;
-    background: #e0e0e0;
-    border-radius: 4px;
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
     overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .xp-fill {
     height: 100%;
-    background: #FF6B35;
-    transition: width 0.5s ease;
-    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    transition: width 0.8s ease;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .hero-stats-btn {
-    background: #FF6B35 !important;
+    background: rgba(255, 255, 255, 0.2) !important;
     color: white !important;
-    border: none !important;
-    padding: 10px 20px !important;
+    border: 2px solid white !important;
+    padding: 12px 24px !important;
     border-radius: 25px !important;
     font-weight: bold !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
-    font-size: 14px !important;
+    font-size: 1rem !important;
+    white-space: nowrap !important;
 }
 
 .hero-stats-btn:hover {
-    background: #E55A2B !important;
+    background: white !important;
+    color: #FF6B35 !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Mobile responsive for hero progress */
+/* Mobile responsive for hero card */
 @media (max-width: 768px) {
-    .hero-progress {
-        width: 95% !important;
-        bottom: 10px !important;
-        padding: 12px !important;
+    .hero-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
     }
     
-    .hero-name-level strong {
-        font-size: 16px;
+    .hero-progress-details {
+        flex-direction: column;
+        gap: 15px;
     }
     
-    .xp-bar {
-        width: 150px;
+    .hero-avatar-large {
+        font-size: 3rem;
+    }
+    
+    .hero-info h3 {
+        font-size: 1.5rem;
+    }
+    
+    .hero-stats-btn {
+        width: 100% !important;
+        padding: 15px !important;
     }
 }
 

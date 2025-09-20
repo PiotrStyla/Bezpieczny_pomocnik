@@ -1131,35 +1131,51 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Add gamification UI
+    // Add gamification UI as a new section in main container
     function addGamificationUI() {
         if (!playerProgress.current_hero || !heroesData) return;
         
         const hero = heroesData.heroes[playerProgress.current_hero];
-        const mascotSection = document.querySelector('.mascot-section');
+        const mainContainer = document.querySelector('.kids-container');
         
-        if (mascotSection && !document.querySelector('.hero-progress')) {
-            const progressUI = document.createElement('div');
-            progressUI.className = 'hero-progress';
-            progressUI.innerHTML = `
-                <div class="hero-info">
-                    <div class="hero-name-level">
-                        <strong>${hero.name}</strong>
-                        <span class="hero-level">Poziom ${playerProgress.level}</span>
+        if (mainContainer && !document.querySelector('.heroes-section')) {
+            const heroesSection = document.createElement('section');
+            heroesSection.className = 'heroes-section';
+            heroesSection.innerHTML = `
+                <div class="kids-card hero-progress-card">
+                    <div class="hero-header">
+                        <div class="hero-avatar-large" style="color: ${hero.color_primary}">${hero.avatar}</div>
+                        <div class="hero-info">
+                            <h3>${hero.name} - Poziom ${playerProgress.level}</h3>
+                            <p class="hero-description">${hero.specialty}</p>
+                        </div>
                     </div>
-                    <div class="hero-xp">
-                        <span>${playerProgress.xp} XP</span>
-                        <div class="xp-bar">
-                            <div class="xp-fill" style="background: ${hero.color_primary}; width: ${getXPProgress()}%"></div>
+                    
+                    <div class="hero-progress-details">
+                        <div class="xp-section">
+                            <span class="xp-label">Doświadczenie: ${playerProgress.xp} XP</span>
+                            <div class="xp-bar">
+                                <div class="xp-fill" style="background: ${hero.color_primary}; width: ${getXPProgress()}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="hero-actions">
+                            <button onclick="showHeroStats()" class="hero-stats-btn" style="background: ${hero.color_primary}">
+                                📊 Statystyki i Zadania
+                            </button>
                         </div>
                     </div>
                 </div>
-                <button onclick="showHeroStats()" class="hero-stats-btn" style="background: ${hero.color_primary}">
-                    📊 Statystyki
-                </button>
             `;
             
-            mascotSection.appendChild(progressUI);
+            // Insert after mascot section
+            const mascotSection = document.querySelector('.mascot-section');
+            if (mascotSection && mascotSection.parentNode) {
+                mascotSection.parentNode.insertBefore(heroesSection, mascotSection.nextSibling);
+            } else {
+                // Fallback - add at the end
+                mainContainer.appendChild(heroesSection);
+            }
         }
     }
     
