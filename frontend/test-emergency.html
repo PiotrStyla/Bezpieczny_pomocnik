@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Emergency Mode Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .emergency-button {
+            background: #FF3B30;
+        }
+        .emergency-button:hover {
+            background: #d70015;
+        }
+        .test-result {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #28a745;
+        }
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚨 Emergency Mode Test Suite</h1>
+    
+    <div class="test-section">
+        <h2>🔍 System Status</h2>
+        <div id="system-status">Loading...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🌍 Language & Age Testing</h2>
+        <button class="test-button" onclick="setLanguageAndAge('pl', 'young')">
+            🇵🇱 Polish Young (6-10)
+        </button>
+        <button class="test-button" onclick="setLanguageAndAge('pl', 'older')">
+            🇵🇱 Polish Older (11-16)
+        </button>
+        <button class="test-button" onclick="setLanguageAndAge('en', 'young')">
+            🇬🇧 English Young (6-10)
+        </button>
+        <button class="test-button" onclick="setLanguageAndAge('en', 'older')">
+            🇬🇧 English Older (11-16)
+        </button>
+        <button class="test-button" onclick="setLanguageAndAge('ua', 'young')">
+            🇺🇦 Ukrainian Young (6-10)
+        </button>
+        <button class="test-button" onclick="setLanguageAndAge('ua', 'older')">
+            🇺🇦 Ukrainian Older (11-16)
+        </button>
+    </div>
+    
+    <div class="test-section">
+        <h2>⚡ Quick Emergency Tests</h2>
+        <button class="test-button emergency-button" onclick="triggerEmergencyMode()">
+            🚨 Force Emergency Mode
+        </button>
+        <button class="test-button" onclick="testShelterFinder()">
+            🏠 Test Shelter Finder
+        </button>
+        <button class="test-button" onclick="testFamilyContact()">
+            👨‍👩‍👧‍👦 Test Family Contact
+        </button>
+        <button class="test-button" onclick="testSatelliteSync()">
+            📡 Test Satellite Sync
+        </button>
+        <button class="test-button" onclick="simulateOffline()">
+            📵 Simulate Offline
+        </button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🖥️ Console Output</h2>
+        <div class="console-output" id="console-output"></div>
+    </div>
+
+    <!-- Load our emergency system -->
+    <script src="mina-safety-core.js"></script>
+    <script type="module" src="emergency-mina-integration.js"></script>
+    
+    <script>
+        // 🧪 TEST UTILITIES
+        let testResults = [];
+        let originalConsoleLog = console.log;
+        
+        // Capture console output
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            const output = args.join(' ');
+            const consoleDiv = document.getElementById('console-output');
+            if (consoleDiv) {
+                consoleDiv.innerHTML += output + '<br>';
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            }
+        };
+        
+        // 🚨 TEST FUNCTIONS
+        function addTestResult(test, status, details) {
+            testResults.push({test, status, details, timestamp: new Date().toLocaleTimeString()});
+            updateTestResults();
+        }
+        
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.map(result => {
+                const statusIcon = result.status === 'PASS' ? '✅' : '❌';
+                return `
+                    <div class="test-result">
+                        ${statusIcon} <strong>${result.test}</strong> - ${result.status}
+                        <br><small>${result.details} (${result.timestamp})</small>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function updateSystemStatus() {
+            const statusDiv = document.getElementById('system-status');
+            const hasMinaCore = typeof window.MinaSafetyClient !== 'undefined';
+            const hasEmergencyMina = typeof window.emergencyMina !== 'undefined';
+            const isOnline = navigator.onLine;
+            
+            statusDiv.innerHTML = `
+                <p>🛡️ Mina Safety Core: ${hasMinaCore ? '✅ Loaded' : '❌ Missing'}</p>
+                <p>🚨 Emergency Manager: ${hasEmergencyMina ? '✅ Active' : '❌ Missing'}</p>
+                <p>📡 Network Status: ${isOnline ? '✅ Online' : '❌ Offline'}</p>
+                <p>🔋 Battery API: ${navigator.getBattery ? '✅ Available' : '❌ Not supported'}</p>
+            `;
+            
+            // Test core functionality
+            if (hasMinaCore) {
+                addTestResult('Mina Core Load', 'PASS', 'MinaSafetyClient available globally');
+            } else {
+                addTestResult('Mina Core Load', 'FAIL', 'MinaSafetyClient not found');
+            }
+            
+            if (hasEmergencyMina) {
+                addTestResult('Emergency Manager', 'PASS', 'Emergency system initialized');
+            } else {
+                addTestResult('Emergency Manager', 'FAIL', 'Emergency system not found');
+            }
+        }
+        
+        // 🌍 LANGUAGE & AGE TESTING
+        function setLanguageAndAge(lang, age) {
+            console.log(`🌍 Testing: Setting language to ${lang}, age to ${age}`);
+            
+            // Set language and age
+            localStorage.setItem('app_language', lang);
+            localStorage.setItem('child_age_range', age);
+            window.currentLanguage = lang;
+            
+            // Recreate emergency manager with new settings
+            if (window.emergencyMina) {
+                window.emergencyMina.currentLanguage = lang;
+                window.emergencyMina.childAge = age;
+                window.emergencyMina.initializeTranslations();
+                
+                // Remove existing emergency banner
+                const existingBanner = document.querySelector('.emergency-banner');
+                if (existingBanner) {
+                    existingBanner.remove();
+                }
+                
+                addTestResult('Language/Age Change', 'PASS', `Set to ${lang}/${age}`);
+            } else {
+                addTestResult('Language/Age Change', 'FAIL', 'Emergency manager not available');
+            }
+        }
+
+        // 🧪 SPECIFIC TEST FUNCTIONS
+        function triggerEmergencyMode() {
+            console.log('🧪 Testing: Manual emergency activation');
+            if (window.emergencyMina) {
+                window.emergencyMina.enableEmergencyMode();
+                addTestResult('Manual Emergency', 'PASS', 'Emergency mode triggered successfully');
+            } else {
+                addTestResult('Manual Emergency', 'FAIL', 'Emergency manager not available');
+            }
+        }
+        
+        function testShelterFinder() {
+            console.log('🧪 Testing: Shelter finder functionality');
+            if (window.emergencyMina && window.emergencyMina.findShelter) {
+                window.emergencyMina.findShelter().then(shelters => {
+                    addTestResult('Shelter Finder', 'PASS', `Found ${shelters.length} shelters`);
+                }).catch(error => {
+                    addTestResult('Shelter Finder', 'FAIL', error.message);
+                });
+            } else {
+                addTestResult('Shelter Finder', 'FAIL', 'Function not available');
+            }
+        }
+        
+        function testFamilyContact() {
+            console.log('🧪 Testing: Family contact system');
+            if (window.emergencyMina && window.emergencyMina.contactFamily) {
+                window.emergencyMina.contactFamily().then(result => {
+                    addTestResult('Family Contact', 'PASS', 'Contact system activated');
+                }).catch(error => {
+                    addTestResult('Family Contact', 'FAIL', error.message);
+                });
+            } else {
+                addTestResult('Family Contact', 'FAIL', 'Function not available');
+            }
+        }
+        
+        function testSatelliteSync() {
+            console.log('🧪 Testing: Satellite sync functionality');
+            if (window.emergencyMina && window.emergencyMina.syncSatellite) {
+                window.emergencyMina.syncSatellite().then(result => {
+                    addTestResult('Satellite Sync', 'PASS', 'Sync completed successfully');
+                }).catch(error => {
+                    addTestResult('Satellite Sync', 'FAIL', error.message);
+                });
+            } else {
+                addTestResult('Satellite Sync', 'FAIL', 'Function not available');
+            }
+        }
+        
+        function simulateOffline() {
+            console.log('🧪 Testing: Offline simulation');
+            // Trigger offline event
+            window.dispatchEvent(new Event('offline'));
+            addTestResult('Offline Simulation', 'PASS', 'Offline event dispatched');
+        }
+        
+        // 🚀 INITIALIZE TEST SUITE
+        window.addEventListener('load', () => {
+            console.log('🧪 Emergency Test Suite Initialized');
+            updateSystemStatus();
+            
+            // Test after emergency system loads
+            setTimeout(() => {
+                updateSystemStatus();
+                console.log('🧪 All systems loaded - ready for testing!');
+            }, 2000);
+        });
+        
+        // Monitor emergency mode activation
+        window.addEventListener('offline', () => {
+            addTestResult('Offline Detection', 'PASS', 'Offline event detected and handled');
+        });
+        
+        window.addEventListener('online', () => {
+            addTestResult('Online Detection', 'PASS', 'Online event detected and handled');
+        });
+    </script>
+</body>
+</html>

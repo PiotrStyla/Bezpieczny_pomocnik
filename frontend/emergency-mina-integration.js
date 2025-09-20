@@ -18,9 +18,132 @@ class EmergencyMinaManager {
         this.batteryOptimized = false;
         this.lastSync = null;
         this.emergencyLevel = window.EMERGENCY_LEVELS?.NORMAL || 0;
+        this.currentLanguage = this.detectLanguage();
+        this.childAge = this.detectChildAge();
+        
+        // Initialize emergency translations
+        this.initializeTranslations();
         
         // Initialize immediately for emergency readiness
         this.initializeEmergencySystem();
+    }
+
+    /**
+     * 🌍 DETECT CURRENT LANGUAGE
+     */
+    detectLanguage() {
+        // Check if main app has language setting
+        if (window.currentLanguage) return window.currentLanguage;
+        if (localStorage.getItem('app_language')) return localStorage.getItem('app_language');
+        
+        // Fallback to browser language
+        const browserLang = navigator.language.toLowerCase();
+        if (browserLang.includes('pl')) return 'pl';
+        if (browserLang.includes('ua') || browserLang.includes('uk')) return 'ua';
+        return 'en'; // Default to English
+    }
+
+    /**
+     * 👶 DETECT CHILD AGE RANGE
+     */
+    detectChildAge() {
+        // Check if parental consent has age info
+        const savedAge = localStorage.getItem('child_age_range');
+        if (savedAge) return savedAge;
+        
+        // Try to get from URL params (parental consent)
+        const urlParams = new URLSearchParams(window.location.search);
+        const ageParam = urlParams.get('age');
+        if (ageParam) {
+            const ageRange = parseInt(ageParam) <= 10 ? 'young' : 'older';
+            localStorage.setItem('child_age_range', ageRange);
+            return ageRange;
+        }
+        
+        return 'young'; // Default to younger child (safer messaging)
+    }
+
+    /**
+     * 🗣️ INITIALIZE EMERGENCY TRANSLATIONS
+     */
+    initializeTranslations() {
+        this.emergencyTexts = {
+            pl: {
+                young: { // 6-10 years
+                    banner: "TRYB AWARYJNY - Jesteś bezpieczny",
+                    bannerSub: "Aplikacja pomoże Ci znaleźć pomoc",
+                    shelter: "🏠 Bezpieczne miejsce",
+                    family: "👨‍👩‍👧‍👦 Znajdź mamę/tatę",
+                    sync: "📡 Sprawdź wiadomości",
+                    shelterTitle: "🏠 Bezpieczne miejsca w pobliżu",
+                    familyMessage: "Szukamy mamy i taty...\n\nPamiętaj:\n- Zostań w bezpiecznym miejscu\n- Jeśli ktoś nieznajomy podchodzi, uciekaj\n- Znajdź dorosłego w mundurze (policjant, strażak)",
+                    syncMessage: "Sprawdzanie wiadomości od rodziny..."
+                },
+                older: { // 11-16 years  
+                    banner: "TRYB AWARYJNY AKTYWNY",
+                    bannerSub: "Zoptymalizowano dla sytuacji kryzysowych",
+                    shelter: "🏠 Schronienie",
+                    family: "👨‍👩‍👧‍👦 Rodzina", 
+                    sync: "📡 Synchronizuj",
+                    shelterTitle: "🏠 Schronienia w pobliżu",
+                    familyMessage: "Inicjowanie kontaktu z rodziną...\n\nProtokół awaryjny:\n1. Sprawdź punkty spotkań awaryjnych\n2. Użyj komunikacji zapasowej\n3. Udaj się do najbliższego schronienia",
+                    syncMessage: "Synchronizacja z siecią awaryjną..."
+                }
+            },
+            en: {
+                young: {
+                    banner: "EMERGENCY MODE - You are safe",
+                    bannerSub: "App will help you find help",
+                    shelter: "🏠 Safe place",
+                    family: "👨‍👩‍👧‍👦 Find mommy/daddy",
+                    sync: "📡 Check messages",
+                    shelterTitle: "🏠 Safe places nearby",
+                    familyMessage: "Looking for mommy and daddy...\n\nRemember:\n- Stay in safe place\n- If stranger approaches, run away\n- Find adult in uniform (police, firefighter)",
+                    syncMessage: "Checking messages from family..."
+                },
+                older: {
+                    banner: "EMERGENCY MODE ACTIVE",
+                    bannerSub: "Optimized for crisis situations",
+                    shelter: "🏠 Shelter",
+                    family: "👨‍👩‍👧‍👦 Family",
+                    sync: "📡 Sync",
+                    shelterTitle: "🏠 Shelters nearby",
+                    familyMessage: "Initiating family contact...\n\nEmergency protocol:\n1. Check emergency meeting points\n2. Use backup communication\n3. Head to nearest shelter",
+                    syncMessage: "Syncing with emergency network..."
+                }
+            },
+            ua: {
+                young: {
+                    banner: "АВАРІЙНИЙ РЕЖИМ - Ти в безпеці",
+                    bannerSub: "Додаток допоможе знайти допомогу",
+                    shelter: "🏠 Безпечне місце",
+                    family: "👨‍👩‍👧‍👦 Знайти маму/тата",
+                    sync: "📡 Перевірити повідомлення",
+                    shelterTitle: "🏠 Безпечні місця поблизу",
+                    familyMessage: "Шукаємо маму і тата...\n\nПам'ятай:\n- Залишайся в безпечному місці\n- Якщо незнайомець підходить, біжи\n- Знайди дорослого в формі (поліцейський, рятувальник)",
+                    syncMessage: "Перевіряємо повідомлення від родини..."
+                },
+                older: {
+                    banner: "АВАРІЙНИЙ РЕЖИМ АКТИВНИЙ",
+                    bannerSub: "Оптимізовано для кризових ситуацій",
+                    shelter: "🏠 Укриття",
+                    family: "👨‍👩‍👧‍👦 Родина",
+                    sync: "📡 Синхронізація",
+                    shelterTitle: "🏠 Укриття поблизу",
+                    familyMessage: "Встановлення зв'язку з родиною...\n\nАварійний протокол:\n1. Перевір місця аварійних зустрічей\n2. Використай резервний зв'язок\n3. Йди до найближчого укриття",
+                    syncMessage: "Синхронізація з аварійною мережею..."
+                }
+            }
+        };
+    }
+
+    /**
+     * 🎯 GET LOCALIZED TEXT
+     */
+    getText(key) {
+        const lang = this.currentLanguage;
+        const age = this.childAge;
+        return this.emergencyTexts[lang]?.[age]?.[key] || this.emergencyTexts.en.young[key] || key;
     }
 
     /**
@@ -78,20 +201,49 @@ class EmergencyMinaManager {
         // Create shelter display UI
         const shelterDisplay = document.createElement('div');
         shelterDisplay.className = 'shelter-results';
+        
+        // Localize capacity and accessibility terms
+        const localizeCapacity = (capacity) => {
+            const translations = {
+                pl: { available: 'dostępne', limited: 'ograniczone', full: 'pełne' },
+                en: { available: 'available', limited: 'limited', full: 'full' },
+                ua: { available: 'доступно', limited: 'обмежено', full: 'повно' }
+            };
+            return translations[this.currentLanguage]?.[capacity] || capacity;
+        };
+        
+        const localizeAccessibility = () => {
+            const translations = {
+                pl: 'Dostępne dla niepełnosprawnych',
+                en: 'Wheelchair accessible', 
+                ua: 'Доступно для інвалідів'
+            };
+            return translations[this.currentLanguage] || 'Accessible';
+        };
+        
+        const localizeClose = () => {
+            const translations = {
+                pl: 'Zamknij',
+                en: 'Close',
+                ua: 'Закрити'
+            };
+            return translations[this.currentLanguage] || 'Close';
+        };
+        
         shelterDisplay.innerHTML = `
             <div class="shelter-popup">
-                <h3>🏠 Schronienia w pobliżu</h3>
+                <h3>${this.getText('shelterTitle')}</h3>
                 ${shelters.map(shelter => `
                     <div class="shelter-item">
                         <div class="shelter-distance">${shelter.distance}</div>
                         <div class="shelter-info">
-                            <span class="capacity ${shelter.capacity}">${shelter.capacity}</span>
+                            <span class="capacity ${shelter.capacity}">${localizeCapacity(shelter.capacity)}</span>
                             <div class="supplies">${shelter.supplies.join(', ')}</div>
-                            ${shelter.accessibility ? '♿ Dostępne' : ''}
+                            ${shelter.accessibility ? `♿ ${localizeAccessibility()}` : ''}
                         </div>
                     </div>
                 `).join('')}
-                <button onclick="this.parentElement.parentElement.remove()" class="close-btn">Zamknij</button>
+                <button onclick="this.parentElement.parentElement.remove()" class="close-btn">${localizeClose()}</button>
             </div>
         `;
         
@@ -120,8 +272,8 @@ class EmergencyMinaManager {
         
         console.log('📄 Physical message prepared:', message);
         
-        // Show message to user
-        alert(`📝 WIADOMOŚĆ AWARYJNA:\n\nCzas: ${message.timestamp}\nStatus: ${message.status}\n\nInstrukcje: ${message.instructions}`);
+        // Show localized message to user
+        alert(this.getText('familyMessage'));
     }
 
     /**
@@ -242,18 +394,18 @@ class EmergencyMinaManager {
             <div class="emergency-content">
                 <span class="emergency-icon">🚨</span>
                 <div class="emergency-text">
-                    <strong>TRYB AWARYJNY AKTYWNY</strong>
-                    <small>Zoptymalizowano dla sytuacji kryzysowych</small>
+                    <strong>${this.getText('banner')}</strong>
+                    <small>${this.getText('bannerSub')}</small>
                 </div>
                 <div class="emergency-actions">
                     <button onclick="emergencyMina.findShelter()" class="emergency-btn">
-                        🏠 Schronienie
+                        ${this.getText('shelter')}
                     </button>
                     <button onclick="emergencyMina.contactFamily()" class="emergency-btn">
-                        👨‍👩‍👧‍👦 Rodzina
+                        ${this.getText('family')}
                     </button>
                     <button onclick="emergencyMina.syncSatellite()" class="emergency-btn">
-                        📡 Synchronizuj
+                        ${this.getText('sync')}
                     </button>
                 </div>
             </div>
@@ -333,9 +485,9 @@ class EmergencyMinaManager {
     async syncSatellite() {
         console.log('📡 Syncing with satellite network...');
         
-        const syncButton = document.querySelector('.emergency-btn');
+        const syncButton = document.querySelector('.emergency-btn:last-child');
         if (syncButton) {
-            syncButton.innerHTML = '📡 Synchronizacja...';
+            syncButton.innerHTML = this.getText('syncMessage');
             syncButton.disabled = true;
         }
         
