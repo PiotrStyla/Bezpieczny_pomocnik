@@ -1794,10 +1794,9 @@ document.addEventListener('DOMContentLoaded', function() {
             handleSafetyCardClick(e);
         }
     });
-});
-
-// Globalna funkcja testowa dla przycisku
-window.testSpeech = function() {
+    
+    // Globalna funkcja testowa dla przycisku
+    window.testSpeech = function() {
     console.log('🎤 TEST: Kliknięto przycisk test mowy');
     const testMessage = "Witaj! To jest test mowy. Jeśli mnie słyszysz, znaczy że wszystko działa!";
     
@@ -1819,4 +1818,6 @@ window.testSpeech = function() {
         console.log('❌ Brak TTS w przeglądarce');
         alert('Twoja przeglądarka nie obsługuje mowy!');
     }
-};
+    };
+    
+}); // Zamknięcie DOMContentLoaded
