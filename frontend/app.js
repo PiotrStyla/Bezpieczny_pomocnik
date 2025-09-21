@@ -1794,7 +1794,6 @@ document.addEventListener('DOMContentLoaded', function() {
             handleSafetyCardClick(e);
         }
     });
-    
 });
 
 // Globalna funkcja testowa dla przycisku
