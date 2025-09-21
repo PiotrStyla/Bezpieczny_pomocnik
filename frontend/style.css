@@ -561,6 +561,106 @@ body {
     font-size: 1.1rem;
 }
 
+/* Location Action Menu */
+.location-action-menu {
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    margin-top: 15px;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    border: 2px solid var(--primary-green);
+}
+
+.location-action-menu.menu-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.action-menu-content h3 {
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-dark);
+    text-decoration: none;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.action-btn .btn-icon {
+    font-size: 1.2rem;
+}
+
+.shelter-btn {
+    border-color: var(--primary-orange);
+}
+.shelter-btn:hover {
+    background: var(--primary-orange);
+    color: white;
+}
+
+.emergency-btn {
+    border-color: var(--primary-red);
+}
+.emergency-btn:hover {
+    background: var(--primary-red);
+    color: white;
+}
+
+.family-btn {
+    border-color: var(--primary-purple);
+}
+.family-btn:hover {
+    background: var(--primary-purple);
+    color: white;
+}
+
+.safe-btn {
+    border-color: var(--primary-blue);
+}
+.safe-btn:hover {
+    background: var(--primary-blue);
+    color: white;
+}
+
+.close-btn {
+    border-color: var(--text-light);
+    grid-column: span 2;
+    justify-self: center;
+    max-width: 200px;
+}
+.close-btn:hover {
+    background: var(--text-light);
+    color: white;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .kids-container {
@@ -1147,6 +1247,27 @@ body {
 
 /* Responsive coverage popup */
 @media (max-width: 480px) {
+    .language-selector select {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+    
+    /* Location action menu mobile styles */
+    .action-buttons {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .action-btn {
+        padding: 15px 20px;
+        font-size: 1rem;
+    }
+    
+    .close-btn {
+        grid-column: span 1;
+        max-width: none;
+    }
+    
     .coverage-info-popup {
         padding: 20px;
         font-size: 0.9rem;

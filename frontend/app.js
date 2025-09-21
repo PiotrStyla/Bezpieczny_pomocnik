@@ -276,6 +276,53 @@ document.addEventListener('DOMContentLoaded', function() {
             utterance.pitch = 1.2; // Wyżej, przyjazniej 
             utterance.volume = 0.9; // Głośno, ale nie za głośno
             
+            // Enhanced voice quality detection and optimization
+            function detectBestPolishVoice() {
+                if (!speechSynthesis) return null;
+                
+                const voices = speechSynthesis.getVoices();
+                console.log('🎤 Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+                
+                // Priority ranking for Polish voices
+                const voiceQualityRanking = [
+                    // Premium Neural voices (best quality)
+                    'Zosia',           // macOS/iOS Neural
+                    'Paulina Enhanced', // Windows 11 Neural  
+                    'Paulina Premium',  // Windows Neural
+                    
+                    // Good quality voices
+                    'Google polski',    // Android Google TTS
+                    'Paulina',         // Windows standard
+                    'Microsoft Paulina', // Windows SAPI
+                    
+                    // Fallback voices
+                    'pl-PL',           // Generic Polish
+                    'Polish'           // Basic Polish
+                ];
+                
+                // Find the highest-ranked available voice
+                for (const preferredName of voiceQualityRanking) {
+                    const voice = voices.find(v => 
+                        v.lang.startsWith('pl') && 
+                        (v.name.includes(preferredName) || v.name === preferredName)
+                    );
+                    if (voice) {
+                        console.log(`🏆 Best Polish voice detected: ${voice.name} (${voice.lang})`);
+                        return voice;
+                    }
+                }
+                
+                // Fallback: any Polish voice
+                const anyPolish = voices.find(v => v.lang.startsWith('pl'));
+                if (anyPolish) {
+                    console.log(`⚠️ Using fallback Polish voice: ${anyPolish.name}`);
+                    return anyPolish;
+                }
+                
+                console.log('❌ No Polish voices available');
+                return null;
+            }
+            
             // Spróbuj znaleźć głos dla konkretnego języka
             const voices = window.speechSynthesis.getVoices();
             console.log('🔊 Dostępne głosy:', voices.length, 'Szukam dla:', utterance.lang);
@@ -312,10 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else { // 'pl'
                 console.log('🔍 Szukam głosu polskiego...');
-                preferredVoice = voices.find(voice => 
-                    voice.lang === 'pl-PL' && 
-                    (voice.name.toLowerCase().includes('paulina') || voice.name.toLowerCase().includes('zofia'))
-                ) || voices.find(voice => voice.lang.startsWith('pl'));
+                preferredVoice = detectBestPolishVoice();
                 console.log('🇵🇱 Znaleziony głos polski:', preferredVoice?.name || 'BRAK');
             }
             
@@ -588,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }, 800);
                     }
                 }
-            }, 1500);
+            }, 1000); // Dodaj zamykający nawias i delay dla setTimeout
         }
     }
 
@@ -698,122 +742,223 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function handleLocationButtonClick() {
             const locationBtn = document.getElementById('location-btn');
+            const currentState = locationBtn.dataset.state || 'initial';
             
-            // Pokaż że szukamy lokalizacji
-            locationBtn.innerHTML = '<span class="btn-icon">🔄</span><span class="btn-text">Szukam...</span>';
-            locationBtn.disabled = true;
-            
-            updateMascotMessage('loading');
-            
-            // Wywołaj funkcję geolokalizacji
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    
-                    // Sprawdź czy lokalizacja jest w Polsce
-                    if (lat >= 48.9 && lat <= 55.0 && lng >= 14.0 && lng <= 24.2) {
-                        userLocation = [lat, lng];
-                        showUserLocationOnMap(lat, lng);
+            if (currentState === 'initial') {
+                // Pokaż że szukamy lokalizacji
+                locationBtn.innerHTML = '<span class="btn-icon">🔄</span><span class="btn-text">Szukam...</span>';
+                locationBtn.disabled = true;
+                locationBtn.dataset.state = 'searching';
+                
+                updateMascotMessage('loading');
+                
+                // Wywołaj funkcję geolokalizacji
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
                         
-                        // Znajdź najbliższe miasto
-                        const nearestCity = findNearestCity(lat, lng);
-                        if (nearestCity) {
-                            updateLocationFilterToNearest(nearestCity);
-                            locationBtn.innerHTML = `<span class="btn-icon">📍</span><span class="btn-text">Znaleziono: ${nearestCity}</span>`;
+                        // Sprawdź czy lokalizacja jest w Polsce
+                        if (lat >= 48.9 && lat <= 55.0 && lng >= 14.0 && lng <= 24.2) {
+                            userLocation = [lat, lng];
+                            showUserLocationOnMap(lat, lng);
+                            
+                            // Znajdź najbliższe miasto i dokładniejszą lokalizację
+                            const nearestCity = findNearestCity(lat, lng);
+                            
+                            if (nearestCity) {
+                                updateLocationFilterToNearest(nearestCity);
+                                // Zmień przycisk na główną akcję
+                                locationBtn.innerHTML = '<span class="btn-icon">🏠</span><span class="btn-text">Zaprowadź do domu</span>';
+                                locationBtn.dataset.state = 'found';
+                                locationBtn.dataset.lat = lat;
+                                locationBtn.dataset.lng = lng;
+                                locationBtn.dataset.city = nearestCity;
+                                locationBtn.style.background = '#32D74B';
+                                
+                                // Pokaż pomocne opcje
+                                showLocationActionMenu(lat, lng, nearestCity);
+                                
+                            } else {
+                                locationBtn.innerHTML = '<span class="btn-icon">📍</span><span class="btn-text">Lokalizacja znaleziona</span>';
+                                locationBtn.dataset.state = 'found';
+                            }
                         } else {
-                            locationBtn.innerHTML = '<span class="btn-icon">📍</span><span class="btn-text">Lokalizacja znaleziona</span>';
+                            locationBtn.innerHTML = '<span class="btn-icon">🌍</span><span class="btn-text">Poza Polską</span>';
+                            locationBtn.style.background = '#FF9500';
+                            locationBtn.dataset.state = 'outside';
+                            updateMascotMessage('welcome');
+                            if (mascotText) {
+                                mascotText.textContent = 'Jesteś poza Polską. Pokazuję ogólne informacje bezpieczeństwa.';
+                            }
                         }
-                        locationBtn.style.background = '#32D74B';
-                    } else {
-                        locationBtn.innerHTML = '<span class="btn-icon">🌍</span><span class="btn-text">Poza Polską</span>';
-                        locationBtn.style.background = '#FF9500';
+                        locationBtn.disabled = false;
+                    },
+                    (error) => {
+                        console.log('Błąd geolokalizacji:', error.message);
+                        locationBtn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Spróbuj ponownie</span>';
+                        locationBtn.style.background = '#FF3B30';  
+                        locationBtn.disabled = false;
+                        locationBtn.dataset.state = 'error';
+                        
                         updateMascotMessage('welcome');
                         if (mascotText) {
-                            mascotText.textContent = 'Twoja lokalizacja jest poza Polską. Pokazuję wszystkie alerty.';
+                            mascotText.textContent = 'Nie mogę znaleźć Twojej lokalizacji. Sprawdź ustawienia przeglądarki albo wybierz miasto z listy.';
                         }
-                    }
-                    locationBtn.disabled = false;
-                },
-                (error) => {
-                    console.log('Błąd geolokalizacji:', error.message);
-                    locationBtn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Nie można znaleźć</span>';
-                    locationBtn.style.background = '#FF3B30';  
-                    locationBtn.disabled = false;
-                    
-                    updateMascotMessage('welcome');
-                    if (mascotText) {
-                        mascotText.textContent = 'Nie mogę znaleźć Twojej lokalizacji. Sprawdź ustawienia przeglądarki lub wybierz miasto ręcznie.';
-                    }
-                },
+                    },
                 {
                     enableHighAccuracy: true,
                     timeout: 15000,
                     maximumAge: 0 // Zawsze pobierz świeżą lokalizację przy kliknięciu
                 }
             );
+        } else if (currentState === 'found') {
+            // Po kliknięciu na "Zaprowadź do domu" - otwórz nawigację
+            const lat = parseFloat(locationBtn.dataset.lat);
+            const lng = parseFloat(locationBtn.dataset.lng);
+            navigateHome(lat, lng);
+        } else if (currentState === 'error' || currentState === 'outside') {
+            // Reset i spróbuj ponownie
+            locationBtn.dataset.state = 'initial';
+            locationBtn.innerHTML = '<span class="btn-icon">📍</span><span class="btn-text">Znajdź mnie</span>';
+            locationBtn.style.background = '';
+            handleLocationButtonClick();
         }
     }
-
-    function handleLocationButtonClick() {
+    
+    function showLocationActionMenu(lat, lng, city) {
+        // Usuń poprzednie menu jeśli istnieje
+        const existingMenu = document.getElementById('location-action-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+        
+        const actionMenu = document.createElement('div');
+        actionMenu.id = 'location-action-menu';
+        actionMenu.className = 'location-action-menu';
+        actionMenu.innerHTML = `
+            <div class="action-menu-content">
+                <h3>🎯 Dodatkowe opcje pomocy:</h3>
+                <div class="action-buttons">
+                    <button class="action-btn shelter-btn" onclick="findNearestShelter(${lat}, ${lng})">
+                        <span class="btn-icon">🏥</span>
+                        <span class="btn-text">Znajdź schronienie</span>
+                    </button>
+                    <button class="action-btn emergency-btn" onclick="callEmergency()">
+                        <span class="btn-icon">📞</span>
+                        <span class="btn-text">Zadzwoń po pomoc</span>
+                    </button>
+                    <button class="action-btn family-btn" onclick="contactFamily()">
+                        <span class="btn-icon">👨‍👩‍👧‍👦</span>
+                        <span class="btn-text">Znajdź rodzinę</span>
+                    </button>
+                    <button class="action-btn safe-btn" onclick="findSafePlace(${lat}, ${lng})">
+                        <span class="btn-icon">🛡️</span>
+                        <span class="btn-text">Bezpieczne miejsce</span>
+                    </button>
+                    <button class="action-btn close-btn" onclick="closeLocationMenu()">
+                        <span class="btn-icon">✕</span>
+                        <span class="btn-text">Ukryj opcje</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Dodaj menu po przycisku lokalizacji
         const locationBtn = document.getElementById('location-btn');
+        locationBtn.parentNode.insertBefore(actionMenu, locationBtn.nextSibling);
         
-        // Pokaż że szukamy lokalizacji
-        locationBtn.innerHTML = '<span class="btn-icon">🔄</span><span class="btn-text">Szukam...</span>';
-        locationBtn.disabled = true;
+        // Animacja pojawiania się
+        setTimeout(() => actionMenu.classList.add('menu-visible'), 10);
         
-        updateMascotMessage('loading');
-        
-        // Wywołaj funkcję geolokalizacji
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-                
-                // Sprawdź czy lokalizacja jest w Polsce
-                if (lat >= 48.9 && lat <= 55.0 && lng >= 14.0 && lng <= 24.2) {
-                    userLocation = [lat, lng];
-                    showUserLocationOnMap(lat, lng);
-                    
-                    // Znajdź najbliższe miasto
-                    const nearestCity = findNearestCity(lat, lng);
-                    if (nearestCity) {
-                        updateLocationFilterToNearest(nearestCity);
-                        locationBtn.innerHTML = `<span class="btn-icon">📍</span><span class="btn-text">Znaleziono: ${nearestCity}</span>`;
-                        
-                        // Nie dodawaj własnej wiadomości - updateLocationFilterToNearest to zrobi
-                        
-                    } else {
-                        locationBtn.innerHTML = '<span class="btn-icon">📍</span><span class="btn-text">Lokalizacja znaleziona</span>';
-                        const message = "Znalazłem twoją lokalizację na mapie!";
-                        if (mascotText) mascotText.textContent = message;
-                        if (speechEnabled) speakText(message, currentLang);
-                    }
-                    locationBtn.style.background = '#32D74B';
-                } else {
-                    locationBtn.innerHTML = '<span class="btn-icon">🌍</span><span class="btn-text">Poza Polską</span>';
-                    locationBtn.style.background = '#FF9500';
-                    const message = 'Twoja lokalizacja jest poza Polską. Pokazuję wszystkie alerty z Polski.';
-                    if (mascotText) mascotText.textContent = message;
-                    if (speechEnabled) speakText(message, currentLang);
-                }
-                locationBtn.disabled = false;
-            },
-            (error) => {
-                console.log('Błąd geolokalizacji:', error.message);
-                locationBtn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Nie można znaleźć</span>';
-                locationBtn.style.background = '#FF3B30';  
-                locationBtn.disabled = false;
-                
-                const message = 'Nie mogę znaleźć twojej lokalizacji. Sprawdź ustawienia przeglądarki albo wybierz miasto z listy.';
-                if (mascotText) mascotText.textContent = message;
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 0 // Zawsze pobierz świeżą lokalizację przy kliknięciu
+        // Informacja dla dziecka
+        if (mascotText) {
+            const helpMessage = `Znalazłem cię w ${city}! Kliknij "Zaprowadź do domu" lub wybierz inną opcję pomocy poniżej.`;
+            mascotText.textContent = helpMessage;
+            if (speechEnabled) {
+                setTimeout(() => speakText(helpMessage, currentLang), 500);
             }
-        );
+        }
+    }
+    
+    // Funkcje akcji lokalizacyjnych
+    window.navigateHome = function(lat, lng) {
+        const googleMapsUrl = `https://www.google.com/maps/dir/${lat},${lng}/Home/@${lat},${lng},15z`;
+        const appleMapsUrl = `maps://maps.google.com/maps/dir/${lat},${lng}/Home`;
+        
+        // Sprawdź czy to iOS/Safari
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        
+        if (isIOS) {
+            window.open(appleMapsUrl, '_blank');
+        } else {
+            window.open(googleMapsUrl, '_blank');
+        }
+        
+        if (mascotText && speechEnabled) {
+            const navMessage = "Otwieram nawigację do domu. Postępuj zgodnie z instrukcjami na mapie!";
+            mascotText.textContent = navMessage;
+            speakText(navMessage, currentLang);
+        }
+    }
+    
+    window.findNearestShelter = function(lat, lng) {
+        const shelterUrl = `https://www.google.com/maps/search/schronienie+przeciwlotnicze+metro+tunel/@${lat},${lng},15z`;
+        window.open(shelterUrl, '_blank');
+        
+        if (mascotText && speechEnabled) {
+            const shelterMessage = "Szukam najbliższego schronienia. Sprawdź mapę i idź w bezpieczne miejsce!";
+            mascotText.textContent = shelterMessage;
+            speakText(shelterMessage, currentLang);
+        }
+    }
+    
+    window.callEmergency = function() {
+        const phoneNumber = "112";
+        const telUrl = `tel:${phoneNumber}`;
+        
+        // Utwórz link do dzwonienia
+        const link = document.createElement('a');
+        link.href = telUrl;
+        link.click();
+        
+        if (mascotText && speechEnabled) {
+            const emergencyMessage = "Dzwonię na numer alarmowy 112. Powiedz gdzie jesteś i co się dzieje!";
+            mascotText.textContent = emergencyMessage;
+            speakText(emergencyMessage, currentLang);
+        }
+    }
+    
+    window.contactFamily = function() {
+        if (mascotText && speechEnabled) {
+            const familyMessage = "Sprawdź kontakty w telefonie i zadzwoń do mamy, taty lub innej bliskiej osoby. Powiedz gdzie jesteś!";
+            mascotText.textContent = familyMessage;
+            speakText(familyMessage, currentLang);
+        }
+        
+        // Pokazuj numery alarmowe jako alternatywę
+        setTimeout(() => {
+            alert("Numery alarmowe:\n112 - Pogotowie/Straż/Policja\n📞 Zadzwoń do rodziny z kontaktów w telefonie");
+        }, 1000);
+    }
+    
+    window.findSafePlace = function(lat, lng) {
+        const safeUrl = `https://www.google.com/maps/search/komisariat+policji+szpital+straż+pożarna/@${lat},${lng},15z`;
+        window.open(safeUrl, '_blank');
+        
+        if (mascotText && speechEnabled) {
+            const safeMessage = "Szukam najbliższych bezpiecznych miejsc - komisariat, szpital, straż pożarna. Idź tam jeśli potrzebujesz pomocy!";
+            mascotText.textContent = safeMessage;
+            speakText(safeMessage, currentLang);
+        }
+    }
+    
+    window.closeLocationMenu = function() {
+        const menu = document.getElementById('location-action-menu');
+        if (menu) {
+            menu.classList.remove('menu-visible');
+            setTimeout(() => menu.remove(), 300);
+        }
     }
 
     notificationsBtn.addEventListener('click', () => {
@@ -1650,40 +1795,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Show call confirmation popup
-    function showCallPopup(phoneNumber, targetElement) {
-        // Remove existing popup
-        const existingPopup = document.querySelector('.call-popup');
-        if (existingPopup) existingPopup.remove();
-        
-        const popup = document.createElement('div');
-        popup.className = 'call-popup';
-        popup.innerHTML = `
-            <div class="popup-content">
-                <div class="popup-icon">📞</div>
-                <div class="popup-text">
-                    ${currentLang === 'en' ? 'Click again to call' : 
-                      currentLang === 'ua' ? 'Клікни ще раз щоб зателефонувати' : 
-                      'Kliknij ponownie aby zadzwonić'}<br>
-                    <strong>${phoneNumber}</strong>
-                </div>
-            </div>
-        `;
-        
-        // Position near clicked element
-        const rect = targetElement.getBoundingClientRect();
-        popup.style.position = 'fixed';
-        popup.style.left = rect.left + 'px';
-        popup.style.top = (rect.top - 80) + 'px';
-        popup.style.zIndex = '10000';
-        
-        document.body.appendChild(popup);
-        
-        // Auto-hide after 3 seconds
-        setTimeout(() => {
-            if (popup.parentNode) popup.remove();
-        }, 3000);
-    }
 });
 
 // Globalna funkcja testowa dla przycisku
@@ -1710,5 +1821,3 @@ window.testSpeech = function() {
         alert('Twoja przeglądarka nie obsługuje mowy!');
     }
 };
-
-// Remove the separate DOMContentLoaded - will add call inside main one

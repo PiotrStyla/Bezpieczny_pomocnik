@@ -9,8 +9,8 @@
  * - 72+ hour battery life in emergency mode
  */
 
-// Load Mina Safety Core first
-import './mina-safety-core.js';
+// Load Mina Safety Core first - fixed for immediate loading
+// import './mina-safety-core.js'; // Commented out - will load via script tag
 
 class EmergencyMinaManager {
     constructor() {
@@ -153,6 +153,16 @@ class EmergencyMinaManager {
         console.log('🚨 EMERGENCY MINA SYSTEM INITIALIZING...');
         
         try {
+            // Wait a bit for dependencies to load
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Check if Mina Safety Core loaded
+            if (!window.MinaSafetyClient) {
+                console.warn('⚠️ MinaSafetyClient not available - using fallback mode');
+                this.enableFallbackMode();
+                return;
+            }
+            
             // Check if we're in a crisis situation
             await this.assessEmergencyStatus();
             
@@ -169,6 +179,7 @@ class EmergencyMinaManager {
             
         } catch (error) {
             console.error('❌ Emergency system initialization failed:', error);
+            console.log('🛡️ Switching to fallback safety mode...');
             // Fallback to traditional safety measures
             this.enableFallbackMode();
         }
@@ -182,6 +193,213 @@ class EmergencyMinaManager {
         // Simulate emergency data caching
         await new Promise(resolve => setTimeout(resolve, 500));
         console.log('✅ Emergency data cached successfully');
+    }
+
+    /**
+     * 🎛️ ADD EMERGENCY CONTROLS TO UI
+     */
+    addEmergencyControls() {
+        console.log('🎛️ Adding emergency controls to UI...');
+        
+        try {
+            // Add emergency status indicator
+            this.addEmergencyStatusIndicator();
+            
+            // Add quick access emergency buttons (if needed)
+            this.addQuickEmergencyButtons();
+            
+            console.log('✅ Emergency controls added successfully');
+        } catch (error) {
+            console.warn('⚠️ Could not add emergency controls:', error);
+        }
+    }
+
+    /**
+     * 🚨 ADD EMERGENCY STATUS INDICATOR
+     */
+    addEmergencyStatusIndicator() {
+        // Check if indicator already exists
+        if (document.getElementById('emergency-status-indicator')) {
+            return;
+        }
+
+        const indicator = document.createElement('div');
+        indicator.id = 'emergency-status-indicator';
+        indicator.className = 'emergency-status-indicator';
+        indicator.innerHTML = `
+            <div class="status-light"></div>
+            <span class="status-text">System bezpieczeństwa aktywny</span>
+        `;
+
+        // Add styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .emergency-status-indicator {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: rgba(50, 215, 75, 0.9);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                z-index: 1000;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            }
+            .status-light {
+                width: 8px;
+                height: 8px;
+                background: #fff;
+                border-radius: 50%;
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            @media (max-width: 768px) {
+                .emergency-status-indicator {
+                    top: 5px;
+                    right: 5px;
+                    font-size: 0.7rem;
+                    padding: 6px 10px;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+        document.body.appendChild(indicator);
+        
+        // Auto-hide after 3 seconds to not interfere with logo
+        setTimeout(() => {
+            if (indicator.parentNode) {
+                indicator.style.opacity = '0';
+                indicator.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => indicator.remove(), 500);
+            }
+        }, 3000); // Reduced from 5s to 3s for better mobile UX
+    }
+
+    /**
+     * ⚡ ADD QUICK EMERGENCY BUTTONS (OPTIONAL)
+     */
+    addQuickEmergencyButtons() {
+        // Only add if in actual emergency mode
+        if (!this.isEmergencyMode) {
+            return;
+        }
+        
+        console.log('⚡ Emergency mode - adding quick access buttons');
+        // This would add additional emergency controls if needed
+        // For now, we rely on the main app's location and emergency features
+    }
+
+    /**
+     * 🎯 HIDE NON-ESSENTIAL FEATURES IN EMERGENCY MODE
+     */
+    hideNonEssentialFeatures() {
+        console.log('🎯 Hiding non-essential features for emergency mode...');
+        
+        try {
+            // Hide decorative elements in emergency mode
+            const nonEssential = document.querySelectorAll('.decorative, .optional, .non-critical');
+            nonEssential.forEach(element => {
+                element.style.display = 'none';
+            });
+            
+            // Reduce UI animations for better performance
+            document.body.classList.add('emergency-mode');
+            
+            // Add emergency mode styles
+            const emergencyStyle = document.createElement('style');
+            emergencyStyle.id = 'emergency-mode-styles';
+            emergencyStyle.textContent = `
+                .emergency-mode * {
+                    animation-duration: 0.1s !important;
+                    transition-duration: 0.1s !important;
+                }
+                .emergency-mode .non-essential {
+                    display: none !important;
+                }
+                .emergency-mode {
+                    filter: contrast(1.2) brightness(1.1);
+                }
+            `;
+            
+            document.head.appendChild(emergencyStyle);
+            console.log('✅ Non-essential features hidden');
+            
+        } catch (error) {
+            console.warn('⚠️ Could not hide non-essential features:', error);
+        }
+    }
+
+    /**
+     * 🔋 REDUCE POLL INTERVAL FOR BATTERY OPTIMIZATION
+     */
+    reducePollInterval() {
+        console.log('🔋 Reducing poll interval for battery optimization...');
+        
+        try {
+            // Reduce sync frequency in emergency mode
+            if (this.syncInterval) {
+                clearInterval(this.syncInterval);
+            }
+            
+            // Set emergency mode polling - every 30 seconds instead of 5
+            this.syncInterval = setInterval(() => {
+                console.log('🔄 Emergency sync check...');
+                // Light sync only essential data
+            }, 30000);
+            
+            console.log('✅ Poll interval reduced to 30s for battery saving');
+        } catch (error) {
+            console.warn('⚠️ Could not reduce poll interval:', error);
+        }
+    }
+
+    /**
+     * 📱 ENABLE OFFLINE MODE
+     */
+    enableOfflineMode() {
+        console.log('📱 Enabling offline mode for emergency operation...');
+        
+        try {
+            // Enable service worker for offline caching
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    console.log('📦 Service Worker ready for offline mode');
+                });
+            }
+            
+            // Cache critical data locally
+            if (typeof(Storage) !== "undefined") {
+                const emergencyData = {
+                    timestamp: Date.now(),
+                    mode: 'offline-emergency',
+                    criticalInfo: {
+                        emergency: '112',
+                        police: '997', 
+                        fire: '998',
+                        medical: '999'
+                    }
+                };
+                
+                localStorage.setItem('emergency-offline-data', JSON.stringify(emergencyData));
+                console.log('💾 Critical emergency data cached offline');
+            }
+            
+            // Disable non-essential network requests
+            this.offlineMode = true;
+            console.log('✅ Offline mode enabled successfully');
+            
+        } catch (error) {
+            console.warn('⚠️ Could not enable offline mode:', error);
+        }
     }
 
     /**
@@ -385,10 +603,25 @@ class EmergencyMinaManager {
     }
 
     /**
-     * 🛡️ SHOW EMERGENCY BANNER
+     * 🛡️ SHOW EMERGENCY BANNER (ONLY WHEN NEEDED)
      */
     showEmergencyBanner() {
+        // 🎯 SMART BANNER: Hide when online to not block logo on mobile
+        const isOnline = navigator.onLine;
+        const hasStableConnection = navigator.connection?.effectiveType === '4g' || 
+                                   navigator.connection?.effectiveType === '3g';
+        
+        // Only show banner if offline or poor connection
+        if (isOnline && hasStableConnection) {
+            console.log('📱 Skipping emergency banner - stable online connection detected');
+            console.log('🎯 Preserving logo visibility on mobile devices');
+            return;
+        }
+        
+        console.log('🚨 Showing emergency banner - unstable or offline connection');
+        
         const banner = document.createElement('div');
+        banner.id = 'emergency-banner';
         banner.className = 'emergency-banner';
         banner.innerHTML = `
             <div class="emergency-content">
@@ -412,6 +645,42 @@ class EmergencyMinaManager {
         `;
         
         document.body.insertBefore(banner, document.body.firstChild);
+        
+        // Monitor connection changes and hide/show banner dynamically
+        this.setupBannerConnectionMonitor();
+    }
+    
+    /**
+     * 📡 MONITOR CONNECTION FOR BANNER VISIBILITY
+     */
+    setupBannerConnectionMonitor() {
+        const toggleBanner = () => {
+            const banner = document.getElementById('emergency-banner');
+            const isOnline = navigator.onLine;
+            const hasStableConnection = navigator.connection?.effectiveType === '4g' || 
+                                       navigator.connection?.effectiveType === '3g';
+            
+            if (banner) {
+                if (isOnline && hasStableConnection) {
+                    // Hide banner when connection is stable
+                    banner.style.display = 'none';
+                    console.log('📱 Emergency banner hidden - stable connection restored');
+                } else {
+                    // Show banner when connection is poor/offline
+                    banner.style.display = 'block';
+                    console.log('🚨 Emergency banner shown - connection issues detected');
+                }
+            }
+        };
+        
+        // Listen for connection changes
+        window.addEventListener('online', toggleBanner);
+        window.addEventListener('offline', toggleBanner);
+        
+        // Listen for connection type changes (if supported)
+        if (navigator.connection) {
+            navigator.connection.addEventListener('change', toggleBanner);
+        }
     }
 
     /**

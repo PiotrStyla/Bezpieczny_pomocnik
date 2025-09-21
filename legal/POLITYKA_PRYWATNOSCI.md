@@ -1,7 +1,7 @@
 # POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
-**Zgodna z RODO | Obowiązuje od: 19 września 2025 r.**
-**Aktualizacja: Rozszerzone funkcje geolokalizacji i pełne pokrycie Polski**
+**Zgodna z RODO | Obowiązuje od: 21 września 2025 r.**
+**Aktualizacja: Dodano funkcje blockchain (Mina Protocol), emergency mode i zk-proof privacy**
 
 ---
 
@@ -83,6 +83,19 @@
 - **Preferencje edukacyjne**
 - **Cel:** Personalizacja treści edukacyjnych
 - **Podstawa prawna:** Zgoda Rodzica/Opiekuna (art. 6 ust. 1 lit. a + art. 8 RODO)
+
+#### **🔗 Emergency Blockchain Features (Mina Protocol):**
+- **Zero-Knowledge Proofs (zk-SNARKs)** - weryfikacja wieku dziecka BEZ ujawniania dokładnych danych
+- **22KB Blockchain Sync** - minimalna synchronizacja w sytuacjach kryzysowych  
+- **Emergency Mode Data** - cache danych ratunkowych (numery alarmowe, lokalizacje schronień)
+- **Offline Emergency Cache** - lokalne przechowywanie krytycznych informacji bezpieczeństwa
+- **Cel:** Maksymalny poziom prywatności i bezpieczeństwa dzieci podczas kryzysu
+- **Podstawa prawna:** Żywotny interes osoby fizycznej + ochrona dzieci (art. 6 ust. 1 lit. d + art. 8 RODO)
+- **Szczególne cechy:** 
+  - NIE przechowujemy kluczy prywatnych blockchain
+  - NIE zapisujemy żadnych danych dziecka w blockchain
+  - zk-proof NIE ujawnia tożsamości dziecka
+  - Wszystkie dane blockchain są anonimowe i nieodwracalne
 
 ---
 

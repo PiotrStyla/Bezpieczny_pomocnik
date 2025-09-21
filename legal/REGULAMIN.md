@@ -1,6 +1,7 @@
 # REGULAMIN UŻYTKOWANIA APLIKACJI "BEZPIECZNY POMOCNIK"
 
-**Obowiązuje od: 19 września 2025 r.**
+**Obowiązuje od: 21 września 2025 r.**
+**Aktualizacja: Dodano emergency mode, blockchain features i smart banner**
 **Aktualizacja: Dodano funkcję geolokalizacji i kompletne pokrycie Polski**
 
 ---

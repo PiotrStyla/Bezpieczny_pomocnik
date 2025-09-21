@@ -1,6 +1,7 @@
 # POLITYKA COOKIES APLIKACJI "BEZPIECZNY POMOCNIK"
 
-**Obowiązuje od: 19 stycznia 2025 r.**
+**Obowiązuje od: 21 września 2025 r.**
+**Aktualizacja: Dodano emergency cache i blockchain localStorage**
 
 ---
 
