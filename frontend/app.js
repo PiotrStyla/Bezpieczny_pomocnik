@@ -1818,6 +1818,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('❌ Brak TTS w przeglądarce');
         alert('Twoja przeglądarka nie obsługuje mowy!');
     }
-    }
+    }; // Zamknięcie window.testSpeech assignment
     
 }); // Zamknięcie DOMContentLoaded
