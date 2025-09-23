@@ -213,10 +213,18 @@ Odpowiedź:`
     }
 
     /**
-     * 🎯 Generate response for specific action
+     * 🎯 Generate response for specific action with adaptive learning
      */
     async generateResponse(action, childAge, context = {}) {
-        const prompt = this.createPolishPrompt(action, childAge, context);
+        // Track interaction for learning (privacy-safe)
+        if (window.adaptiveLearning && window.adaptiveLearning.learningEnabled) {
+            window.adaptiveLearning.trackInteraction(action, context);
+        }
+        
+        // Generate adaptive or base prompt
+        const prompt = window.adaptiveLearning && window.adaptiveLearning.learningEnabled ?
+            window.adaptiveLearning.generateAdaptivePrompt(action, childAge, context) :
+            this.createPolishPrompt(action, childAge, context);
         
         // Try OpenAI first (best Polish capabilities)
         if (this.providers.openai.available) {
@@ -228,6 +236,11 @@ Odpowiedź:`
                 // Ensure reasonable length
                 if (cleaned.length > 180) {
                     cleaned = cleaned.substring(0, 177) + '...';
+                }
+                
+                // Log learning status
+                if (window.adaptiveLearning && window.adaptiveLearning.learningEnabled) {
+                    console.log('🧠 Response adapted based on child behavior patterns');
                 }
                 
                 return cleaned;
@@ -269,6 +282,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('🤖 ChatGPT/OpenAI configured - intelligent Polish responses enabled');
     } else {
         console.log('⚠️ No Polish AI providers configured - using fallback responses');
+    }
+    
+    // Initialize adaptive learning system
+    if (window.adaptiveLearning) {
+        await window.adaptiveLearning.initializeLearning();
     }
 });
 
