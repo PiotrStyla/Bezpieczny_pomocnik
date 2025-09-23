@@ -270,128 +270,60 @@ function getUserLocation() {
     );
 }
 
-// Safety functions
-async function generateContextualSpeech(action, context = {}) {
-    try {
-        console.log(` Generating contextual speech for: ${action}`);
-        
-        // Get consent data for age context
-        const consentData = JSON.parse(localStorage.getItem('parental_consent') || '{}');
-        const fullContext = {
-            childAge: consentData.childAge || 8,
-            timeOfDay: new Date().getHours() < 12 ? 'rano' : new Date().getHours() < 18 ? 'popołudnie' : 'wieczór',
-            isFirstVisit: userMemory.visitCount === 1,
-            location: userLocation ? `${userLocation.lat},${userLocation.lon}` : '',
-            ...context
-        };
-        
-        const response = await fetch('/api/generate-speech', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: action,
-                context: fullContext,
-                lang: 'pl'
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log(` Contextual Response (${result.ai_model}):`, result.text);
-        
-        return result.text;
-    } catch (error) {
-        console.error(' Contextual generation failed:', error);
-        
-        // Fallback texts
-        const fallbacks = {
-            'find_safety': ' Najbliższe bezpieczne miejsca to: sklepy, szkoły, biblioteki i komisariaty. Szukaj miejsc gdzie są ludzie!',
-            'safe_route': ' Bezpieczna droga: idź głównymi ulicami, unikaj pustych miejsc, przechodź tylko na przejściach dla pieszych.',
-            'emergency_help': ' UWAGA! W prawdziwej sytuacji awaryjnej dzwoń 112! Poproś dorosłego o pomoc!',
-            'where_am_i': ' Sprawdzam gdzie jesteś. Zapamiętaj ważne miejsca wokół siebie.'
-        };
-        
-        return fallbacks[action] || 'Przepraszam, nie mogę teraz pomóc.';
-    }
-}
-
 async function handleWhereAmI() {
-    console.log(' Where Am I clicked');
+    console.log('🧭 Where Am I clicked');
     
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = ' Sprawdzam gdzie jesteś...';
+        mascotText.textContent = '🧭 Sprawdzam gdzie jesteś...';
     }
     
-    const contextualMessage = await generateContextualSpeech('where_am_i');
-    
-    if (mascotText) {
-        mascotText.textContent = contextualMessage;
-    }
-    
-    speakText(contextualMessage);
+    speakText('Sprawdzam twoją lokalizację...');
     getUserLocation();
 }
 
 async function handleFindSafety() {
-    console.log(' Find Safety clicked');
+    console.log('🏃 Find Safety clicked');
+    
+    const message = '🏃 Najbliższe bezpieczne miejsca to: sklepy, szkoły, biblioteki i komisariaty. Szukaj miejsc gdzie są ludzie!';
     
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = ' Szukam bezpiecznych miejsc...';
+        mascotText.textContent = message;
     }
     
-    const contextualMessage = await generateContextualSpeech('find_safety');
-    
-    if (mascotText) {
-        mascotText.textContent = contextualMessage;
-    }
-    
-    speakText(contextualMessage);
+    speakText(message);
 }
 
 async function handleSafeRoute() {
-    console.log(' Safe Route clicked');
+    console.log('🚶 Safe Route clicked');
+    
+    const message = '🚶 Bezpieczna droga: idź głównymi ulicami, unikaj pustych miejsc, przechodź tylko na przejściach dla pieszych.';
     
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = ' Planuję bezpieczną trasę...';
+        mascotText.textContent = message;
     }
     
-    const contextualMessage = await generateContextualSpeech('safe_route');
-    
-    if (mascotText) {
-        mascotText.textContent = contextualMessage;
-    }
-    
-    speakText(contextualMessage);
+    speakText(message);
 }
 
 async function handleEmergencyHelp() {
-    console.log(' Emergency Help clicked');
+    console.log('🚨 Emergency Help clicked');
     
     document.body.style.background = 'linear-gradient(45deg, #ff1744, #ff5722)';
     setTimeout(() => {
         document.body.style.background = '';
     }, 3000);
     
+    const message = '🚨 UWAGA! W prawdziwej sytuacji awaryjnej dzwoń 112! Poproś dorosłego o pomoc!';
+    
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = ' UWAGA! Sytuacja awaryjna!';
+        mascotText.textContent = message;
     }
     
-    const contextualMessage = await generateContextualSpeech('emergency_help');
-    
-    if (mascotText) {
-        mascotText.textContent = contextualMessage;
-    }
-    
-    speakText(contextualMessage);
+    speakText(message);
 }
 
 // DOM Content Loaded
