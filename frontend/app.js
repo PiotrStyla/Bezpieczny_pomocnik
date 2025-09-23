@@ -269,6 +269,143 @@ document.addEventListener('DOMContentLoaded', function() {
             class: e.target.className
         });
     });
+
+    // Handle tip cards clicks
+    document.querySelectorAll('.tip-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const h4 = card.querySelector('h4');
+            const p = card.querySelector('p');
+            if (h4 && p) {
+                const title = h4.textContent;
+                const content = p.textContent;
+                
+                const mascotText = document.getElementById('mascot-text');
+                if (mascotText) {
+                    mascotText.textContent = `💡 ${title}: ${content}`;
+                }
+                
+                speakText(`${title}. ${content}`);
+            }
+        });
+    });
+
+    // Handle emergency cards clicks
+    document.querySelectorAll('.emergency-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const h4 = card.querySelector('h4');
+            const link = card.querySelector('.emergency-number');
+            if (h4 && link) {
+                const service = h4.textContent;
+                const number = link.textContent;
+                
+                const mascotText = document.getElementById('mascot-text');
+                if (mascotText) {
+                    mascotText.textContent = `🚨 ${service} - numer ${number}. Dzwoń tylko w prawdziwych sytuacjach awaryjnych!`;
+                }
+                
+                speakText(`${service}. Numer ${number}. Dzwoń tylko w prawdziwych sytuacjach awaryjnych!`);
+                
+                // Show call popup
+                showCallPopup(number, card);
+            }
+        });
+    });
+
+    // Notifications button handler
+    const notificationsBtn = document.getElementById('notifications-btn');
+    if (notificationsBtn) {
+        notificationsBtn.addEventListener('click', () => {
+            console.log('🔔 Notifications button clicked');
+            
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    new Notification('Bezpieczny Pomocnik', {
+                        body: 'Powiadomienia są już włączone!',
+                        icon: 'images/logo_192x192.png'
+                    });
+                    
+                    const mascotText = document.getElementById('mascot-text');
+                    if (mascotText) {
+                        mascotText.textContent = '🔔 Powiadomienia są już włączone!';
+                    }
+                    
+                    speakText('Powiadomienia są już włączone');
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            new Notification('Bezpieczny Pomocnik', {
+                                body: 'Świetnie! Powiadomienia zostały włączone!',
+                                icon: 'images/logo_192x192.png'
+                            });
+                            
+                            notificationsBtn.innerHTML = '<span class="btn-icon">✅</span><span class="btn-text">Powiadomienia włączone</span>';
+                            notificationsBtn.style.background = '#32D74B';
+                            
+                            const mascotText = document.getElementById('mascot-text');
+                            if (mascotText) {
+                                mascotText.textContent = '✅ Świetnie! Powiadomienia zostały włączone!';
+                            }
+                            
+                            speakText('Świetnie! Powiadomienia zostały włączone');
+                        }
+                    });
+                }
+            } else {
+                const mascotText = document.getElementById('mascot-text');
+                if (mascotText) {
+                    mascotText.textContent = '❌ Twoja przeglądarka nie obsługuje powiadomień';
+                }
+                
+                speakText('Twoja przeglądarka nie obsługuje powiadomień');
+            }
+        });
+    }
+
+    // Location button handler
+    const locationBtn = document.getElementById('location-btn');
+    if (locationBtn) {
+        locationBtn.addEventListener('click', () => {
+            console.log('📍 Location button clicked');
+            getUserLocation();
+            
+            const mascotText = document.getElementById('mascot-text');
+            if (mascotText) {
+                mascotText.textContent = '📍 Sprawdzam twoją lokalizację...';
+            }
+            
+            speakText('Sprawdzam twoją lokalizację');
+        });
+    }
+
+    // Show call popup function
+    function showCallPopup(phoneNumber, targetElement) {
+        console.log('📞 Showing call popup for:', phoneNumber);
+        
+        const existingPopup = document.querySelector('.call-popup');
+        if (existingPopup) {
+            existingPopup.remove();
+        }
+
+        const popup = document.createElement('div');
+        popup.className = 'call-popup';
+        popup.innerHTML = `
+            <div class="popup-content">
+                <h3>📞 Połączenie</h3>
+                <p>Czy chcesz zadzwonić pod numer:</p>
+                <div class="phone-display">${phoneNumber}</div>
+                <p><small>Kliknij ponownie aby wykonać połączenie</small></p>
+                <button onclick="this.parentElement.parentElement.remove()" class="popup-close">✕</button>
+            </div>
+        `;
+        
+        document.body.appendChild(popup);
+        
+        setTimeout(() => {
+            if (popup.parentNode) {
+                popup.remove();
+            }
+        }, 3000);
+    }
     
     // Welcome message
     setTimeout(() => {
