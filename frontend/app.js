@@ -205,7 +205,7 @@ function initMap() {
     }
 }
 
-// Speech functions
+// Speech functions with child-friendly voice selection
 function speakText(text, lang = 'pl') {
     console.log('🗣️ SPEAK:', text);
     
@@ -220,14 +220,137 @@ function speakText(text, lang = 'pl') {
 
     setTimeout(() => {
         const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Select child-friendly female voice
+        const selectedVoice = selectChildFriendlyVoice(lang);
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            console.log(`🎵 Using child-friendly voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+        }
+        
         utterance.lang = lang === 'pl' ? 'pl-PL' : lang === 'en' ? 'en-US' : 'uk-UA';
-        utterance.rate = 0.7;
-        utterance.pitch = 1.2;
-        utterance.volume = 0.9;
+        utterance.rate = 0.6;    // Slower for children
+        utterance.pitch = 1.3;   // Higher pitch for friendly tone
+        utterance.volume = 0.8;  // Gentle volume
 
         window.speechSynthesis.speak(utterance);
-        console.log('🚀 Speech started');
+        console.log('🚀 Child-friendly speech started');
     }, 300);
+}
+
+// Select best child-friendly voice (preferably female Polish)
+function selectChildFriendlyVoice(lang = 'pl') {
+    const voices = window.speechSynthesis.getVoices();
+    
+    if (voices.length === 0) {
+        console.log('⚠️ No voices available yet, using default');
+        return null;
+    }
+    
+    // Priority order for child-friendly voices
+    const polishFemalePreferences = [
+        // Polish female voices (highest priority)
+        'Zofia', 'Paulina', 'Agnieszka', 'Ewa', 'Anna', 'Kasia',
+        'Microsoft Paulina - Polish (Poland)',
+        'Microsoft Zofia - Polish (Poland)',
+        'Google polski',
+        'Polski'
+    ];
+    
+    const englishFemalePreferences = [
+        // English female voices (fallback)
+        'Samantha', 'Victoria', 'Alex', 'Karen', 'Moira',
+        'Microsoft Zira - English (United States)',
+        'Google US English Female',
+        'English Female'
+    ];
+    
+    // Try to find the best Polish female voice first
+    if (lang === 'pl') {
+        // Look for exact matches first
+        for (const preference of polishFemalePreferences) {
+            const voice = voices.find(v => 
+                v.name.includes(preference) && 
+                (v.lang.includes('pl') || v.lang.includes('PL'))
+            );
+            if (voice) {
+                console.log(`✅ Found preferred Polish female voice: ${voice.name}`);
+                return voice;
+            }
+        }
+        
+        // Fallback: any Polish female voice
+        const polishFemale = voices.find(v => 
+            (v.lang.includes('pl') || v.lang.includes('PL')) &&
+            !v.name.toLowerCase().includes('male') &&
+            !v.name.toLowerCase().includes('man')
+        );
+        if (polishFemale) {
+            console.log(`📞 Using Polish female voice: ${polishFemale.name}`);
+            return polishFemale;
+        }
+        
+        // Fallback: any Polish voice
+        const polishAny = voices.find(v => 
+            v.lang.includes('pl') || v.lang.includes('PL')
+        );
+        if (polishAny) {
+            console.log(`🇵🇱 Using Polish voice: ${polishAny.name}`);
+            return polishAny;
+        }
+    }
+    
+    // Fallback to English female voices
+    for (const preference of englishFemalePreferences) {
+        const voice = voices.find(v => 
+            v.name.includes(preference) && 
+            (v.lang.includes('en') || v.lang.includes('EN'))
+        );
+        if (voice) {
+            console.log(`🔄 Fallback to English female voice: ${voice.name}`);
+            return voice;
+        }
+    }
+    
+    // Last resort: any female-sounding voice
+    const anyFemale = voices.find(v => 
+        !v.name.toLowerCase().includes('male') &&
+        !v.name.toLowerCase().includes('man') &&
+        (v.name.toLowerCase().includes('female') ||
+         v.name.toLowerCase().includes('woman') ||
+         v.name.toLowerCase().includes('samantha') ||
+         v.name.toLowerCase().includes('victoria'))
+    );
+    
+    if (anyFemale) {
+        console.log(`👩 Using female voice: ${anyFemale.name}`);
+        return anyFemale;
+    }
+    
+    console.log('⚠️ No ideal child-friendly voice found, using system default');
+    return voices[0]; // System default
+}
+
+// Initialize voices when they become available
+function initializeVoices() {
+    if (typeof speechSynthesis !== 'undefined') {
+        speechSynthesis.onvoiceschanged = () => {
+            const voices = speechSynthesis.getVoices();
+            console.log(`🎵 ${voices.length} voices loaded for child-friendly selection`);
+            
+            // Log available Polish voices for debugging
+            const polishVoices = voices.filter(v => 
+                v.lang.includes('pl') || v.lang.includes('PL')
+            );
+            console.log('🇵🇱 Available Polish voices:', polishVoices.map(v => `${v.name} (${v.lang})`));
+            
+            // Pre-select the best voice for children
+            const childVoice = selectChildFriendlyVoice('pl');
+            if (childVoice) {
+                console.log(`👶 Pre-selected child-friendly voice: ${childVoice.name}`);
+            }
+        };
+    }
 }
 
 function toggleSpeech() {
@@ -483,7 +606,11 @@ async function handleEmergencyHelp() {
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log(' DOM CONTENT LOADED');
+    console.log('🎯 DOM CONTENT LOADED');
+    
+    // Initialize child-friendly voices
+    console.log('🎵 Initializing child-friendly voice system...');
+    initializeVoices();
     
     // Initialize map
     console.log('🗺️ Initializing map...');
