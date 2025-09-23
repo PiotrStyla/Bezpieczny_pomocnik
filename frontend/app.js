@@ -30,12 +30,126 @@ window.testSpeech = function() {
     }
 };
 
-// 🗺️ Map variables
+// Map variables and app state
 let map = null;
 let markersLayer = null;
 let userLocation = null;
 let userLocationMarker = null;
 let speechEnabled = localStorage.getItem('speech_enabled') === 'true' || true;
+
+// User memory/progress system
+let userMemory = {
+    visitCount: parseInt(localStorage.getItem('visit_count')) || 0,
+    lastVisit: localStorage.getItem('last_visit') || null,
+    learnedTips: JSON.parse(localStorage.getItem('learned_tips')) || [],
+    emergencyCallsCount: parseInt(localStorage.getItem('emergency_calls_count')) || 0,
+    locationUsageCount: parseInt(localStorage.getItem('location_usage_count')) || 0,
+    favoriteFeatures: JSON.parse(localStorage.getItem('favorite_features')) || [],
+    safetyLevel: parseInt(localStorage.getItem('safety_level')) || 1,
+    achievements: JSON.parse(localStorage.getItem('achievements')) || []
+};
+
+// Save user memory to localStorage
+function saveUserMemory() {
+    localStorage.setItem('visit_count', userMemory.visitCount.toString());
+    localStorage.setItem('last_visit', new Date().toISOString());
+    localStorage.setItem('learned_tips', JSON.stringify(userMemory.learnedTips));
+    localStorage.setItem('emergency_calls_count', userMemory.emergencyCallsCount.toString());
+    localStorage.setItem('location_usage_count', userMemory.locationUsageCount.toString());
+    localStorage.setItem('favorite_features', JSON.stringify(userMemory.favoriteFeatures));
+    localStorage.setItem('safety_level', userMemory.safetyLevel.toString());
+    localStorage.setItem('achievements', JSON.stringify(userMemory.achievements));
+    
+    console.log('💾 User memory saved:', userMemory);
+}
+
+// Update visit count and show returning user message
+function updateVisitCount() {
+    userMemory.visitCount++;
+    
+    if (userMemory.visitCount === 1) {
+        console.log('🆕 New user - first visit');
+        setTimeout(() => {
+            const mascotText = document.getElementById('mascot-text');
+            if (mascotText) {
+                mascotText.textContent = '👋 Witaj po raz pierwszy! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij na różne elementy aby się uczyć!';
+            }
+            if (speechEnabled) {
+                speakText('Witaj po raz pierwszy! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij na różne elementy aby się uczyć!');
+            }
+        }, 3000);
+    } else {
+        console.log(`🔄 Returning user - visit #${userMemory.visitCount}`);
+        setTimeout(() => {
+            const mascotText = document.getElementById('mascot-text');
+            if (mascotText) {
+                mascotText.textContent = `🔄 Witaj ponownie! To już twoja ${userMemory.visitCount}. wizyta. Pamiętam, że nauczyłeś się już ${userMemory.learnedTips.length} porad bezpieczeństwa!`;
+            }
+            if (speechEnabled) {
+                speakText(`Witaj ponownie! To już twoja ${userMemory.visitCount}. wizyta. Pamiętam, że nauczyłeś się już ${userMemory.learnedTips.length} porad bezpieczeństwa!`);
+            }
+        }, 3000);
+    }
+    
+    saveUserMemory();
+}
+
+// Add learned tip to memory
+function addLearnedTip(tipTitle) {
+    if (!userMemory.learnedTips.includes(tipTitle)) {
+        userMemory.learnedTips.push(tipTitle);
+        
+        // Check for achievement
+        if (userMemory.learnedTips.length === 5 && !userMemory.achievements.includes('safety_expert')) {
+            userMemory.achievements.push('safety_expert');
+            showAchievement('🎓 Ekspert Bezpieczeństwa!', 'Poznałeś wszystkie 5 porad bezpieczeństwa!');
+        }
+        
+        saveUserMemory();
+        console.log('📚 Learned tip added:', tipTitle);
+    }
+}
+
+// Show achievement notification
+function showAchievement(title, description) {
+    const achievement = document.createElement('div');
+    achievement.className = 'achievement-popup';
+    achievement.innerHTML = `
+        <div class="achievement-content">
+            <h3>${title}</h3>
+            <p>${description}</p>
+        </div>
+    `;
+    
+    document.body.appendChild(achievement);
+    
+    setTimeout(() => {
+        achievement.remove();
+    }, 5000);
+    
+    if (speechEnabled) {
+        speakText(`Osiągnięcie odblokowane! ${title}. ${description}`);
+    }
+}
+
+// Track feature usage
+function trackFeatureUsage(feature) {
+    if (!userMemory.favoriteFeatures.includes(feature)) {
+        userMemory.favoriteFeatures.push(feature);
+    }
+    
+    switch(feature) {
+        case 'location':
+            userMemory.locationUsageCount++;
+            break;
+        case 'emergency':
+            userMemory.emergencyCallsCount++;
+            break;
+    }
+    
+    saveUserMemory();
+    console.log('📊 Feature usage tracked:', feature);
+}
 
 // Map initialization
 function initMap() {
@@ -285,6 +399,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 speakText(`${title}. ${content}`);
+                
+                // Track learning and add to memory
+                addLearnedTip(title);
+                trackFeatureUsage('education');
             }
         });
     });
@@ -304,6 +422,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 speakText(`${service}. Numer ${number}. Dzwoń tylko w prawdziwych sytuacjach awaryjnych!`);
+                
+                // Track emergency usage
+                trackFeatureUsage('emergency');
                 
                 // Show call popup
                 showCallPopup(number, card);
@@ -374,6 +495,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             speakText('Sprawdzam twoją lokalizację');
+            
+            // Track location usage
+            trackFeatureUsage('location');
         });
     }
 
@@ -407,15 +531,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
     
-    // Welcome message
+    // Welcome message and initialize memory
     setTimeout(() => {
-        const mascotText = document.getElementById('mascot-text');
-        if (mascotText) {
-            mascotText.textContent = 'Cześć! Jestem twoim pomocnikiem bezpieczeństwa!';
-        }
+        // Initialize user memory system
+        updateVisitCount();
         
-        if (speechEnabled) {
-            speakText('Witaj! Jestem twoim pomocnikiem bezpieczeństwa!');
+        // Set initial mascot message (will be overridden by updateVisitCount)
+        const mascotText = document.getElementById('mascot-text');
+        if (mascotText && userMemory.visitCount === 1) {
+            mascotText.textContent = 'Cześć! Jestem twoim pomocnikiem bezpieczeństwa!';
         }
     }, 2000);
     
