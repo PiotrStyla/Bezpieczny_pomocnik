@@ -1,105 +1,115 @@
 /**
- * 🇵🇱 BIELIK AI CLIENT-SIDE INTEGRATION
+ * 🇵🇱 POLISH AI CLIENT-SIDE INTEGRATION
  * 
- * Bezpośrednie wywołania do Bielik AI z przeglądarki
- * Bez problemów z backend dependencies - deploy zawsze przejdzie!
+ * Multi-provider Polish AI for children's safety
+ * Zero backend dependencies - deploy always works!
  */
 
-class BielikClient {
+class PolishAIClient {
     constructor() {
-        this.apiUrl = 'https://api-inference.huggingface.co/models/bielik-ai/bielik-7b-instruct';
-        this.apiKey = null;
+        this.providers = {
+            openai: {
+                url: 'https://api.openai.com/v1/chat/completions',
+                key: null,
+                available: false
+            },
+            pllum: {
+                url: 'https://pllum.clarin-pl.eu/api',  // Check if they have API
+                key: null,
+                available: false
+            }
+        };
+        this.preferredProvider = 'openai';
         this.maxRetries = 2;
     }
 
     /**
-     * 🔑 Set API key (from user input or config)
+     * 🔑 Set API key for specific provider
      */
-    setApiKey(key) {
-        if (key && key.startsWith('hf_') && key.length > 20) {
-            this.apiKey = key;
-            localStorage.setItem('bielik_api_key', key);
-            console.log('🔑 Bielik API key set successfully');
+    setApiKey(provider, key) {
+        if (provider === 'openai' && key && key.startsWith('sk-')) {
+            this.providers.openai.key = key;
+            this.providers.openai.available = true;
+            localStorage.setItem('openai_api_key', key);
+            console.log('🔑 OpenAI API key set successfully');
             return true;
         }
-        console.warn('❌ Invalid Bielik API key format');
+        
+        console.warn(`❌ Invalid ${provider} API key format`);
         return false;
     }
 
     /**
-     * 🔑 Load API key from localStorage
+     * 🔑 Load API keys from localStorage
      */
-    loadApiKey() {
-        const stored = localStorage.getItem('bielik_api_key');
-        if (stored && stored.startsWith('hf_')) {
-            this.apiKey = stored;
-            return true;
+    loadApiKeys() {
+        const openaiKey = localStorage.getItem('openai_api_key');
+        if (openaiKey && openaiKey.startsWith('sk-')) {
+            this.providers.openai.key = openaiKey;
+            this.providers.openai.available = true;
         }
-        return false;
+        
+        return this.providers.openai.available;
     }
 
     /**
-     * 🇵🇱 Call Bielik AI directly from browser
+     * 🇵🇱 Call OpenAI with Polish safety prompts
      */
-    async callBielikAI(prompt, retryCount = 0) {
-        if (!this.apiKey) {
-            console.log('⚠️ No Bielik API key - using fallback');
+    async callOpenAI(prompt, retryCount = 0) {
+        if (!this.providers.openai.available) {
             return null;
         }
 
         try {
-            console.log(`🇵🇱 Calling Bielik AI (attempt ${retryCount + 1})...`);
+            console.log(`🇵🇱 Calling OpenAI for Polish safety response (attempt ${retryCount + 1})...`);
 
-            const response = await fetch(this.apiUrl, {
+            const response = await fetch(this.providers.openai.url, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Authorization': `Bearer ${this.providers.openai.key}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    inputs: prompt,
-                    parameters: {
-                        max_new_tokens: 120,
-                        temperature: 0.7,
-                        top_p: 0.9,
-                        return_full_text: false,
-                        do_sample: true
-                    }
+                    model: 'gpt-4o-mini',  // Cost-effective for children's safety
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Jesteś polskim asystentem bezpieczeństwa dla dzieci. Odpowiadasz TYLKO po polsku, używając prostego i przyjaznego języka. Zawsze rozpoczynaj odpowiedzi od odpowiedniego emoji. Maksymalnie 2-3 zdania.'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    max_tokens: 100,
+                    temperature: 0.7,
+                    frequency_penalty: 0.2
                 })
             });
 
             if (response.ok) {
                 const result = await response.json();
                 
-                if (Array.isArray(result) && result.length > 0) {
-                    const text = result[0].generated_text?.trim() || '';
+                if (result.choices && result.choices.length > 0) {
+                    const text = result.choices[0].message.content?.trim() || '';
                     if (text.length > 10) {
-                        console.log('✅ Bielik AI response received');
+                        console.log('✅ OpenAI Polish response received');
                         return text;
-                    }
-                }
-                
-                // Model might be loading
-                if (result.error && result.error.includes('loading')) {
-                    console.log('⏳ Bielik model is loading, retrying...');
-                    if (retryCount < this.maxRetries) {
-                        await this.sleep(3000);
-                        return await this.callBielikAI(prompt, retryCount + 1);
                     }
                 }
             }
 
-            console.log(`❌ Bielik API failed (${response.status})`);
+            console.log(`❌ OpenAI API failed (${response.status})`);
             return null;
 
         } catch (error) {
-            console.error('❌ Bielik AI error:', error);
+            console.error('❌ OpenAI error:', error);
             return null;
         }
     }
 
     /**
-     * 📝 Create Polish prompts for children
+     * 📝 Create Polish prompts for children safety
      */
     createPolishPrompt(action, childAge, context) {
         // Determine language complexity
@@ -121,7 +131,7 @@ class BielikClient {
 
         // Create specific prompts
         const prompts = {
-            find_safety: `Jesteś polskim asystentem bezpieczeństwa dla ${childAge}-letniego dziecka. Wyjaśnij gdzie znaleźć bezpieczne miejsca gdy się zgubi.
+            find_safety: `Wyjaśnij ${childAge}-latkowi gdzie znaleźć bezpieczne miejsca gdy się zgubi.
 
 Zasady:
 - ${languageLevel}
@@ -129,43 +139,44 @@ Zasady:
 - Maksymalnie 2 zdania
 - Zacznij od emoji 🏃
 - ${timeContext}Bądź konkretny ale ciepły
+- Tylko polskie porady dla polskich dzieci
 
 Odpowiedź:`,
 
-            safe_route: `Jesteś polskim asystentem bezpieczeństwa dla ${childAge}-letniego dziecka. Wyjaśnij jak bezpiecznie poruszać się po ulicach.
+            safe_route: `Wyjaśnij ${childAge}-latkowi jak bezpiecznie poruszać się po polskich ulicach.
 
 Zasady:
 - ${languageLevel}
 - ${complexity} poziom szczegółów  
 - Maksymalnie 2 zdania
 - Zacznij od emoji 🚶
-- ${timeContext}Podaj praktyczne wskazówki
+- ${timeContext}Podaj polskie praktyczne wskazówki (przejścia, ulice, itp.)
 
 Odpowiedź:`,
 
-            emergency_help: `Jesteś polskim asystentem bezpieczeństwa dla ${childAge}-letniego dziecka. Wyjaśnij co robić w sytuacji awaryjnej.
+            emergency_help: `Wyjaśnij ${childAge}-latkowi co robić w sytuacji awaryjnej w Polsce.
 
 Zasady:
 - ${languageLevel}
 - ${complexity} poziom szczegółów
 - Maksymalnie 2 zdania
 - Zacznij od emoji 🚨
-- ${timeContext}Podkreśl znaczenie pomocy dorosłych
+- ${timeContext}Podkreśl numer 112 i pomoc dorosłych
 
 Odpowiedź:`,
 
-            where_am_i: `Jesteś polskim asystentem bezpieczeństwa dla ${childAge}-letniego dziecka. Wyjaśnij jak zapamiętywać i rozpoznawać miejsca.
+            where_am_i: `Wyjaśnij ${childAge}-latkowi jak zapamiętywać i rozpoznawać miejsca w Polsce.
 
 Zasady:
 - ${languageLevel}
 - ${complexity} poziom szczegółów
 - Maksymalnie 2 zdania
 - Zacznij od emoji 🧭
-- ${timeContext}Naucz orientacji w przestrzeni
+- ${timeContext}Naucz polskiej orientacji w przestrzeni
 
 Odpowiedź:`,
 
-            welcome: `Jesteś polskim asystentem bezpieczeństwa dla ${childAge}-letniego dziecka. ${context.isFirstVisit ? 'Przywitaj się po raz pierwszy' : 'Przywitaj się ponownie'}.
+            welcome: `${context.isFirstVisit ? 'Przywitaj się po raz pierwszy' : 'Przywitaj się ponownie'} z ${childAge}-latkiem jako polski asystent bezpieczeństwa.
 
 Zasady:
 - ${languageLevel}
@@ -173,6 +184,7 @@ Zasady:
 - Maksymalnie 2 zdania
 - Zacznij od odpowiedniego emoji
 - ${timeContext}Bądź ciepły i zachęcający
+- Pokaż się jako polski pomocnik
 
 Odpowiedź:`
         };
@@ -185,55 +197,58 @@ Odpowiedź:`
      */
     async generateResponse(action, childAge, context = {}) {
         const prompt = this.createPolishPrompt(action, childAge, context);
-        const response = await this.callBielikAI(prompt);
         
-        if (response) {
-            // Clean up response
-            let cleaned = response.trim();
-            
-            // Remove any prompt leakage
-            if (cleaned.toLowerCase().includes('odpowiedź:')) {
-                cleaned = cleaned.split('Odpowiedź:').pop().trim();
+        // Try OpenAI first (best Polish capabilities)
+        if (this.providers.openai.available) {
+            const response = await this.callOpenAI(prompt);
+            if (response) {
+                // Clean up response
+                let cleaned = response.trim();
+                
+                // Ensure reasonable length
+                if (cleaned.length > 180) {
+                    cleaned = cleaned.substring(0, 177) + '...';
+                }
+                
+                return cleaned;
             }
-            
-            // Ensure reasonable length
-            if (cleaned.length > 180) {
-                cleaned = cleaned.substring(0, 177) + '...';
-            }
-            
-            return cleaned;
         }
         
+        // No AI available
         return null;
     }
 
     /**
-     * 💤 Sleep utility
+     * 🔍 Check if any AI provider is configured
      */
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+    isConfigured() {
+        return this.providers.openai.available;
     }
 
     /**
-     * 🔍 Check if API key is configured
+     * 📊 Get available providers
      */
-    isConfigured() {
-        return this.apiKey && this.apiKey.startsWith('hf_');
+    getAvailableProviders() {
+        return Object.keys(this.providers).filter(
+            provider => this.providers[provider].available
+        );
     }
 }
 
-// Create global instance
-window.BielikClient = BielikClient;
-window.bielikClient = new BielikClient();
+// Create global instance  
+window.PolishAIClient = PolishAIClient;
+window.polishAI = new PolishAIClient();
 
-// Auto-load API key on startup
+// Auto-load API keys on startup
 document.addEventListener('DOMContentLoaded', () => {
-    window.bielikClient.loadApiKey();
-    if (window.bielikClient.isConfigured()) {
-        console.log('🇵🇱 Bielik AI ready for Polish children safety responses');
+    window.polishAI.loadApiKeys();
+    const available = window.polishAI.getAvailableProviders();
+    
+    if (available.length > 0) {
+        console.log(`🇵🇱 Polish AI ready with providers: ${available.join(', ')}`);
     } else {
-        console.log('⚠️ Bielik AI not configured - using fallback responses');
+        console.log('⚠️ No Polish AI providers configured - using fallback responses');
     }
 });
 
-console.log('🇵🇱 Bielik Client loaded - zero backend dependencies!');
+console.log('🇵🇱 Polish AI Client loaded - zero backend dependencies!');

@@ -286,7 +286,7 @@ function getUserLocation() {
     );
 }
 
-// Frontend AI - Bielik AI + ZK privacy
+// Frontend AI - Polish AI + ZK privacy  
 async function generateSmartSpeech(action, context = {}) {
     // Get child age using ZK-protected method
     const age = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
@@ -295,39 +295,29 @@ async function generateSmartSpeech(action, context = {}) {
     const isFirstVisit = userMemory.visitCount === 1;
     const hasLocation = userLocation ? true : false;
     
-    console.log(`🤖🇵🇱 Calling Bielik AI: action=${action}, age=${age}, time=${timeOfDay}`);
+    console.log(`🤖🇵🇱 Polish AI: action=${action}, age=${age}, time=${timeOfDay}`);
     
-    // Try Bielik AI first
-    try {
-        const bielikContext = {
-            childAge: age,
-            timeOfDay: timeOfDay,
-            isFirstVisit: isFirstVisit,
-            location: hasLocation ? `${userLocation.lat},${userLocation.lon}` : null
-        };
-        
-        const response = await fetch('/api/bielik-speech', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                action: action,
-                context: bielikContext
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            console.log(`✅ ${result.model} response:`, result.text);
-            return result.text;
+    // Try client-side Polish AI first
+    if (window.polishAI && window.polishAI.isConfigured()) {
+        try {
+            const aiContext = {
+                timeOfDay: timeOfDay,
+                isFirstVisit: isFirstVisit,
+                hasLocation: hasLocation
+            };
+            
+            const aiResponse = await window.polishAI.generateResponse(action, age, aiContext);
+            
+            if (aiResponse && aiResponse.length > 10) {
+                console.log(`✅ Polish AI (${window.polishAI.getAvailableProviders().join(', ')}):`, aiResponse);
+                return aiResponse;
+            }
+        } catch (error) {
+            console.error('❌ Client-side Polish AI failed:', error);
         }
-        
-    } catch (error) {
-        console.error('❌ Bielik AI call failed:', error);
     }
     
-    // Fallback to local rules if Bielik fails
+    // Fallback to local rules
     console.log('🔄 Using local rule-based fallback');
     return generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocation);
 }
