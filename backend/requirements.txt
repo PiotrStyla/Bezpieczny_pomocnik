@@ -1,21 +1,12 @@
-fastapi==0.68.0
-uvicorn[standard]==0.15.0
-pydantic==1.8.2
-python-multipart==0.0.5
-
-# External APIs
-requests==2.28.1
-aiohttp==3.8.5
-
-# Task scheduling
-apscheduler==3.9.1
-
-# Web Push Notifications
-py-vapid==1.9.0
-pywebpush==1.14.0
-
-# Caching
-cachetools==5.2.0.4
+fastapi==0.100.1
+uvicorn==0.23.2
+openai==1.3.7
+feedparser==6.0.10
+requests==2.31.0
+beautifulsoup4==4.12.2
+cachetools==5.3.2
+pywebpush==1.13.0
+apscheduler==3.10.4
 pytest==7.4.3
 pytest-asyncio==0.21.1
 pydantic==1.10.12
