@@ -286,12 +286,11 @@ function getUserLocation() {
     );
 }
 
-// Frontend AI - inteligentne wypowiedzi bez backend
+// Frontend AI - inteligentne wypowiedzi z ZK privacy
 function generateSmartSpeech(action, context = {}) {
-    // Get child age from parental consent
-    const consentData = JSON.parse(localStorage.getItem('parental_consent') || '{}');
+    // Get child age using ZK-protected method
+    const age = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
     
-    const age = parseInt(consentData.childAge) || 8;
     const timeOfDay = new Date().getHours() < 12 ? 'rano' : new Date().getHours() < 18 ? 'popołudnie' : 'wieczór';
     const isFirstVisit = userMemory.visitCount === 1;
     const hasLocation = userLocation ? true : false;
@@ -309,7 +308,9 @@ function generateSmartSpeech(action, context = {}) {
         agePrefix = '';
     }
     
-    console.log(`🤖 Smart speech: age=${age}, complexity=${complexity}, time=${timeOfDay}`);
+    console.log(`🤖🔐 ZK Smart speech: age=${age}, complexity=${complexity}, time=${timeOfDay}`);
+    
+    // ... rest of switch statement remains the same
     
     // Generuj wypowiedzi według akcji i wieku
     switch(action) {
