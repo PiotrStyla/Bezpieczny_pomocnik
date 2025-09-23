@@ -286,8 +286,8 @@ function getUserLocation() {
     );
 }
 
-// Frontend AI - inteligentne wypowiedzi z ZK privacy
-function generateSmartSpeech(action, context = {}) {
+// Frontend AI - Bielik AI + ZK privacy
+async function generateSmartSpeech(action, context = {}) {
     // Get child age using ZK-protected method
     const age = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
     
@@ -295,7 +295,45 @@ function generateSmartSpeech(action, context = {}) {
     const isFirstVisit = userMemory.visitCount === 1;
     const hasLocation = userLocation ? true : false;
     
-    // Określ poziom złożoności na podstawie wieku
+    console.log(`🤖🇵🇱 Calling Bielik AI: action=${action}, age=${age}, time=${timeOfDay}`);
+    
+    // Try Bielik AI first
+    try {
+        const bielikContext = {
+            childAge: age,
+            timeOfDay: timeOfDay,
+            isFirstVisit: isFirstVisit,
+            location: hasLocation ? `${userLocation.lat},${userLocation.lon}` : null
+        };
+        
+        const response = await fetch('/api/bielik-speech', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: action,
+                context: bielikContext
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log(`✅ ${result.model} response:`, result.text);
+            return result.text;
+        }
+        
+    } catch (error) {
+        console.error('❌ Bielik AI call failed:', error);
+    }
+    
+    // Fallback to local rules if Bielik fails
+    console.log('🔄 Using local rule-based fallback');
+    return generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocation);
+}
+
+function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocation) {
+    // Local rule-based system as fallback
     let complexity, agePrefix;
     if (age <= 6) {
         complexity = 'simple';
@@ -308,11 +346,7 @@ function generateSmartSpeech(action, context = {}) {
         agePrefix = '';
     }
     
-    console.log(`🤖🔐 ZK Smart speech: age=${age}, complexity=${complexity}, time=${timeOfDay}`);
-    
-    // ... rest of switch statement remains the same
-    
-    // Generuj wypowiedzi według akcji i wieku
+    // Generate responses based on age and action
     switch(action) {
         case 'find_safety':
             if (complexity === 'simple') {
