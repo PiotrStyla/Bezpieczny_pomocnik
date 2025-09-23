@@ -77,7 +77,6 @@ body {
 
 .logo-icon {
     font-size: 48px;
-    animation: bounce 2s infinite;
 }
 
 @keyframes bounce {
@@ -149,7 +148,6 @@ body {
 
 .mascot {
     font-size: 64px;
-    animation: wiggle 3s ease-in-out infinite;
 }
 
 @keyframes wiggle {
@@ -944,7 +942,6 @@ body {
 
 .foundation-logo {
     font-size: 48px;
-    animation: gentle-pulse 3s ease-in-out infinite;
 }
 
 @keyframes gentle-pulse {
@@ -1360,7 +1357,6 @@ body {
 
 .hero-avatar-large {
     font-size: 4rem;
-    animation: bounce 2s infinite;
 }
 
 .hero-info h3 {
@@ -1747,7 +1743,6 @@ body {
 .hero-card .hero-avatar {
     font-size: 4rem;
     margin-bottom: 15px;
-    animation: bounce 2s infinite;
 }
 
 .hero-card h3 {

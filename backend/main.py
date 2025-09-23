@@ -17,8 +17,10 @@ from fastapi import FastAPI, Request, HTTPException, Query, Body
 import base64
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from typing import List, Literal, Dict, Any
+from fastapi.staticfiles import logging
+import asyncio
+from datetime import datetime
+from typing import Optional, List, Dict, Any
 from cachetools import TTLCache
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -238,6 +240,113 @@ def get_poland_administrative_info():
     except Exception as e:
         logging.error(f"Error getting Poland info: {e}")
         raise HTTPException(status_code=500, detail=f"Błąd pobierania informacji o Polsce: {str(e)}")
+
+@app.post("/api/generate-speech")
+async def generate_speech_simple(request: dict):
+    """
+    Prosty endpoint dla wypowiedzi - bez zewnętrznych AI, tylko inteligentne teksty
+    
+    Body: {
+        "action": "find_safety" | "safe_route" | "emergency_help" | "where_am_i",
+        "context": {"childAge": 8, "timeOfDay": "rano", "location": "lat,lon"},
+        "lang": "pl"
+    }
+    """
+    try:
+        action = request.get("action")
+        context = request.get("context", {})
+        lang = request.get("lang", "pl")
+        
+        if not action or action not in ["find_safety", "safe_route", "emergency_help", "where_am_i"]:
+            raise HTTPException(status_code=400, detail="Invalid action type")
+        
+        # Generuj inteligentny tekst na podstawie kontekstu
+        speech_text = generate_contextual_speech(action, context, lang)
+        
+        return {
+            "success": True,
+            "action": action,
+            "text": speech_text,
+            "lang": lang,
+            "ai_model": "contextual_rules",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logging.error(f"Error generating speech: {e}")
+        # Fallback teksty
+        fallback_texts = {
+            "find_safety": "🏃 Najbliższe bezpieczne miejsca to: sklepy, szkoły, biblioteki i komisariaty. Szukaj miejsc gdzie są ludzie!",
+            "safe_route": "🚶 Bezpieczna droga: idź głównymi ulicami, unikaj pustych miejsc, przechodź tylko na przejściach dla pieszych.",
+            "emergency_help": "🚨 UWAGA! W prawdziwej sytuacji awaryjnej dzwoń 112! Poproś dorosłego o pomoc!",
+            "where_am_i": "🧭 Sprawdzam gdzie jesteś. Zapamiętaj ważne miejsca wokół siebie."
+        }
+        
+        return {
+            "success": False,
+            "action": action,
+            "text": fallback_texts.get(action, "Przepraszam, nie mogę teraz pomóc."),
+            "lang": lang,
+            "ai_model": "fallback",
+            "error": str(e)
+        }
+
+def generate_contextual_speech(action: str, context: dict, lang: str = "pl") -> str:
+    """Generuje inteligentne wypowiedzi na podstawie kontekstu bez zewnętrznych AI"""
+    
+    age = context.get('childAge', 8)
+    time_of_day = context.get('timeOfDay', 'dzień')
+    is_first_visit = context.get('isFirstVisit', False)
+    location = context.get('location', '')
+    
+    # Dostosuj język do wieku
+    if age <= 6:
+        age_prefix = "maluszku"
+        complexity = "simple"
+    elif age <= 9:
+        age_prefix = ""
+        complexity = "medium"  
+    else:
+        age_prefix = ""
+        complexity = "advanced"
+    
+    # Generuj wypowiedzi według akcji
+    if action == "find_safety":
+        if complexity == "simple":
+            return f"🏃 {age_prefix.capitalize() if age_prefix else 'Szukaj'} bezpiecznych miejsc! Idź do sklepu, szkoły lub tam gdzie są dorośli ludzie!"
+        elif complexity == "medium":
+            return f"🏃 Gdy się zgubisz, szukaj bezpiecznych miejsc: sklepy, szkoły, biblioteki. Zawsze tam gdzie są dorośli!"
+        else:
+            return f"🏃 Najbliższe bezpieczne miejsca to: sklepy, szkoły, biblioteki, komisariaty i urzędy. Wybieraj miejsca z dobrym oświetleniem i wieloma osobami."
+    
+    elif action == "safe_route":
+        if complexity == "simple":
+            return f"🚶 {'Maluszku, i' if age_prefix else 'I'}dź główną drogą! Nie skręcaj w ciemne uliczki. Przechodź tylko tam gdzie są pasy!"
+        elif complexity == "medium":
+            return f"🚶 Bezpieczna droga: idź głównymi ulicami, gdzie jest dużo ludzi. Unikaj pustych miejsc!"
+        else:
+            return f"🚶 Planuj bezpieczną trasę: główne ulice, dobrze oświetlone miejsca, przejścia dla pieszych. Unikaj skrótów przez parki czy pustynie tereny."
+    
+    elif action == "emergency_help":
+        if complexity == "simple":
+            return f"🚨 {'Maluszku, w' if age_prefix else 'W'} niebezpieczeństwie dzwoń 112! Poproś dorosłego o pomoc!"
+        elif complexity == "medium":
+            return f"🚨 W sytuacji awaryjnej: dzwoń 112, znajdź dorosłego, idź do bezpiecznego miejsca!"
+        else:
+            return f"🚨 Procedura awaryjna: 1) Oceń sytuację 2) Dzwoń 112 3) Poinformuj zaufanego dorosłego 4) Idź do najbliższego bezpiecznego miejsca"
+    
+    elif action == "where_am_i":
+        base_msg = f"🧭 {'Maluszku, s' if age_prefix else 'S'}prawdzam gdzie jesteś..."
+        
+        if time_of_day in ['wieczór', 'noc']:
+            base_msg += f" Jest już {time_of_day}, pamiętaj o bezpieczeństwie!"
+        
+        if location:
+            base_msg += " Zapamiętaj ważne miejsca wokół siebie: nazwy ulic, sklepy, numery budynków."
+        
+        return base_msg
+    
+    return "Przepraszam, nie rozumiem tej akcji."
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
 
