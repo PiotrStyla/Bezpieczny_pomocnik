@@ -239,6 +239,93 @@ def get_poland_administrative_info():
         logging.error(f"Error getting Poland info: {e}")
         raise HTTPException(status_code=500, detail=f"Błąd pobierania informacji o Polsce: {str(e)}")
 
+@app.post("/api/bielik-speech")
+async def generate_bielik_speech(request: dict):
+    """
+    Generate speech using Bielik AI (Polish model)
+    """
+    try:
+        action = request.get("action")
+        context = request.get("context", {})
+        
+        if not action:
+            raise HTTPException(status_code=400, detail="Missing action")
+        
+        # Import here to avoid startup issues
+        from .bielik_ai import generate_bielik_response
+        import os
+        
+        # Get API key
+        api_key = os.getenv('BIELIK_API_KEY')
+        if not api_key or api_key.startswith('hf_TUTAJ'):
+            # Fallback to rule-based response
+            return await generate_fallback_response(action, context)
+        
+        # Generate with Bielik AI
+        bielik_response = await generate_bielik_response(action, context, api_key)
+        
+        if bielik_response:
+            return {
+                "success": True,
+                "text": bielik_response,
+                "model": "bielik-ai",
+                "action": action,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        else:
+            # Fallback if Bielik fails
+            return await generate_fallback_response(action, context)
+            
+    except Exception as e:
+        logging.error(f"Bielik speech error: {e}")
+        return await generate_fallback_response(action, context)
+
+async def generate_fallback_response(action: str, context: dict):
+    """
+    Fallback rule-based responses when Bielik AI is unavailable
+    """
+    child_age = context.get('childAge', 8)
+    try:
+        child_age = int(child_age)
+    except:
+        child_age = 8
+    
+    # Age-appropriate responses
+    if child_age <= 6:
+        responses = {
+            "find_safety": "🏃 Maluszku, szukaj bezpiecznych miejsc! Idź do sklepu, szkoły lub tam gdzie są dorośli!",
+            "safe_route": "🚶 Maluszku, idź główną drogą! Nie skręcaj w ciemne uliczki!",
+            "emergency_help": "🚨 Maluszku, w niebezpieczeństwie dzwoń 112! Poproś dorosłego o pomoc!",
+            "where_am_i": "🧭 Maluszku, sprawdzam gdzie jesteś. Zapamiętaj ważne miejsca!",
+            "welcome": "🎈 Cześć maluszku! Jestem twoim przyjacielem bezpieczeństwa!"
+        }
+    elif child_age <= 9:
+        responses = {
+            "find_safety": "🏃 Gdy się zgubisz, szukaj bezpiecznych miejsc: sklepy, szkoły, biblioteki!",
+            "safe_route": "🚶 Bezpieczna droga: idź głównymi ulicami, gdzie jest dużo ludzi!",
+            "emergency_help": "🚨 W sytuacji awaryjnej: dzwoń 112, znajdź dorosłego!",
+            "where_am_i": "🧭 Sprawdzam gdzie jesteś. Zapamiętaj nazwy ulic i ważne miejsca!",
+            "welcome": "👋 Witaj! Jestem twoim pomocnikiem bezpieczeństwa!"
+        }
+    else:
+        responses = {
+            "find_safety": "🏃 Najbliższe bezpieczne miejsca: sklepy, szkoły, biblioteki, komisariaty. Wybieraj dobrze oświetlone miejsca!",
+            "safe_route": "🚶 Planuj bezpieczną trasę: główne ulice, przejścia dla pieszych. Unikaj skrótów przez pustnie tereny!",
+            "emergency_help": "🚨 Procedura awaryjna: 1) Oceń sytuację 2) Dzwoń 112 3) Poinformuj dorosłego 4) Idź do bezpiecznego miejsca",
+            "where_am_i": "🧭 Sprawdzam lokalizację. Zapamiętaj: nazwy ulic, numery budynków, punkty orientacyjne!",
+            "welcome": "🛡️ Witaj! Jestem AI asystentem bezpieczeństwa. Pomogę ci w różnych sytuacjach!"
+        }
+    
+    response_text = responses.get(action, responses["welcome"])
+    
+    return {
+        "success": False,
+        "text": response_text,
+        "model": "rule-based-fallback",
+        "action": action,
+        "note": "Bielik AI unavailable - using rule-based response"
+    }
+
 app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
 
 if __name__ == "__main__":
