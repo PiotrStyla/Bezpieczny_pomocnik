@@ -63,35 +63,51 @@ function saveUserMemory() {
     console.log('💾 User memory saved:', userMemory);
 }
 
-// Update visit count and show returning user message
+// Update visit count and show smart welcome message
 function updateVisitCount() {
     userMemory.visitCount++;
+    console.log(`📊 Visit count updated: ${userMemory.visitCount}`);
+    saveUserMemory();
     
-    if (userMemory.visitCount === 1) {
-        console.log('🆕 New user - first visit');
+    // Check if we have parental consent for smart welcome
+    const consentData = JSON.parse(localStorage.getItem('parental_consent') || '{}');
+    
+    if (consentData.granted) {
+        // Use smart AI welcome based on age and context
         setTimeout(() => {
+            const smartWelcome = generateSmartSpeech('welcome');
             const mascotText = document.getElementById('mascot-text');
             if (mascotText) {
-                mascotText.textContent = '👋 Witaj po raz pierwszy! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij na różne elementy aby się uczyć!';
+                mascotText.textContent = smartWelcome;
             }
             if (speechEnabled) {
-                speakText('Witaj po raz pierwszy! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij na różne elementy aby się uczyć!');
+                speakText(smartWelcome);
             }
         }, 3000);
     } else {
-        console.log(`🔄 Returning user - visit #${userMemory.visitCount}`);
-        setTimeout(() => {
-            const mascotText = document.getElementById('mascot-text');
-            if (mascotText) {
-                mascotText.textContent = `🔄 Witaj ponownie! To już twoja ${userMemory.visitCount}. wizyta. Pamiętam, że nauczyłeś się już ${userMemory.learnedTips.length} porad bezpieczeństwa!`;
-            }
-            if (speechEnabled) {
-                speakText(`Witaj ponownie! To już twoja ${userMemory.visitCount}. wizyta. Pamiętam, że nauczyłeś się już ${userMemory.learnedTips.length} porad bezpieczeństwa!`);
-            }
-        }, 3000);
+        // Default welcome without age info
+        if (userMemory.visitCount === 1) {
+            setTimeout(() => {
+                const mascotText = document.getElementById('mascot-text');
+                if (mascotText) {
+                    mascotText.textContent = '👋 Witaj! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij na różne elementy aby się uczyć!';
+                }
+                if (speechEnabled) {
+                    speakText('Witaj po raz pierwszy! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij na różne elementy aby się uczyć!');
+                }
+            }, 3000);
+        } else {
+            setTimeout(() => {
+                const mascotText = document.getElementById('mascot-text');
+                if (mascotText) {
+                    mascotText.textContent = `🔄 Witaj ponownie! To już twoja ${userMemory.visitCount}. wizyta. Pamiętam, że nauczyłeś się już ${userMemory.learnedTips.length} porad bezpieczeństwa!`;
+                }
+                if (speechEnabled) {
+                    speakText(`Witaj ponownie! To już twoja ${userMemory.visitCount}. wizyta. Pamiętam, że nauczyłeś się już ${userMemory.learnedTips.length} porad bezpieczeństwa!`);
+                }
+            }, 3000);
+        }
     }
-    
-    saveUserMemory();
 }
 
 // Add learned tip to memory
@@ -270,6 +286,97 @@ function getUserLocation() {
     );
 }
 
+// Frontend AI - inteligentne wypowiedzi bez backend
+function generateSmartSpeech(action, context = {}) {
+    // Get child age from parental consent
+    const consentData = JSON.parse(localStorage.getItem('parental_consent') || '{}');
+    
+    const age = parseInt(consentData.childAge) || 8;
+    const timeOfDay = new Date().getHours() < 12 ? 'rano' : new Date().getHours() < 18 ? 'popołudnie' : 'wieczór';
+    const isFirstVisit = userMemory.visitCount === 1;
+    const hasLocation = userLocation ? true : false;
+    
+    // Określ poziom złożoności na podstawie wieku
+    let complexity, agePrefix;
+    if (age <= 6) {
+        complexity = 'simple';
+        agePrefix = 'maluszku';
+    } else if (age <= 9) {
+        complexity = 'medium';
+        agePrefix = '';
+    } else {
+        complexity = 'advanced'; 
+        agePrefix = '';
+    }
+    
+    console.log(`🤖 Smart speech: age=${age}, complexity=${complexity}, time=${timeOfDay}`);
+    
+    // Generuj wypowiedzi według akcji i wieku
+    switch(action) {
+        case 'find_safety':
+            if (complexity === 'simple') {
+                return `🏃 ${agePrefix ? 'Maluszku, szukaj' : 'Szukaj'} bezpiecznych miejsc! Idź do sklepu, szkoły lub tam gdzie są dorośli ludzie!`;
+            } else if (complexity === 'medium') {
+                return `🏃 Gdy się zgubisz, szukaj bezpiecznych miejsc: sklepy, szkoły, biblioteki. Zawsze tam gdzie są dorośli!`;
+            } else {
+                return `🏃 Najbliższe bezpieczne miejsca to: sklepy, szkoły, biblioteki, komisariaty i urzędy. Wybieraj miejsca z dobrym oświetleniem i wieloma osobami.`;
+            }
+            
+        case 'safe_route':
+            if (complexity === 'simple') {
+                return `🚶 ${agePrefix ? 'Maluszku, i' : 'I'}dź główną drogą! Nie skręcaj w ciemne uliczki. Przechodź tylko tam gdzie są pasy!`;
+            } else if (complexity === 'medium') {
+                return `🚶 Bezpieczna droga: idź głównymi ulicami, gdzie jest dużo ludzi. Unikaj pustych miejsc!`;
+            } else {
+                return `🚶 Planuj bezpieczną trasę: główne ulice, dobrze oświetlone miejsca, przejścia dla pieszych. Unikaj skrótów przez parki czy pustynie tereny.`;
+            }
+            
+        case 'emergency_help':
+            if (complexity === 'simple') {
+                return `🚨 ${agePrefix ? 'Maluszku, w' : 'W'} niebezpieczeństwie dzwoń 112! Poproś dorosłego o pomoc!`;
+            } else if (complexity === 'medium') {
+                return `🚨 W sytuacji awaryjnej: dzwoń 112, znajdź dorosłego, idź do bezpiecznego miejsca!`;
+            } else {
+                return `🚨 Procedura awaryjna: 1) Oceń sytuację 2) Dzwoń 112 3) Poinformuj zaufanego dorosłego 4) Idź do najbliższego bezpiecznego miejsca`;
+            }
+            
+        case 'where_am_i':
+            let baseMsg = `🧭 ${agePrefix ? 'Maluszku, s' : 'S'}prawdzam gdzie jesteś...`;
+            
+            if (timeOfDay === 'wieczór') {
+                baseMsg += ` Jest już wieczór, pamiętaj o bezpieczeństwie!`;
+            }
+            
+            if (hasLocation) {
+                baseMsg += ` Zapamiętaj ważne miejsca wokół siebie: nazwy ulic, sklepy, numery budynków.`;
+            }
+            
+            return baseMsg;
+            
+        case 'welcome':
+            if (isFirstVisit) {
+                if (complexity === 'simple') {
+                    return `🎈 Cześć ${agePrefix}! Jestem twoim przyjacielem, który pomoże ci być bezpiecznym!`;
+                } else if (complexity === 'medium') {
+                    return `👋 Witaj! Jestem twoim pomocnikiem bezpieczeństwa. Pokażę ci jak być bezpiecznym!`;
+                } else {
+                    return `🛡️ Cześć! Jestem AI asystentem bezpieczeństwa. Pomogę ci w różnych sytuacjach!`;
+                }
+            } else {
+                if (complexity === 'simple') {
+                    return `🎈 Cześć ${agePrefix}! Miło cię znowu widzieć!`;
+                } else if (complexity === 'medium') {
+                    return `👋 Witaj ponownie! Super, że wróciłeś!`;
+                } else {
+                    return `🛡️ Witaj z powrotem! Gotowy na nowe przygody z bezpieczeństwem?`;
+                }
+            }
+            
+        default:
+            return 'Cześć! Jestem twoim pomocnikiem bezpieczeństwa!';
+    }
+}
+
 async function handleWhereAmI() {
     console.log('🧭 Where Am I clicked');
     
@@ -278,34 +385,52 @@ async function handleWhereAmI() {
         mascotText.textContent = '🧭 Sprawdzam gdzie jesteś...';
     }
     
-    speakText('Sprawdzam twoją lokalizację...');
+    const smartMessage = generateSmartSpeech('where_am_i');
+    
+    setTimeout(() => {
+        if (mascotText) {
+            mascotText.textContent = smartMessage;
+        }
+        speakText(smartMessage);
+    }, 1000);
+    
     getUserLocation();
 }
 
 async function handleFindSafety() {
     console.log('🏃 Find Safety clicked');
     
-    const message = '🏃 Najbliższe bezpieczne miejsca to: sklepy, szkoły, biblioteki i komisariaty. Szukaj miejsc gdzie są ludzie!';
-    
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = message;
+        mascotText.textContent = '🏃 Szukam bezpiecznych miejsc...';
     }
     
-    speakText(message);
+    const smartMessage = generateSmartSpeech('find_safety');
+    
+    setTimeout(() => {
+        if (mascotText) {
+            mascotText.textContent = smartMessage;
+        }
+        speakText(smartMessage);
+    }, 800);
 }
 
 async function handleSafeRoute() {
     console.log('🚶 Safe Route clicked');
     
-    const message = '🚶 Bezpieczna droga: idź głównymi ulicami, unikaj pustych miejsc, przechodź tylko na przejściach dla pieszych.';
-    
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = message;
+        mascotText.textContent = '🚶 Planuję bezpieczną trasę...';
     }
     
-    speakText(message);
+    const smartMessage = generateSmartSpeech('safe_route');
+    
+    setTimeout(() => {
+        if (mascotText) {
+            mascotText.textContent = smartMessage;
+        }
+        speakText(smartMessage);
+    }, 800);
 }
 
 async function handleEmergencyHelp() {
@@ -316,14 +441,19 @@ async function handleEmergencyHelp() {
         document.body.style.background = '';
     }, 3000);
     
-    const message = '🚨 UWAGA! W prawdziwej sytuacji awaryjnej dzwoń 112! Poproś dorosłego o pomoc!';
-    
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = message;
+        mascotText.textContent = '🚨 UWAGA! Sytuacja awaryjna!';
     }
     
-    speakText(message);
+    const smartMessage = generateSmartSpeech('emergency_help');
+    
+    setTimeout(() => {
+        if (mascotText) {
+            mascotText.textContent = smartMessage;
+        }
+        speakText(smartMessage);
+    }, 500);
 }
 
 // DOM Content Loaded
