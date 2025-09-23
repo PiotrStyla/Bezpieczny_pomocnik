@@ -239,6 +239,25 @@ def get_poland_administrative_info():
         logging.error(f"Error getting Poland info: {e}")
         raise HTTPException(status_code=500, detail=f"Błąd pobierania informacji o Polsce: {str(e)}")
 
+@app.get("/api/ai-config")
+async def get_ai_config():
+    """
+    Provide AI configuration for frontend
+    """
+    import os
+    
+    openai_key = os.getenv('OPENAI_API_KEY')
+    
+    return {
+        "providers": {
+            "openai": {
+                "available": bool(openai_key and openai_key.startswith('sk-')),
+                "key": openai_key if openai_key and openai_key.startswith('sk-') else None
+            }
+        },
+        "default_provider": "openai" if openai_key else "fallback"
+    }
+
 app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
 
 if __name__ == "__main__":

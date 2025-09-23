@@ -40,16 +40,36 @@ class PolishAIClient {
     }
 
     /**
-     * 🔑 Load API keys from localStorage
+     * 🔑 Load API keys from backend and localStorage
      */
-    loadApiKeys() {
+    async loadApiKeys() {
+        // First try to load from backend (Render environment)
+        try {
+            const response = await fetch('/api/ai-config');
+            if (response.ok) {
+                const config = await response.json();
+                
+                if (config.providers.openai.available && config.providers.openai.key) {
+                    this.providers.openai.key = config.providers.openai.key;
+                    this.providers.openai.available = true;
+                    console.log('🔑 OpenAI API key loaded from Render environment');
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.log('⚠️ Could not load API config from backend, checking localStorage...');
+        }
+        
+        // Fallback to localStorage  
         const openaiKey = localStorage.getItem('openai_api_key');
         if (openaiKey && openaiKey.startsWith('sk-')) {
             this.providers.openai.key = openaiKey;
             this.providers.openai.available = true;
+            console.log('🔑 OpenAI API key loaded from localStorage');
+            return true;
         }
         
-        return this.providers.openai.available;
+        return false;
     }
 
     /**
@@ -240,12 +260,13 @@ window.PolishAIClient = PolishAIClient;
 window.polishAI = new PolishAIClient();
 
 // Auto-load API keys on startup
-document.addEventListener('DOMContentLoaded', () => {
-    window.polishAI.loadApiKeys();
+document.addEventListener('DOMContentLoaded', async () => {
+    await window.polishAI.loadApiKeys();
     const available = window.polishAI.getAvailableProviders();
     
     if (available.length > 0) {
         console.log(`🇵🇱 Polish AI ready with providers: ${available.join(', ')}`);
+        console.log('🤖 ChatGPT/OpenAI configured - intelligent Polish responses enabled');
     } else {
         console.log('⚠️ No Polish AI providers configured - using fallback responses');
     }
