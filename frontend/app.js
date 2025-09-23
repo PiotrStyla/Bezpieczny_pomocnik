@@ -13,7 +13,35 @@
  * For licensing inquiries: kontakt@fundacja-hospicjum.org
  */
 
+console.log(' APP.JS LOADING...');
+console.log(' Timestamp:', new Date().toISOString());
+
+// IMMEDIATELY define critical functions to prevent "undefined" errors
+window.testSpeech = function() {
+    console.log(' TEST: Kliknięto przycisk test mowy');
+    const testMessage = "Witaj! To jest test mowy. Jeśli mnie słyszysz, znaczy że wszystko działa!";
+    
+    if (window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(testMessage);
+        utterance.lang = 'pl-PL';
+        utterance.rate = 0.8;
+        utterance.pitch = 1.1;
+        utterance.volume = 1.0;
+        
+        utterance.onstart = () => console.log(' Test mowy rozpoczęty');
+        utterance.onend = () => console.log(' Test mowy zakończony');
+        utterance.onerror = (e) => console.log(' Błąd test mowy:', e.error);
+        
+        window.speechSynthesis.speak(utterance);
+        console.log(' Test speak() wysłany');
+    } else {
+        console.log(' Brak TTS w przeglądarce');
+        alert('Twoja przeglądarka nie obsługuje mowy!');
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log(' DOM CONTENT LOADED - Starting app initialization...');
     const alertsContainer = document.getElementById('alerts-container');
     const langButtons = document.querySelectorAll('.lang-btn');
     const notificationsBtn = document.getElementById('notifications-btn');
@@ -37,9 +65,168 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     const speechSynthesis = window.speechSynthesis;
     
-    // Geolocation functionality
-    let userLocation = null;
-    let userLocationMarker = null;
+    // 🗺️ Map variables
+    let map = null;
+    let markersLayer = null;
+
+    console.log('🔧 INITIALIZING VARIABLES AND ELEMENTS...');
+    console.log('📍 Elements check:', {
+        alertsContainer: !!alertsContainer,
+        langButtons: langButtons.length,
+        locationFilter: !!locationFilter,
+        mascotText: !!mascotText
+    });
+
+    // 🎯 CRITICAL EVENT LISTENERS SETUP
+    console.log('🎯 SETTING UP EVENT LISTENERS...');
+    
+    // Language buttons
+    if (langButtons.length > 0) {
+        langButtons.forEach((button, index) => {
+            console.log(`🌍 Setting up language button ${index + 1}:`, button.id);
+            button.addEventListener('click', (e) => {
+                console.log('🌍 Language button clicked:', button.id);
+                const selectedLang = button.id.replace('lang-', '');
+                langButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentLang = selectedLang;
+                fetchAndDisplayAlerts(selectedLang);
+                updateFooterLanguage(selectedLang);
+                updateCardTitles(selectedLang);
+            });
+        });
+        console.log('✅ Language buttons setup complete');
+    } else {
+        console.error('❌ No language buttons found!');
+    }
+
+    // Location filter
+    if (locationFilter) {
+        locationFilter.addEventListener('change', () => {
+            console.log('📍 Location filter changed:', locationFilter.value);
+            displayFilteredAlerts();
+        });
+        console.log('✅ Location filter setup complete');
+    } else {
+        console.error('❌ Location filter not found!');
+    }
+
+    // 🎤 Speech toggle button
+    const speechToggleBtn = document.getElementById('speech-toggle-btn');
+    if (speechToggleBtn) {
+        speechToggleBtn.addEventListener('click', () => {
+            console.log('🔊 Speech button clicked');
+            toggleSpeech();
+        });
+        console.log('✅ Speech toggle button setup complete');
+    } else {
+        console.error('❌ Speech toggle button not found!');
+    }
+
+    // 📍 Location button
+    const locationBtn = document.getElementById('location-btn');
+    if (locationBtn) {
+        locationBtn.addEventListener('click', () => {
+            console.log('📍 Location button clicked');
+            handleLocationButtonClick();
+        });
+        console.log('✅ Location button setup complete');
+    } else {
+        console.log('⚠️ Location button not found (may be normal)');
+    }
+
+    // 🎯 Safety buttons setup
+    const whereAmIBtn = document.getElementById('where-am-i-btn');
+    const findSafetyBtn = document.getElementById('find-safety-btn');
+    const safeRouteBtn = document.getElementById('safe-route-btn');
+    const emergencyHelpBtn = document.getElementById('emergency-help-btn');
+    const testSpeechBtn = document.getElementById('test-speech-btn');
+
+    if (whereAmIBtn) {
+        whereAmIBtn.addEventListener('click', handleWhereAmI);
+        console.log('✅ Where Am I button setup complete');
+    } else {
+        console.log('⚠️ Where Am I button not found');
+    }
+
+    if (findSafetyBtn) {
+        findSafetyBtn.addEventListener('click', handleFindSafety);
+        console.log('✅ Find Safety button setup complete');
+    } else {
+        console.log('⚠️ Find Safety button not found');
+    }
+
+    if (safeRouteBtn) {
+        safeRouteBtn.addEventListener('click', handleSafeRoute);
+        console.log('✅ Safe Route button setup complete');
+    } else {
+        console.log('⚠️ Safe Route button not found');
+    }
+
+    if (emergencyHelpBtn) {
+        emergencyHelpBtn.addEventListener('click', handleEmergencyHelp);
+        console.log('✅ Emergency Help button setup complete');
+    } else {
+        console.log('⚠️ Emergency Help button not found');
+    }
+
+    if (testSpeechBtn) {
+        testSpeechBtn.addEventListener('click', window.testSpeech);
+        console.log('✅ Test Speech button setup complete');
+    } else {
+        console.log('⚠️ Test Speech button not found');
+    }
+
+    // 🎯 Universal click handler for all buttons
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        const closest = e.target.closest('button, .control-card, .tip-card, .emergency-card');
+        
+        console.log('🖱️ Universal click detected:', {
+            target: target.tagName,
+            id: target.id,
+            className: target.className,
+            closest: closest?.tagName,
+            closestId: closest?.id,
+            closestClass: closest?.className
+        });
+
+        // Handle button clicks by ID
+        if (target.id) {
+            switch (target.id) {
+                case 'where-am-i-btn':
+                    console.log('🧭 Where Am I clicked via universal handler');
+                    handleWhereAmI();
+                    break;
+                case 'find-safety-btn':
+                    console.log('🏃 Find Safety clicked via universal handler');
+                    handleFindSafety();
+                    break;
+                case 'safe-route-btn':
+                    console.log('🚶 Safe Route clicked via universal handler');
+                    handleSafeRoute();
+                    break;
+                case 'emergency-help-btn':
+                    console.log('🚨 Emergency Help clicked via universal handler');
+                    handleEmergencyHelp();
+                    break;
+                case 'test-speech-btn':
+                    console.log('🎤 Test Speech clicked via universal handler');
+                    window.testSpeech();
+                    break;
+                case 'speech-toggle-btn':
+                    console.log('🔊 Speech Toggle clicked via universal handler');
+                    toggleSpeech();
+                    break;
+            }
+        }
+
+        // Handle card clicks
+        if (closest && (closest.classList.contains('tip-card') || closest.classList.contains('emergency-card'))) {
+            console.log('🎯 Card clicked via universal handler');
+            handleSafetyCardClick(e);
+        }
+    });
     
     // Get mascot text element
     const mascotText = document.getElementById('mascot-text');
