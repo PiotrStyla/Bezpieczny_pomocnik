@@ -392,14 +392,12 @@ function selectCzubownaLikeVoice(lang = 'pl') {
     console.log('⚠️ No suitable female voice found, using system default');
     return null;
 }
-    const voices = window.speechSynthesis.getVoices();
-    
-    if (voices.length === 0) {
-        console.log('⚠️ No voices available yet, using default');
-        return null;
-    }
-    
-    // Priority order for child-friendly voices
+
+/**
+ * 📍 GENERATE AGE-APPROPRIATE LOCATION MESSAGE
+ * Uses LLM to create personalized messages based on child's age
+ */
+function generateLocationMessage() {
     const polishFemalePreferences = [
         // Polish female voices (highest priority)
         'Zofia', 'Paulina', 'Agnieszka', 'Ewa', 'Anna', 'Kasia',
