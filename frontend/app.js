@@ -870,16 +870,16 @@ function startAlertMonitoring() {
     // Initial check
     checkForAlerts();
     
-    // Check every 2 minutes for new alerts
+    // Check every 30 seconds for new alerts - LIFE SAVING SPEED vs 3-4 hour official propagation
     if (alertMonitorInterval) {
         clearInterval(alertMonitorInterval);
     }
     
     alertMonitorInterval = setInterval(() => {
         checkForAlerts();
-    }, 120000); // 2 minutes
+    }, 30000); // 30 seconds - CRITICAL for child safety vs 3-4 hour official propagation!
     
-    console.log('✅ Alert monitoring system active - checking every 2 minutes');
+    console.log('✅ Alert monitoring system active - checking every 30 seconds (vs 3-4 HOURS official systems!)');
 }
 
 /**
