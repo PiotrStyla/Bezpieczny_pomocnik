@@ -511,9 +511,9 @@ function initializeVoices() {
             console.log('🇵🇱 Available Polish voices:', polishVoices.map(v => `${v.name} (${v.lang})`));
             
             // Pre-select the best voice for children
-            const childVoice = selectChildFriendlyVoice('pl');
+            const childVoice = selectCzubownaLikeVoice('pl');
             if (childVoice) {
-                console.log(`👶 Pre-selected child-friendly voice: ${childVoice.name}`);
+                console.log(`👶 Pre-selected Czubówna-like voice: ${childVoice.name}`);
             }
         };
     }
@@ -788,18 +788,23 @@ function handleLocationError(error) {
  */
 async function getAddressFromCoords(lat, lon) {
     try {
-        // Simple reverse geocoding (you can use any geocoding service)
-        const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=YOUR_API_KEY&language=pl&no_annotations=1`);
+        // Use free Nominatim OpenStreetMap API
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=pl`);
         
         if (response.ok) {
             const data = await response.json();
-            if (data.results && data.results[0]) {
-                const address = data.results[0].formatted;
+            if (data && data.display_name) {
+                const address = data.display_name;
                 showLocationMessage('address', { address });
+                console.log('🏠 Address found:', address);
+            } else {
+                console.log('ℹ️ No address data found');
             }
+        } else {
+            console.log('⚠️ Geocoding service unavailable');
         }
     } catch (error) {
-        console.log('ℹ️ Address lookup failed, using coordinates only');
+        console.log('ℹ️ Address lookup failed, using coordinates only:', error.message);
         // This is fine, we already showed success message with coordinates
     }
 }
