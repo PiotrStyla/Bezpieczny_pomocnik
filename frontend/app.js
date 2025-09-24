@@ -1028,7 +1028,16 @@ function generateRuleBasedAlert(alert, childAge) {
         } else {
             message = 'Ostrzeżenie przed burzami i gradem. Szukaj natychmiastowego schronienia. Zabezpiecz rzeczy na balkonie.';
         }
-    } else if (title.includes('woda') || title.includes('powódź') || content.includes('podtopienia') || content.includes('wezbranych')) {
+    } else if (title.includes('woda niezdatna') || content.includes('nie nadaje się do spożycia') || content.includes('nie nadaje się do użytku')) {
+        emoji = '💧';
+        if (childAge <= 6) {
+            message = 'Nie pij wody z kranu! Woda jest brudna i może cię rozchorować. Pij tylko wodę z butelek.';
+        } else if (childAge <= 9) {
+            message = 'Woda z kranu jest skażona! Używaj tylko wody butelkowanej do picia, mycia zębów i gotowania.';
+        } else {
+            message = 'Skażenie wody pitnej! Nie używaj wody z kranu do picia ani przygotowania jedzenia. Tylko woda butelkowana!';
+        }
+    } else if (title.includes('powódź') || content.includes('podtopienia') || content.includes('wezbranych') || content.includes('opady deszczu')) {
         emoji = '🌊';
         if (childAge <= 6) {
             message = 'Za dużo wody wszędzie! Nie chodź blisko rzek ani potoczków. Trzymaj się z dala od kałuż.';
@@ -1036,15 +1045,6 @@ function generateRuleBasedAlert(alert, childAge) {
             message = 'Niebezpieczne podtopienia! Unikaj rzek, mostów i niskich terenów. Idź na wyższe miejsce.';
         } else {
             message = 'Alert powodziowy! Natychmiast oddal się od rzek i potoków. Udaj się na wyższy teren.';
-        }
-    } else if (title.includes('woda niezdatna') || content.includes('nie nadaje się do spożycia')) {
-        emoji = '💧';
-        if (childAge <= 6) {
-            message = 'Nie pij wody z kranu! Pij tylko wodę z butelek. Powiedz dorosłym żeby sprawdzili wodę.';
-        } else if (childAge <= 9) {
-            message = 'Woda z kranu jest niebezpieczna! Używaj tylko wody butelkowanej do picia i mycia zębów.';
-        } else {
-            message = 'Skażenie wody wodociągowej! Nie używaj wody z kranu. Korzystaj tylko z wody butelkowanej.';
         }
     } else if (title.includes('dron') || title.includes('obiekt') || content.includes('naruszyły granice')) {
         emoji = '🚁';
@@ -1060,9 +1060,9 @@ function generateRuleBasedAlert(alert, childAge) {
         if (childAge <= 6) {
             message = 'Wojsko ćwiczy dzisiaj. Będzie głośno ale to nie prawdziwa wojna. Zostań blisko dorosłych.';
         } else if (childAge <= 9) {
-            message = 'Ćwiczenia wojskowe w okolicy. Odgłosy strzałów i helikopterów to tylko trening.';
+            message = 'Ćwiczenia wojskowe w okolicy. Odgłosy strzałów i helikopterów to tylko trening. Wszystko w porządku.';
         } else {
-            message = 'Ćwiczenia służb mundurowych. Hałas i loty helikopterów to część treningu, zachowaj spokój.';
+            message = 'Ćwiczenia służb mundurowych. Hałas strzałów i loty helikopterów to część treningu, zachowaj spokój.';
         }
     } else {
         // Generic alert with concrete actions
