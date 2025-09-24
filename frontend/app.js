@@ -459,8 +459,12 @@ function getUserLocation() {
     
     if (!navigator.geolocation) {
         console.error('❌ Geolocation not supported');
+        handleLocationError('Twoja przeglądarka nie obsługuje lokalizacji.');
         return;
     }
+
+    // Show starting message
+    showLocationMessage('checking');
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -471,6 +475,10 @@ function getUserLocation() {
             
             userLocation = { lat, lon };
             
+            // Show success message with location details
+            showLocationMessage('success', { lat, lon });
+            
+            // Update map
             if (map) {
                 if (userLocationMarker) {
                     map.removeLayer(userLocationMarker);
@@ -478,21 +486,156 @@ function getUserLocation() {
                 
                 userLocationMarker = L.marker([lat, lon])
                     .addTo(map)
-                    .bindPopup('📍 Twoja lokalizacja')
+                    .bindPopup('📍 Twoja bezpieczna lokalizacja')
                     .openPopup();
                     
                 map.setView([lat, lon], 12);
             }
+            
+            // Try to get address details for better communication
+            getAddressFromCoords(lat, lon);
         },
         (error) => {
             console.error('❌ Geolocation error:', error);
+            handleLocationError(error);
         },
         {
             enableHighAccuracy: true,
-            timeout: 10000,
+            timeout: 15000, // Longer timeout for better accuracy
             maximumAge: 300000
         }
     );
+}
+
+/**
+ * 📍 SHOW LOCATION MESSAGE - Complete communication system
+ */
+function showLocationMessage(stage, data = {}) {
+    const childAge = getChildAgeForAI();
+    let message, speech;
+    
+    switch (stage) {
+        case 'checking':
+            if (childAge <= 6) {
+                message = '🔍 Szukam gdzie jesteś! To pomoże mi znaleźć odpowiedzi dla Ciebie.';
+                speech = 'Szukam... gdzie... jesteś... To... pomoże... mi... znaleźć... odpowiedzi... dla... Ciebie';
+            } else if (childAge <= 9) {
+                message = '🧭 Sprawdzam gdzie jesteś, żeby dać ci najlepsze rady bezpieczeństwa!';
+                speech = 'Sprawdzam... gdzie... jesteś... żeby... dać... ci... najlepsze... rady... bezpieczeństwa';
+            } else if (childAge <= 12) {
+                message = '📍 Określam twoją lokalizację, żeby pokazać ci bezpieczne miejsca w okolicy!';
+                speech = 'Określam... twoją... lokalizację... żeby... pokazać... ci... bezpieczne... miejsca... w... okolicy';
+            } else {
+                message = '🌍 Analizuję twoją pozycję GPS, żeby przygotować mape bezpieczeństwa!';
+                speech = 'Analizuję... twoją... pozycję... GPS... żeby... przygotować... mape... bezpieczeństwa';
+            }
+            break;
+            
+        case 'success':
+            const lat = data.lat.toFixed(4);
+            const lon = data.lon.toFixed(4);
+            
+            if (childAge <= 6) {
+                message = `✅ Znalazłem Cię! Jesteś bezpieczny i mogę Ci teraz pomóc!`;
+                speech = 'Znalazłem... Cię... Jesteś... bezpieczny... i... mogę... Ci... teraz... pomóc';
+            } else if (childAge <= 9) {
+                message = `🎯 Mam Twoją lokalizację! Teraz mogę pokazać Ci co dzieje się w okolicy i jak być bezpiecznym!`;
+                speech = 'Mam... Twoją... lokalizację... Teraz... mogę... pokazać... Ci... co... dzieje... się... w... okolicy';
+            } else if (childAge <= 12) {
+                message = `📍 Lokalizacja znaleziona! Współrzędne: ${lat}, ${lon}. Przygotowuję informacje o bezpieczeństwie w Twojej okolicy!`;
+                speech = 'Lokalizacja... znaleziona... Przygotowuję... informacje... o... bezpieczeństwie... w... Twojej... okolicy';
+            } else {
+                message = `🌍 GPS aktywny! Pozycja: ${lat}°N, ${lon}°E. System bezpieczeństwa skanuje okoliczne zagrożenia...`;
+                speech = 'GPS... aktywny... System... bezpieczeństwa... skanuje... okoliczne... zagrożenia';
+            }
+            break;
+            
+        case 'address':
+            const address = data.address;
+            if (childAge <= 9) {
+                message = `🏠 Widzę że jesteś w: ${address}. Sprawdzam czy wszystko jest bezpieczne!`;
+                speech = `Widzę... że... jesteś... w... ${address}... Sprawdzam... czy... wszystko... jest... bezpieczne`;
+            } else {
+                message = `📍 Lokalizacja: ${address}. Analizuję sytuację bezpieczeństwa w tej okolicy...`;
+                speech = `Lokalizacja... ${address}... Analizuję... sytuację... bezpieczeństwa... w... tej... okolicy`;
+            }
+            break;
+    }
+    
+    // Update UI
+    const mascotText = document.getElementById('mascot-text');
+    if (mascotText) {
+        mascotText.textContent = message;
+    }
+    
+    // Speak the message
+    if (speech) {
+        speakText(speech);
+    }
+    
+    console.log(`📍 Location message (age ${childAge}): ${message}`);
+}
+
+/**
+ * ❌ HANDLE LOCATION ERROR - Supportive error messages
+ */
+function handleLocationError(error) {
+    const childAge = getChildAgeForAI();
+    let message, speech, advice;
+    
+    const errorType = typeof error === 'string' ? error : error.message || 'Nieznany błąd';
+    
+    if (childAge <= 6) {
+        message = '😟 Nie mogę znaleźć gdzie jesteś, ale nie martw się! Zapytaj dorosłego o pomoc.';
+        speech = 'Nie... mogę... znaleźć... gdzie... jesteś... ale... nie... martw... się... Zapytaj... dorosłego... o... pomoc';
+        advice = 'Poproś mamę lub tatę żeby włączyli lokalizację w telefonie.';
+    } else if (childAge <= 9) {
+        message = '🤔 Mam problem ze znalezieniem Twojej lokalizacji. To może być przez ustawienia telefonu.';
+        speech = 'Mam... problem... ze... znalezieniem... Twojej... lokalizacji... To... może... być... przez... ustawienia... telefonu';
+        advice = 'Sprawdź czy włączyłeś lokalizację w ustawieniach lub zapytaj dorosłego.';
+    } else if (childAge <= 12) {
+        message = '📍 Nie udało się ustalić lokalizacji. Możesz użyć aplikacji bez tego, ale niektóre funkcje będą ograniczone.';
+        speech = 'Nie... udało... się... ustalić... lokalizacji... Możesz... użyć... aplikacji... bez... tego';
+        advice = 'Sprawdź ustawienia lokalizacji w przeglądarce lub spróbuj ponownie.';
+    } else {
+        message = '🚫 Błąd geolokalizacji: Brak dostępu do GPS. Aplikacja będzie działać w trybie podstawowym.';
+        speech = 'Błąd... geolokalizacji... Brak... dostępu... do... GPS... Aplikacja... będzie... działać... w... trybie... podstawowym';
+        advice = 'Włącz lokalizację w ustawieniach przeglądarki lub urządzenia.';
+    }
+    
+    // Update UI with error message
+    const mascotText = document.getElementById('mascot-text');
+    if (mascotText) {
+        mascotText.innerHTML = `${message}<br><small style="color: #666;">${advice}</small>`;
+    }
+    
+    // Speak error message
+    if (speech) {
+        speakText(speech);
+    }
+    
+    console.error(`❌ Location error (age ${childAge}): ${errorType}`);
+}
+
+/**
+ * 🏠 GET ADDRESS FROM COORDINATES 
+ */
+async function getAddressFromCoords(lat, lon) {
+    try {
+        // Simple reverse geocoding (you can use any geocoding service)
+        const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=YOUR_API_KEY&language=pl&no_annotations=1`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.results && data.results[0]) {
+                const address = data.results[0].formatted;
+                showLocationMessage('address', { address });
+            }
+        }
+    } catch (error) {
+        console.log('ℹ️ Address lookup failed, using coordinates only');
+        // This is fine, we already showed success message with coordinates
+    }
 }
 
 // Frontend AI - Polish AI + ZK privacy  
