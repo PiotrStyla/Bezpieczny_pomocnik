@@ -209,6 +209,22 @@ function initMap() {
 function speakText(text, lang = 'pl') {
     console.log('🎭 KRYSTYNA CZUBÓWNA VOICE:', text);
     
+    // RODO Art. 8 COMPLIANCE - Check parental consent before speech
+    if (window.ZKParentalConsent) {
+        const zkConsent = new window.ZKParentalConsent();
+        const verification = zkConsent.verifyAnonymousConsent();
+        
+        if (!verification.hasConsent) {
+            console.log('🔒 Speech blocked: Parental consent required (RODO Art. 8)');
+            console.log('ℹ️  Child age must be verified by parent before speech activation');
+            return;
+        }
+        
+        console.log(`✅ Valid parental consent verified for ${verification.childAge}-year-old child`);
+    } else {
+        console.log('⚠️ ZK Parental Consent system not available - using fallback');
+    }
+    
     if (!speechEnabled || !window.speechSynthesis) {
         console.log('❌ Speech disabled or not available');
         return;
@@ -912,7 +928,7 @@ async function handleWhereAmI() {
         mascotText.textContent = '🧭 Sprawdzam gdzie jesteś...';
     }
     
-    const smartMessage = generateSmartSpeech('where_am_i');
+    const smartMessage = await generateSmartSpeech('where_am_i');
     
     setTimeout(() => {
         if (mascotText) {
@@ -932,7 +948,7 @@ async function handleFindSafety() {
         mascotText.textContent = '🏃 Szukam bezpiecznych miejsc...';
     }
     
-    const smartMessage = generateSmartSpeech('find_safety');
+    const smartMessage = await generateSmartSpeech('find_safety');
     
     setTimeout(() => {
         if (mascotText) {
@@ -950,7 +966,7 @@ async function handleSafeRoute() {
         mascotText.textContent = '🚶 Planuję bezpieczną trasę...';
     }
     
-    const smartMessage = generateSmartSpeech('safe_route');
+    const smartMessage = await generateSmartSpeech('safe_route');
     
     setTimeout(() => {
         if (mascotText) {
@@ -973,7 +989,7 @@ async function handleEmergencyHelp() {
         mascotText.textContent = '🚨 UWAGA! Sytuacja awaryjna!';
     }
     
-    const smartMessage = generateSmartSpeech('emergency_help');
+    const smartMessage = await generateSmartSpeech('emergency_help');
     
     setTimeout(() => {
         if (mascotText) {
