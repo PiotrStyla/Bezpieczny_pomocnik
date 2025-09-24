@@ -1130,6 +1130,79 @@ function trackAlertForParents(alert, childMessage) {
     }
 }
 
+// 🧪 ALERT TESTING SYSTEM
+/**
+ * 🧪 TEST ALERT FUNCTION - For local testing
+ * Simulates receiving an alert to test child-friendly translation
+ */
+function testAlert(alertType = 'weather') {
+    console.log('🧪 TESTING ALERT SYSTEM - Simulating real alert...');
+    
+    const testAlerts = {
+        weather: {
+            id: 'test_weather_001',
+            title: 'OSTRZEŻENIE METEOROLOGICZNE - Silny wiatr',
+            content: 'IMGW wydało ostrzeżenie przed silnym wiatrem do 80 km/h. Prognozowane są opady deszczu i burze. Wystąpią w okresie od 14:00 do 22:00. Możliwe podtopienia.',
+            severity: 'warning',
+            location: 'Województwo Małopolskie',
+            timestamp: new Date().toISOString()
+        },
+        fire: {
+            id: 'test_fire_001', 
+            title: 'ALARM POŻAROWY - Pożar lasu',
+            content: 'Straż Pożarna informuje o dużym pożarze lasu w okolicy. Zaleca się unikanie tego obszaru. Drogi dostępowe zablokowane. Dym może być niebezpieczny.',
+            severity: 'critical',
+            location: 'Las Wolski, Kraków',
+            timestamp: new Date().toISOString()
+        },
+        flood: {
+            id: 'test_flood_001',
+            title: 'OSTRZEŻENIE HYDROLOGICZNE - Wysoki poziom wody',
+            content: 'Instytut Meteorologii ostrzega przed gwałtownym wzrostem poziomu wody w rzekach. Możliwe lokalne podtopienia. Nie zbliżaj się do brzegów rzek.',
+            severity: 'warning', 
+            location: 'Dolina Wisły',
+            timestamp: new Date().toISOString()
+        }
+    };
+    
+    const testAlert = testAlerts[alertType] || testAlerts.weather;
+    
+    console.log('🧪 Simulating alert:', testAlert);
+    
+    // Process exactly like real alert
+    processChildFriendlyAlert(testAlert);
+}
+
+// Add test buttons to DOM when page loads
+function addTestButtons() {
+    const testContainer = document.createElement('div');
+    testContainer.id = 'test-controls';
+    testContainer.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        background: #333;
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        z-index: 9999;
+        font-family: Arial, sans-serif;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    `;
+    
+    testContainer.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 10px;">🧪 Test Alertów</div>
+        <button onclick="testAlert('weather')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer;">🌧️ Test Pogoda</button>
+        <button onclick="testAlert('fire')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #f44336; color: white; cursor: pointer;">🔥 Test Pożar</button>
+        <button onclick="testAlert('flood')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #2196F3; color: white; cursor: pointer;">🌊 Test Powódź</button>
+        <button onclick="document.getElementById('test-controls').style.display='none'" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #666; color: white; cursor: pointer;">✕ Ukryj</button>
+    `;
+    
+    document.body.appendChild(testContainer);
+    
+    console.log('🧪 Test buttons added - you can now test alerts!');
+}
+
 // Frontend AI - Polish AI + ZK privacy  
 async function generateSmartSpeech(action, context = {}) {
     // Get child age using ZK-protected method
@@ -1555,6 +1628,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         startAlertMonitoring();
     }, 5000); // Start after 5 seconds to allow app to fully initialize
+    
+    // 🧪 ADD TEST BUTTONS for local testing
+    setTimeout(() => {
+        addTestButtons();
+    }, 7000); // Add test buttons after system initialization
 });
 
 console.log('📄 App.js loaded successfully');
