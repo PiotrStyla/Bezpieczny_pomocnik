@@ -207,7 +207,7 @@ function initMap() {
 
 // Speech functions with Krystyna Czubówna-inspired voice
 function speakText(text, lang = 'pl') {
-    console.log('🎭 KRYSTYNA CZUBÓWNA VOICE:', text);
+    console.log('🎭 CZUBÓWNA-INSPIRED VOICE SYNTHESIS:', text);
     
     // RODO Art. 8 COMPLIANCE - Smart consent checking
     // If child age is available, it means parent has already verified via RODO process
@@ -1096,7 +1096,7 @@ function showChildAlert(alert, childMessage) {
         mascotText.style.animation = 'pulse 2s infinite';
     }
     
-    // Speak the alert using Krystyna Czubówna voice
+    // Speak the alert using Czubówna-inspired voice synthesis
     speakText(childMessage);
     
     // Visual alert indicator
