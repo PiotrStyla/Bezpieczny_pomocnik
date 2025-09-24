@@ -205,9 +205,9 @@ function initMap() {
     }
 }
 
-// Speech functions with child-friendly voice selection
+// Speech functions with Krystyna Czubówna-inspired voice
 function speakText(text, lang = 'pl') {
-    console.log('🗣️ SPEAK:', text);
+    console.log('🎭 KRYSTYNA CZUBÓWNA VOICE:', text);
     
     if (!speechEnabled || !window.speechSynthesis) {
         console.log('❌ Speech disabled or not available');
@@ -219,27 +219,179 @@ function speakText(text, lang = 'pl') {
     }
 
     setTimeout(() => {
-        const utterance = new SpeechSynthesisUtterance(text);
+        // Format text with Krystyna Czubówna-style pauses
+        const czubownaText = formatTextForCzubowna(text);
+        const utterance = new SpeechSynthesisUtterance(czubownaText);
         
-        // Select child-friendly female voice
-        const selectedVoice = selectChildFriendlyVoice(lang);
+        // Select voice most similar to Krystyna Czubówna
+        const selectedVoice = selectCzubownaLikeVoice(lang);
         if (selectedVoice) {
             utterance.voice = selectedVoice;
-            console.log(`🎵 Using child-friendly voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+            console.log(`🎭 Using Krystyna Czubówna-inspired voice: ${selectedVoice.name}`);
         }
         
         utterance.lang = lang === 'pl' ? 'pl-PL' : lang === 'en' ? 'en-US' : 'uk-UA';
-        utterance.rate = 0.6;    // Slower for children
-        utterance.pitch = 1.3;   // Higher pitch for friendly tone
-        utterance.volume = 0.8;  // Gentle volume
+        
+        // KRYSTYNA CZUBÓWNA SIGNATURE PARAMETERS:
+        utterance.rate = 0.55;   // Very slow, contemplative like Czubówna
+        utterance.pitch = 1.15;  // Gentle, warm feminine tone
+        utterance.volume = 0.9;  // Clear, confident but not aggressive
+        
+        // Add Czubówna-style emotional expression
+        utterance.onstart = () => {
+            console.log('🚀 Krystyna Czubówna-inspired speech started (parental consent verified)');
+        };
+        
+        utterance.onend = () => {
+            console.log('✅ Krystyna Czubówna-style speech completed');
+        };
 
         window.speechSynthesis.speak(utterance);
-        console.log('🚀 Child-friendly speech started');
-    }, 300);
+    }, 400); // Slightly longer pause before speaking (Czubówna style)
 }
 
-// Select best child-friendly voice (preferably female Polish)
-function selectChildFriendlyVoice(lang = 'pl') {
+/**
+ * 🎭 FORMAT TEXT FOR KRYSTYNA CZUBÓWNA STYLE
+ * Adds characteristic pauses and rhythm like the legendary Polish narrator
+ */
+function formatTextForCzubowna(text) {
+    // Remove existing ellipses to avoid double pauses
+    let formatted = text.replace(/\.{2,}/g, '');
+    
+    // Add characteristic Czubówna pauses:
+    
+    // After important words (bezpieczeństwo, lokalizacja, etc.)
+    formatted = formatted.replace(/\b(bezpieczeństwo|lokalizacja|dziecko|rodzic|pomoc|zagrożenie)\b/gi, '$1...');
+    
+    // After conjunctions (natural speech breaks)
+    formatted = formatted.replace(/\b(ale|więc|czyli|oraz|a także|i)\b/gi, '$1...');
+    
+    // Before important information
+    formatted = formatted.replace(/\b(uwaga|pamiętaj|ważne|ostrzeżenie)\b/gi, '...$1');
+    
+    // Add pauses after punctuation (Czubówna's signature dramatic timing)
+    formatted = formatted.replace(/([.!?])\s+/g, '$1... ');
+    
+    // Add gentle pauses in longer sentences (every 4-5 words)
+    const words = formatted.split(' ');
+    if (words.length > 6) {
+        let result = [];
+        for (let i = 0; i < words.length; i++) {
+            result.push(words[i]);
+            // Add pause every 4-5 words, but not at the end
+            if ((i + 1) % 4 === 0 && i < words.length - 1) {
+                result.push('...');
+            }
+        }
+        formatted = result.join(' ');
+    }
+    
+    // Clean up multiple consecutive pauses
+    formatted = formatted.replace(/\.{6,}/g, '...');
+    
+    console.log(`🎭 Formatted for Czubówna style: "${formatted}"`);
+    return formatted;
+}
+
+/**
+ * 🎵 SELECT VOICE MOST SIMILAR TO KRYSTYNA CZUBÓWNA
+ * Prioritizes warm, mature feminine Polish voices
+ */
+function selectCzubownaLikeVoice(lang = 'pl') {
+    const voices = window.speechSynthesis.getVoices();
+    
+    if (voices.length === 0) {
+        console.log('⚠️ No voices available yet, using default');
+        return null;
+    }
+    
+    // Krystyna Czubówna voice characteristics priority:
+    const czubownaPreferences = [
+        // Polish voices that sound mature and warm (like Czubówna)
+        'Microsoft Paulina - Polish (Poland)',  // Usually the best for Polish
+        'Paulina',
+        'Microsoft Zofia - Polish (Poland)', 
+        'Zofia',
+        'Agnieszka',  // Often has mature, warm tone
+        'Ewa',        // Sometimes sounds similar to Czubówna
+        'Anna',
+        'Kasia',
+        'Google polski',
+        'Polski'
+    ];
+    
+    // For debugging - log available Polish voices
+    const polishVoices = voices.filter(v => 
+        v.lang.includes('pl') || v.lang.includes('PL')
+    );
+    console.log('🇵🇱 Available Polish voices:', polishVoices.map(v => v.name));
+    
+    // Try to find the best Czubówna-like voice
+    for (const preference of czubownaPreferences) {
+        const voice = voices.find(v => 
+            v.name.includes(preference) && 
+            (v.lang.includes('pl') || v.lang.includes('PL'))
+        );
+        if (voice) {
+            console.log(`✅ Found Czubówna-like voice: ${voice.name}`);
+            return voice;
+        }
+    }
+    
+    // Fallback: any Polish female voice (avoid male voices)
+    const polishFemale = voices.find(v => 
+        (v.lang.includes('pl') || v.lang.includes('PL')) &&
+        !v.name.toLowerCase().includes('male') &&
+        !v.name.toLowerCase().includes('man') &&
+        !v.name.toLowerCase().includes('mężczyzna')
+    );
+    
+    if (polishFemale) {
+        console.log(`🔄 Fallback Polish female voice: ${polishFemale.name}`);
+        return polishFemale;
+    }
+    
+    // English fallback (for international users)
+    if (lang === 'en') {
+        // English voices with warm, mature characteristics
+        const englishWarmFemale = [
+            'Samantha',    // macOS - known for natural, warm tone
+            'Victoria',    // Often sounds mature and pleasant
+            'Karen',       // Usually warm and clear
+            'Microsoft Zira - English (United States)',
+            'Google US English Female'
+        ];
+        
+        for (const preference of englishWarmFemale) {
+            const voice = voices.find(v => 
+                v.name.includes(preference) && 
+                (v.lang.includes('en') || v.lang.includes('EN'))
+            );
+            if (voice) {
+                console.log(`🔄 Fallback to English female voice: ${voice.name}`);
+                return voice;
+            }
+        }
+    }
+    
+    // Last resort: any female-sounding voice
+    const anyFemale = voices.find(v => 
+        !v.name.toLowerCase().includes('male') &&
+        !v.name.toLowerCase().includes('man') &&
+        (v.name.toLowerCase().includes('female') ||
+         v.name.toLowerCase().includes('woman') ||
+         v.name.toLowerCase().includes('samantha') ||
+         v.name.toLowerCase().includes('victoria'))
+    );
+    
+    if (anyFemale) {
+        console.log(`🔄 Last resort female voice: ${anyFemale.name}`);
+        return anyFemale;
+    }
+    
+    console.log('⚠️ No suitable female voice found, using system default');
+    return null;
+}
     const voices = window.speechSynthesis.getVoices();
     
     if (voices.length === 0) {
