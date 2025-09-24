@@ -262,12 +262,63 @@ function speakText(text, lang = 'pl') {
 }
 
 /**
+ * 🔢 FORMAT NUMBERS FOR CHILDREN
+ * Converts phone numbers and emergency numbers to individual digits
+ * 112 → "jeden jeden dwa", 997 → "dziewięć dziewięć siedem"
+ */
+function formatNumbersForChildren(text) {
+    const digitMap = {
+        '0': 'zero',
+        '1': 'jeden', 
+        '2': 'dwa',
+        '3': 'trzy',
+        '4': 'cztery',
+        '5': 'pięć',
+        '6': 'sześć',
+        '7': 'siedem',
+        '8': 'osiem',
+        '9': 'dziewięć'
+    };
+    
+    // Function to convert number to individual digits
+    function numberToDigits(match, number) {
+        const digits = number.split('').map(digit => digitMap[digit] || digit);
+        return digits.join(' ');
+    }
+    
+    // Emergency numbers - always as individual digits
+    text = text.replace(/\b(112|997|998|999|911)\b/g, numberToDigits);
+    
+    // Phone numbers (Polish format) - as individual digits
+    text = text.replace(/\b(\d{3}[\s-]?\d{3}[\s-]?\d{3})\b/g, (match, phone) => {
+        const cleanPhone = phone.replace(/[\s-]/g, '');
+        return numberToDigits(match, cleanPhone);
+    });
+    
+    // Standalone 3-digit numbers (likely emergency or important codes)
+    text = text.replace(/\bnumer\s+(\d{3})\b/gi, (match, number) => {
+        return `numer ${numberToDigits(match, number)}`;
+    });
+    
+    // Standalone numbers after "dzwoń" or "wybierz"
+    text = text.replace(/\b(dzwoń|wybierz|naciśnij)\s+(\d{3,})\b/gi, (match, action, number) => {
+        return `${action} ${numberToDigits(match, number)}`;
+    });
+    
+    console.log(`🔢 Numbers formatted for children: "${text}"`);
+    return text;
+}
+
+/**
  * 🎭 FORMAT TEXT FOR KRYSTYNA CZUBÓWNA STYLE
  * Adds characteristic pauses and rhythm like the legendary Polish narrator
  */
 function formatTextForCzubowna(text) {
     // Remove existing ellipses to avoid double pauses
     let formatted = text.replace(/\.{2,}/g, '');
+    
+    // 🔢 FORMAT NUMBERS FOR CHILDREN - pojedyncze cyfry
+    formatted = formatNumbersForChildren(formatted);
     
     // Add characteristic Czubówna pauses:
     
