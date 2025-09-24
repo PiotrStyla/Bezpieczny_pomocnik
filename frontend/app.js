@@ -367,6 +367,92 @@ function toggleSpeech() {
     }
 }
 
+/**
+ * 📍 GENERATE AGE-APPROPRIATE LOCATION MESSAGE
+ * Uses LLM to create personalized messages based on child's age
+ */
+function generateLocationMessage() {
+    // Get child age from ZK system
+    const childAge = getChildAgeForAI();
+    
+    // Check if LLM is available
+    const bielikClient = window.BielikClient;
+    const hasLLM = bielikClient && bielikClient.isAvailable();
+    
+    console.log(`📍 Generating location message for age: ${childAge}, LLM available: ${hasLLM}`);
+    
+    if (!hasLLM) {
+        // Fallback to simple message
+        return {
+            text: '📍 Sprawdzam twoją lokalizację...',
+            speech: 'Sprawdzam twoją lokalizację'
+        };
+    }
+    
+    // Age-appropriate messages with LLM enhancement
+    let baseMessage, speechMessage;
+    
+    if (childAge <= 6) {
+        // Very young children (4-6)
+        baseMessage = '🔍 Szukam gdzie jesteś, żeby ci pomóc!';
+        speechMessage = 'Szukam... gdzie... jesteś... żeby... ci... pomóc';
+    } else if (childAge <= 9) {
+        // Young children (7-9) 
+        baseMessage = '🧭 Sprawdzam twoją lokalizację, żebyś był bezpieczny!';
+        speechMessage = 'Sprawdzam... twoją... lokalizację... żebyś... był... bezpieczny';
+    } else if (childAge <= 12) {
+        // Pre-teens (10-12)
+        baseMessage = '📍 Określam twoją pozycję dla twojego bezpieczeństwa!';
+        speechMessage = 'Określam... twoją... pozycję... dla... twojego... bezpieczeństwa';
+    } else {
+        // Teenagers (13-16)
+        baseMessage = '🌍 Analizuję twoją lokalizację w systemie bezpieczeństwa!';
+        speechMessage = 'Analizuję... twoją... lokalizację... w... systemie... bezpieczeństwa';
+    }
+    
+    // Try to enhance with LLM (async, but return immediately)
+    if (window.BielikClient && window.BielikClient.isAvailable()) {
+        enhanceLocationMessageWithAI(childAge, baseMessage);
+    }
+    
+    return {
+        text: baseMessage,
+        speech: speechMessage
+    };
+}
+
+/**
+ * 🤖 ENHANCE LOCATION MESSAGE WITH AI
+ * Asynchronously improves the message using LLM
+ */
+async function enhanceLocationMessageWithAI(childAge, fallbackMessage) {
+    try {
+        const prompt = `Jako przyjazny asystent dla ${childAge}-letniego dziecka, napisz krótką (max 50 znaków), pozytywną wiadomość o sprawdzaniu lokalizacji dziecka dla bezpieczeństwa. Użyj prostego języka i emotikonki. Przykład: "🔍 Szukam gdzie jesteś!"`;
+        
+        const bielikClient = window.BielikClient;
+        const enhancedMessage = await bielikClient.generateText(prompt, {
+            maxTokens: 50,
+            temperature: 0.7
+        });
+        
+        if (enhancedMessage && enhancedMessage.length > 0 && enhancedMessage.length < 100) {
+            // Update mascot text with enhanced message
+            const mascotText = document.getElementById('mascot-text');
+            if (mascotText) {
+                mascotText.textContent = `📍 ${enhancedMessage}`;
+            }
+            
+            // Create speech version (with pauses)
+            const speechVersion = enhancedMessage.replace(/\s+/g, '... ');
+            speakText(speechVersion);
+            
+            console.log(`🤖 Enhanced location message for age ${childAge}: ${enhancedMessage}`);
+        }
+    } catch (error) {
+        console.log('⚠️ LLM enhancement failed, using fallback:', fallbackMessage);
+    }
+}
+
 // Location functions
 function getUserLocation() {
     console.log('📍 Getting user location...');
@@ -770,12 +856,15 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('📍 Location button clicked');
             getUserLocation();
             
+            // Generate age-appropriate location message
+            const locationMessage = generateLocationMessage();
+            
             const mascotText = document.getElementById('mascot-text');
             if (mascotText) {
-                mascotText.textContent = '📍 Sprawdzam twoją lokalizację...';
+                mascotText.textContent = locationMessage.text;
             }
             
-            speakText('Sprawdzam twoją lokalizację');
+            speakText(locationMessage.speech);
             
             // Track location usage
             trackFeatureUsage('location');
