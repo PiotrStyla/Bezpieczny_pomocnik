@@ -1018,42 +1018,60 @@ function generateRuleBasedAlert(alert, childAge) {
     let message = '';
     let emoji = '⚠️';
     
-    // Determine alert type and generate appropriate message
-    if (title.includes('burza') || title.includes('deszcz') || content.includes('pogoda')) {
-        emoji = '🌧️';
+    // Determine alert type and generate appropriate message with CONCRETE actions
+    if (title.includes('burza') || title.includes('wiatr') || title.includes('grad') || content.includes('burze')) {
+        emoji = '⛈️';
         if (childAge <= 6) {
-            message = 'Będzie brzydka pogoda! Zostań w domu z mamą lub tatą.';
+            message = 'Nadchodzi burza z gradem! Idź szybko do domu. Nie baw się na dworze. Schowaj zabawki do środka.';
         } else if (childAge <= 9) {
-            message = 'Ostrzeżenie o złej pogodzie w twojej okolicy. Nie wychodź na dwór bez dorosłego.';
+            message = 'Alert burzowy! Wróć natychmiast do domu. Unikaj drzew i wysokich budynków. Zamknij okna.';
         } else {
-            message = 'Alert pogodowy dla twojego regionu. Sprawdź warunki przed wyjściem i poinformuj rodziców.';
+            message = 'Ostrzeżenie przed burzami i gradem. Szukaj natychmiastowego schronienia. Zabezpiecz rzeczy na balkonie.';
         }
-    } else if (title.includes('pożar') || content.includes('ogień')) {
-        emoji = '🔥';
-        if (childAge <= 6) {
-            message = 'Ogień w okolicy! Zostań z dorosłymi i słuchaj ich poleceń.';
-        } else if (childAge <= 9) {
-            message = 'Pożar w twojej okolicy. Nie wychodź z domu. Poproś rodziców o sprawdzenie sytuacji.';
-        } else {
-            message = 'Alert o pożarze w regionie. Unikaj tego obszaru i poinformuj rodziców.';
-        }
-    } else if (title.includes('woda') || title.includes('powódź')) {
+    } else if (title.includes('woda') || title.includes('powódź') || content.includes('podtopienia') || content.includes('wezbranych')) {
         emoji = '🌊';
         if (childAge <= 6) {
-            message = 'Dużo wody w okolicy! Nie chodź blisko rzek. Zostań z dorosłymi.';
+            message = 'Za dużo wody wszędzie! Nie chodź blisko rzek ani potoczków. Trzymaj się z dala od kałuż.';
         } else if (childAge <= 9) {
-            message = 'Ostrzeżenie o wysokim poziomie wody. Unikaj rzek i potoków.';
+            message = 'Niebezpieczne podtopienia! Unikaj rzek, mostów i niskich terenów. Idź na wyższe miejsce.';
         } else {
-            message = 'Alert hydrologiczny w twojej okolicy. Trzymaj się z dala od zbiorników wodnych.';
+            message = 'Alert powodziowy! Natychmiast oddal się od rzek i potoków. Udaj się na wyższy teren.';
+        }
+    } else if (title.includes('woda niezdatna') || content.includes('nie nadaje się do spożycia')) {
+        emoji = '💧';
+        if (childAge <= 6) {
+            message = 'Nie pij wody z kranu! Pij tylko wodę z butelek. Powiedz dorosłym żeby sprawdzili wodę.';
+        } else if (childAge <= 9) {
+            message = 'Woda z kranu jest niebezpieczna! Używaj tylko wody butelkowanej do picia i mycia zębów.';
+        } else {
+            message = 'Skażenie wody wodociągowej! Nie używaj wody z kranu. Korzystaj tylko z wody butelkowanej.';
+        }
+    } else if (title.includes('dron') || title.includes('obiekt') || content.includes('naruszyły granice')) {
+        emoji = '🚁';
+        if (childAge <= 6) {
+            message = 'Niebezpieczne latające rzeczy! Idź szybko do domu. Nie dotykaj niczego co spadło z nieba.';
+        } else if (childAge <= 9) {
+            message = 'Niebezpieczne drony w okolicy! Wróć do domu. Jeśli widzisz coś spadającego - nie zbliżaj się!';
+        } else {
+            message = 'Alert wojskowy - drony! Natychmiastowe schronienie. Nie dotykaj podejrzanych obiektów!';
+        }
+    } else if (title.includes('ćwiczenia') || content.includes('strzałów') || content.includes('helikopterów')) {
+        emoji = '🎯';
+        if (childAge <= 6) {
+            message = 'Wojsko ćwiczy dzisiaj. Będzie głośno ale to nie prawdziwa wojna. Zostań blisko dorosłych.';
+        } else if (childAge <= 9) {
+            message = 'Ćwiczenia wojskowe w okolicy. Odgłosy strzałów i helikopterów to tylko trening.';
+        } else {
+            message = 'Ćwiczenia służb mundurowych. Hałas i loty helikopterów to część treningu, zachowaj spokój.';
         }
     } else {
-        // Generic alert
+        // Generic alert with concrete actions
         if (childAge <= 6) {
-            message = 'Ważna wiadomość o bezpieczeństwie! Poproś mamę lub tatę żeby ci wytłumaczyli.';
+            message = 'Ważne ostrzeżenie! Znajdź szybko dorosłego i powiedz mu o tej wiadomości.';
         } else if (childAge <= 9) {
-            message = 'Ostrzeżenie bezpieczeństwa w twojej okolicy. Poproś rodziców o wyjaśnienie.';
+            message = 'Alert bezpieczeństwa! Poinformuj rodziców i trzymaj się blisko domu.';
         } else {
-            message = 'Alert bezpieczeństwa dla twojego regionu. Skonsultuj się z rodzicami.';
+            message = 'Ostrzeżenie w twojej okolicy. Sprawdź z rodzicami co robić dalej.';
         }
     }
     
@@ -1139,28 +1157,44 @@ function testAlert(alertType = 'weather') {
     console.log('🧪 TESTING ALERT SYSTEM - Simulating real alert...');
     
     const testAlerts = {
-        weather: {
-            id: 'test_weather_001',
-            title: 'OSTRZEŻENIE METEOROLOGICZNE - Silny wiatr',
-            content: 'IMGW wydało ostrzeżenie przed silnym wiatrem do 80 km/h. Prognozowane są opady deszczu i burze. Wystąpią w okresie od 14:00 do 22:00. Możliwe podtopienia.',
+        water: {
+            id: 'rcb_water_real',
+            title: 'Alert RCB - woda niezdatna do picia w gminie',
+            content: 'UWAGA! Woda z wodociągu w gminie nie nadaje się do spożycia. Gmina zapewnia wodę pitną w butelkach i z beczkowozu. Śledź lokalne komunikaty.',
+            severity: 'critical',
+            location: 'Gmina lokalna',
+            timestamp: new Date().toISOString()
+        },
+        storm: {
+            id: 'rcb_storm_real',
+            title: 'Alert RCB - burze, silny wiatr i lokalnie grad',
+            content: 'Uwaga! Dziś możliwe burze, silny wiatr i lokalnie grad. Zachowaj ostrożność i zabezpiecz rzeczy, które może porwać wiatr.',
             severity: 'warning',
             location: 'Województwo Małopolskie',
             timestamp: new Date().toISOString()
         },
-        fire: {
-            id: 'test_fire_001', 
-            title: 'ALARM POŻAROWY - Pożar lasu',
-            content: 'Straż Pożarna informuje o dużym pożarze lasu w okolicy. Zaleca się unikanie tego obszaru. Drogi dostępowe zablokowane. Dym może być niebezpieczny.',
-            severity: 'critical',
-            location: 'Las Wolski, Kraków',
+        flood: {
+            id: 'rcb_flood_real',
+            title: 'Alert RCB - intensywne opady deszczu i burze',
+            content: 'Uwaga! Dziś prognozowane intensywne opady deszczu i burze. Możliwe podtopienia. Nie zbliżaj się do wezbranych rzek. Słuchaj poleceń służb.',
+            severity: 'warning',
+            location: 'Dolina Wisły',
             timestamp: new Date().toISOString()
         },
-        flood: {
-            id: 'test_flood_001',
-            title: 'OSTRZEŻENIE HYDROLOGICZNE - Wysoki poziom wody',
-            content: 'Instytut Meteorologii ostrzega przed gwałtownym wzrostem poziomu wody w rzekach. Możliwe lokalne podtopienia. Nie zbliżaj się do brzegów rzek.',
-            severity: 'warning', 
-            location: 'Dolina Wisły',
+        drones: {
+            id: 'rcb_drones_real',
+            title: 'Alert RCB - neutralizacja obiektów',
+            content: 'Uwaga! W związku z operacją neutralizacji obiektów, które naruszyły granice RP, informuj służby o dronach lub miejscach ich upadku. Nie zbliżaj się do nich.',
+            severity: 'critical',
+            location: 'Województwa wschodnie',
+            timestamp: new Date().toISOString()
+        },
+        exercises: {
+            id: 'rcb_exercises_real', 
+            title: 'Alert RCB - ćwiczenia służb mundurowych',
+            content: 'Uwaga! Ćwiczenia służb mundurowych. Możliwe odgłosy strzałów i loty helikopterów. Zachowaj spokój i ostrożność.',
+            severity: 'info',
+            location: 'Teren ćwiczeń',
             timestamp: new Date().toISOString()
         }
     };
@@ -1191,10 +1225,12 @@ function addTestButtons() {
     `;
     
     testContainer.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 10px;">🧪 Test Alertów</div>
-        <button onclick="testAlert('weather')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #4CAF50; color: white; cursor: pointer;">🌧️ Test Pogoda</button>
-        <button onclick="testAlert('fire')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #f44336; color: white; cursor: pointer;">🔥 Test Pożar</button>
-        <button onclick="testAlert('flood')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #2196F3; color: white; cursor: pointer;">🌊 Test Powódź</button>
+        <div style="font-weight: bold; margin-bottom: 10px;">🧪 Test Rzeczywistych Alertów RCB</div>
+        <button onclick="testAlert('water')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #f44336; color: white; cursor: pointer;">💧 Woda Niezdatna</button>
+        <button onclick="testAlert('storm')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #ff9800; color: white; cursor: pointer;">⛈️ Burze+Grad</button>
+        <button onclick="testAlert('flood')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #2196F3; color: white; cursor: pointer;">🌊 Powódź</button>
+        <button onclick="testAlert('drones')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #9c27b0; color: white; cursor: pointer;">🚁 Drony</button>
+        <button onclick="testAlert('exercises')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #607d8b; color: white; cursor: pointer;">🎯 Ćwiczenia</button>
         <button onclick="document.getElementById('test-controls').style.display='none'" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #666; color: white; cursor: pointer;">✕ Ukryj</button>
     `;
     
