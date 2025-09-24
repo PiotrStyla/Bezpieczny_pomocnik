@@ -855,6 +855,281 @@ async function getAddressFromCoords(lat, lon) {
     }
 }
 
+// 🚨 ALERT MONITORING SYSTEM - 260 Sources Integration
+let alertMonitorInterval = null;
+let lastAlertCheck = null;
+let activeAlerts = [];
+
+/**
+ * 🚨 START ALERT MONITORING
+ * Connects to backend system with 260 Polish alert sources
+ */
+function startAlertMonitoring() {
+    console.log('🚨 Starting alert monitoring system...');
+    
+    // Initial check
+    checkForAlerts();
+    
+    // Check every 2 minutes for new alerts
+    if (alertMonitorInterval) {
+        clearInterval(alertMonitorInterval);
+    }
+    
+    alertMonitorInterval = setInterval(() => {
+        checkForAlerts();
+    }, 120000); // 2 minutes
+    
+    console.log('✅ Alert monitoring system active - checking every 2 minutes');
+}
+
+/**
+ * 🔍 CHECK FOR ALERTS
+ * Fetches location-based alerts and processes them for children
+ */
+async function checkForAlerts() {
+    if (!userLocation) {
+        console.log('📍 No location available - skipping alert check');
+        return;
+    }
+    
+    try {
+        console.log('🔍 Checking for new alerts...');
+        
+        const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lng}`);
+        
+        if (response.ok) {
+            const alerts = await response.json();
+            await processNewAlerts(alerts);
+        } else {
+            console.log('⚠️ Alert service unavailable - using offline mode');
+        }
+    } catch (error) {
+        console.log('⚠️ Alert check failed:', error.message);
+        // Silent failure - app continues working normally
+    }
+}
+
+/**
+ * 📝 PROCESS NEW ALERTS
+ * Converts official alerts to child-friendly messages using LLM
+ */
+async function processNewAlerts(alerts) {
+    if (!alerts || alerts.length === 0) {
+        return;
+    }
+    
+    const newAlerts = alerts.filter(alert => 
+        !activeAlerts.some(existing => existing.id === alert.id)
+    );
+    
+    if (newAlerts.length === 0) {
+        return;
+    }
+    
+    console.log(`🚨 ${newAlerts.length} new alerts found`);
+    
+    for (const alert of newAlerts) {
+        await processChildFriendlyAlert(alert);
+    }
+    
+    // Update active alerts list
+    activeAlerts = [...activeAlerts, ...newAlerts].slice(-10); // Keep last 10
+}
+
+/**
+ * 👶 PROCESS CHILD-FRIENDLY ALERT
+ * Converts official alert to age-appropriate message with LLM
+ */
+async function processChildFriendlyAlert(alert) {
+    const childAge = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
+    
+    console.log(`🚨 Processing alert for ${childAge}-year-old: ${alert.title}`);
+    
+    try {
+        // Generate child-friendly version using LLM
+        let childFriendlyMessage = await generateAlertMessage(alert, childAge);
+        
+        // Fallback to rule-based if LLM fails
+        if (!childFriendlyMessage || childFriendlyMessage.length < 10) {
+            childFriendlyMessage = generateRuleBasedAlert(alert, childAge);
+        }
+        
+        // Show alert to child
+        showChildAlert(alert, childFriendlyMessage);
+        
+        // Track in memory for parents
+        trackAlertForParents(alert, childFriendlyMessage);
+        
+    } catch (error) {
+        console.error('❌ Failed to process alert:', error);
+        // Fallback to simple alert
+        showChildAlert(alert, generateRuleBasedAlert(alert, childAge));
+    }
+}
+
+/**
+ * 🤖 GENERATE ALERT MESSAGE using LLM
+ */
+async function generateAlertMessage(alert, childAge) {
+    if (!window.polishAI || !window.polishAI.isConfigured()) {
+        return null;
+    }
+    
+    const severity = alert.severity || 'medium';
+    const location = alert.location || 'twoja okolica';
+    
+    const prompt = `Jako asystent bezpieczeństwa dla ${childAge}-letniego dziecka, przetłumacz ten oficjalny alert na prosty, uspokajający język:
+
+ALERT: "${alert.title}"
+OPIS: "${alert.content}"
+LOKALIZACJA: ${location}
+POZIOM: ${severity}
+
+Wytyczne:
+- Użyj prostego języka dla ${childAge}-latka
+- Zacznij od odpowiedniego emoji
+- Maksymalnie 2-3 zdania
+- Podaj konkretne, bezpieczne działania
+- Nie strasź, ale ostrzegaj
+- Podkreśl "poproś dorosłego o pomoc"
+
+Odpowiedź:`;
+
+    try {
+        const response = await window.polishAI.generateResponse('alert_translation', childAge, {
+            alert: alert,
+            prompt: prompt
+        });
+        
+        return response;
+    } catch (error) {
+        console.error('❌ LLM alert generation failed:', error);
+        return null;
+    }
+}
+
+/**
+ * 📋 GENERATE RULE-BASED ALERT (fallback)
+ */
+function generateRuleBasedAlert(alert, childAge) {
+    const title = alert.title.toLowerCase();
+    const content = alert.content.toLowerCase();
+    
+    let message = '';
+    let emoji = '⚠️';
+    
+    // Determine alert type and generate appropriate message
+    if (title.includes('burza') || title.includes('deszcz') || content.includes('pogoda')) {
+        emoji = '🌧️';
+        if (childAge <= 6) {
+            message = 'Będzie brzydka pogoda! Zostań w domu z mamą lub tatą.';
+        } else if (childAge <= 9) {
+            message = 'Ostrzeżenie o złej pogodzie w twojej okolicy. Nie wychodź na dwór bez dorosłego.';
+        } else {
+            message = 'Alert pogodowy dla twojego regionu. Sprawdź warunki przed wyjściem i poinformuj rodziców.';
+        }
+    } else if (title.includes('pożar') || content.includes('ogień')) {
+        emoji = '🔥';
+        if (childAge <= 6) {
+            message = 'Ogień w okolicy! Zostań z dorosłymi i słuchaj ich poleceń.';
+        } else if (childAge <= 9) {
+            message = 'Pożar w twojej okolicy. Nie wychodź z domu. Poproś rodziców o sprawdzenie sytuacji.';
+        } else {
+            message = 'Alert o pożarze w regionie. Unikaj tego obszaru i poinformuj rodziców.';
+        }
+    } else if (title.includes('woda') || title.includes('powódź')) {
+        emoji = '🌊';
+        if (childAge <= 6) {
+            message = 'Dużo wody w okolicy! Nie chodź blisko rzek. Zostań z dorosłymi.';
+        } else if (childAge <= 9) {
+            message = 'Ostrzeżenie o wysokim poziomie wody. Unikaj rzek i potoków.';
+        } else {
+            message = 'Alert hydrologiczny w twojej okolicy. Trzymaj się z dala od zbiorników wodnych.';
+        }
+    } else {
+        // Generic alert
+        if (childAge <= 6) {
+            message = 'Ważna wiadomość o bezpieczeństwie! Poproś mamę lub tatę żeby ci wytłumaczyli.';
+        } else if (childAge <= 9) {
+            message = 'Ostrzeżenie bezpieczeństwa w twojej okolicy. Poproś rodziców o wyjaśnienie.';
+        } else {
+            message = 'Alert bezpieczeństwa dla twojego regionu. Skonsultuj się z rodzicami.';
+        }
+    }
+    
+    return `${emoji} ${message} Zawsze poproś dorosłego o pomoc!`;
+}
+
+/**
+ * 🚨 SHOW CHILD ALERT
+ * Displays alert to child with speech and visual notification
+ */
+function showChildAlert(alert, childMessage) {
+    console.log('🚨 Showing alert to child:', childMessage);
+    
+    // Update mascot with alert message
+    const mascotText = document.getElementById('mascot-text');
+    if (mascotText) {
+        mascotText.innerHTML = `<div class="alert-message">${childMessage}</div>`;
+        mascotText.style.backgroundColor = '#ffe6e6';
+        mascotText.style.border = '2px solid #ff6b6b';
+        mascotText.style.borderRadius = '12px';
+        mascotText.style.padding = '15px';
+        mascotText.style.animation = 'pulse 2s infinite';
+    }
+    
+    // Speak the alert using Krystyna Czubówna voice
+    speakText(childMessage);
+    
+    // Visual alert indicator
+    document.body.style.background = 'linear-gradient(45deg, #ffeb3b, #ff9800)';
+    setTimeout(() => {
+        document.body.style.background = '';
+        if (mascotText) {
+            mascotText.style.backgroundColor = '';
+            mascotText.style.border = '';
+            mascotText.style.animation = '';
+        }
+    }, 10000);
+    
+    // Browser notification if permission granted
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('🚨 Bezpieczny Pomocnik', {
+            body: childMessage,
+            icon: 'images/logo_192x192.png',
+            requireInteraction: true
+        });
+    }
+}
+
+/**
+ * 📊 TRACK ALERT FOR PARENTS
+ * Stores alert information for parental dashboard (ZK-encrypted)
+ */
+function trackAlertForParents(alert, childMessage) {
+    const alertData = {
+        id: alert.id,
+        timestamp: new Date().toISOString(),
+        originalTitle: alert.title,
+        childMessage: childMessage,
+        severity: alert.severity,
+        location: alert.location,
+        childAge: window.getChildAgeForAI ? window.getChildAgeForAI() : null
+    };
+    
+    // Store in ZK system for privacy
+    if (window.saveZKUserProgress) {
+        const existingAlerts = window.getZKUserProgress('alert_history') || [];
+        existingAlerts.push(alertData);
+        
+        // Keep only last 50 alerts
+        const recentAlerts = existingAlerts.slice(-50);
+        window.saveZKUserProgress('alert_history', recentAlerts);
+        
+        console.log('📊 Alert tracked in ZK system for parental review');
+    }
+}
+
 // Frontend AI - Polish AI + ZK privacy  
 async function generateSmartSpeech(action, context = {}) {
     // Get child age using ZK-protected method
@@ -1274,6 +1549,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 2000);
     
     console.log('✅ App initialization complete!');
+    
+    // 🚨 START ALERT MONITORING SYSTEM
+    // Starts monitoring 260 Polish alert sources for child safety
+    setTimeout(() => {
+        startAlertMonitoring();
+    }, 5000); // Start after 5 seconds to allow app to fully initialize
 });
 
 console.log('📄 App.js loaded successfully');

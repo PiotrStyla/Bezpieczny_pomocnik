@@ -1945,3 +1945,52 @@ body {
         max-width: none;
     }
 }
+
+/* 🚨 ALERT SYSTEM STYLES */
+.alert-message {
+    font-size: 1.1em;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.alert-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(45deg, #ff6b6b, #ffa500);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+    z-index: 10000;
+    max-width: 350px;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.alert-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+    display: block;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .alert-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
