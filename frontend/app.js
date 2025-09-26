@@ -37,6 +37,11 @@ let userLocation = null;
 let userLocationMarker = null;
 let speechEnabled = localStorage.getItem('speech_enabled') === 'true' || true;
 
+// Alert monitoring system
+let alertMonitoringActive = false;
+let alertMonitorInterval = null;
+let activeAlerts = [];
+
 // User memory/progress system
 let userMemory = {
     visitCount: parseInt(localStorage.getItem('visit_count')) || 0,
@@ -314,6 +319,12 @@ function formatNumbersForChildren(text) {
  * Adds characteristic pauses and rhythm like the legendary Polish narrator
  */
 function formatTextForCzubowna(text) {
+    // Handle Promise or non-string inputs
+    if (!text || typeof text !== 'string') {
+        console.warn('⚠️ formatTextForCzubowna received non-string:', typeof text, text);
+        return String(text || '');
+    }
+    
     // Remove existing ellipses to avoid double pauses
     let formatted = text.replace(/\.{2,}/g, '');
     
@@ -934,9 +945,7 @@ async function getAddressFromCoords(lat, lon) {
 }
 
 // 🚨 ALERT MONITORING SYSTEM - 260 Sources Integration
-let alertMonitorInterval = null;
 let lastAlertCheck = null;
-let activeAlerts = [];
 
 /**
  * 🚨 START ALERT MONITORING
@@ -944,6 +953,9 @@ let activeAlerts = [];
  */
 function startAlertMonitoring() {
     console.log('🚨 Starting alert monitoring system...');
+    
+    // Activate monitoring
+    alertMonitoringActive = true;
     
     // Initial check
     checkForAlerts();
