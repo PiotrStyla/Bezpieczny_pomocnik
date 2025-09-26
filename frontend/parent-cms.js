@@ -408,9 +408,6 @@ function updatePreview() {
                 <div style="font-size: 18px; color: #333; line-height: 1.5;">
                     ${message}
                 </div>
-                <div style="margin-top: 10px; font-size: 14px; color: #666;">
-                    Wiek: ${currentAge} lat | Kategoria: ${currentCategory}
-                </div>
             `;
         }
     }
