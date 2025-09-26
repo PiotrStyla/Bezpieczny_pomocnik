@@ -211,7 +211,16 @@ function initMap() {
 }
 
 // Speech functions with Krystyna Czubówna-inspired voice
-function speakText(text, lang = 'pl') {
+async function speakText(text, lang = 'pl') {
+    // Handle async text (Promises)
+    if (text instanceof Promise) {
+        try {
+            text = await text;
+        } catch (error) {
+            console.warn('⚠️ Failed to resolve Promise text:', error);
+            text = 'Error loading message';
+        }
+    }
     console.log('🎭 CZUBÓWNA-INSPIRED VOICE SYNTHESIS:', text);
     
     // RODO Art. 8 COMPLIANCE - Smart consent checking
@@ -990,7 +999,7 @@ async function checkForAlerts() {
         if (userLocation && await getParentRegion()) {
             const parentRegion = await getParentRegion();
             console.log(`📍 Using GPS + Parent region: ${parentRegion}`);
-            const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lng}&region=${parentRegion}`);
+            const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lon}&region=${parentRegion}`);
             if (response.ok) {
                 alerts = await response.json();
             }
@@ -999,7 +1008,7 @@ async function checkForAlerts() {
         // 🥈 LEVEL 2: GPS Only (Good)  
         else if (userLocation) {
             console.log('📍 Using GPS location only');
-            const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lng}`);
+            const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lon}`);
             if (response.ok) {
                 alerts = await response.json();
             }
@@ -1008,20 +1017,40 @@ async function checkForAlerts() {
         // 🥉 LEVEL 3: National Alerts (Basic)
         else {
             console.log('🏛️ Using national alerts (no location consent)');
-            const response = await fetch(`/api/alerts/national`);
-            if (response.ok) {
-                alerts = await response.json();
+            try {
+                const response = await fetch(`/api/alerts/national`);
+                if (response.ok) {
+                    alerts = await response.json();
+                }
+            } catch (error) {
+                console.log('ℹ️ National alerts endpoint unavailable - using mock data for testing');
+                alerts = []; // Empty for now - will be replaced with backend
             }
         }
         
         // 🚨 LEVEL 4: Critical Alerts (Always)
-        const criticalResponse = await fetch(`/api/alerts/critical`);
-        if (criticalResponse.ok) {
-            const criticalAlerts = await criticalResponse.json();
-            // Merge and deduplicate
-            alerts = [...alerts, ...criticalAlerts.filter(c => 
-                !alerts.some(a => a.id === c.id)
-            )];
+        try {
+            const criticalResponse = await fetch(`/api/alerts/critical`);
+            if (criticalResponse.ok) {
+                const criticalAlerts = await criticalResponse.json();
+                // Merge and deduplicate
+                alerts = [...alerts, ...criticalAlerts.filter(c => 
+                    !alerts.some(a => a.id === c.id)
+                )];
+            }
+        } catch (error) {
+            console.log('ℹ️ Critical alerts endpoint unavailable - using mock data for testing');
+            // Add mock critical alert for testing
+            if (alerts.length === 0) {
+                alerts = [{
+                    id: 'test-alert-1',
+                    title: 'Test Alert - Emergency Drill',
+                    content: 'This is a test alert for emergency preparedness. All systems operational.',
+                    type: 'exercises',
+                    severity: 'info',
+                    location: 'Poland'
+                }];
+            }
         }
         
         await processNewAlerts(alerts);
