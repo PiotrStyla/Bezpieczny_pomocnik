@@ -719,6 +719,32 @@ function getUserLocation() {
     );
 }
 
+
+/**
+ * ?? GET CHILD AGE FOR AI
+ * Safe age retrieval with fallback
+ */
+function getChildAgeForAI() {
+    try {
+        // Try ZK system first
+        if (window.ZKParentalConsent && window.ZKParentalConsent.getChildAge) {
+            return window.ZKParentalConsent.getChildAge();
+        }
+        
+        // Fallback to ZK storage
+        const zkData = JSON.parse(localStorage.getItem('zk_child_age') || 'null');
+        if (zkData && zkData.data) {
+            return zkData.data;
+        }
+        
+        // Default fallback age for safety
+        return 8; // Safe middle age for child-appropriate messaging
+        
+    } catch (error) {
+        console.warn('?? Failed to get child age, using default:', error);
+        return 8;
+    }
+}
 /**
  * 📍 SHOW LOCATION MESSAGE - Complete communication system
  */
