@@ -585,14 +585,18 @@ class ParentalConsentManager {
 
     blurAppContent(blur = true) {
         const appContainer = document.querySelector('.kids-container') || document.body;
+        console.log(`🔒 Parental Consent: ${blur ? 'BLURRING' : 'UNBLURRING'} app content`);
+        
         if (blur) {
             appContainer.style.filter = 'blur(3px) brightness(0.7)';
             appContainer.style.pointerEvents = 'none';
             appContainer.setAttribute('aria-hidden', 'true');
+            console.log('🚨 APP BLURRED - waiting for parental consent');
         } else {
             appContainer.style.filter = 'none';
             appContainer.style.pointerEvents = 'auto';
             appContainer.removeAttribute('aria-hidden');
+            console.log('✅ APP UNBLURRED - parental consent granted');
         }
     }
 
@@ -694,8 +698,49 @@ lub dostarczyć osobiście pod adres: 30-404 Kraków, ul. Cegielniana 6B/45
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.parentalConsentManager = new ParentalConsentManager();
+        window.ZKParentalConsent = new ZKParentalConsent();
     });
 } else {
-    window.parentalConsentManager = new ParentalConsentManager();
+    window.ZKParentalConsent = new ZKParentalConsent();
 }
+
+// EMERGENCY DEBUGGING FUNCTIONS
+window.forceUnblurApp = function() {
+    console.log(' EMERGENCY: Force unblurring app');
+    const appContainer = document.querySelector('.kids-container') || document.body;
+    appContainer.style.filter = 'none';
+    appContainer.style.pointerEvents = 'auto';
+    appContainer.removeAttribute('aria-hidden');
+    
+    // Remove any consent banners
+    const banners = document.querySelectorAll('#parental-consent-banner, .consent-confirmation');
+    banners.forEach(banner => banner.remove());
+    
+    console.log(' App force-unblurred - should be accessible now');
+};
+
+window.resetParentalConsent = function() {
+    console.log('Resetting parental consent system');
+    localStorage.removeItem('zk_parental_consent');
+    localStorage.removeItem('zk_child_age');
+    localStorage.removeItem('pending_parental_verification');
+    window.forceUnblurApp();
+    console.log('Parental consent reset - reload page to start fresh');
+};
+
+// Auto-check if app is stuck blurred
+setTimeout(() => {
+    const appContainer = document.querySelector('.kids-container') || document.body;
+    if (appContainer && appContainer.style.filter && appContainer.style.filter.includes('blur')) {
+        console.log('DETECTED: App seems stuck blurred!');
+        console.log('SOLUTIONS:');
+        console.log('   1. Type: forceUnblurApp() in console');
+        console.log('   2. Type: resetParentalConsent() in console');
+        console.log('   3. Refresh page and look for parental consent banner');
+    }
+}, 5000);
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    window.ZKParentalConsent.initialize();
+});

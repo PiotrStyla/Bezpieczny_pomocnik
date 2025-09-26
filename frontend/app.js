@@ -1040,6 +1040,7 @@ async function checkForAlerts() {
             }
         } catch (error) {
             console.log('ℹ️ Critical alerts endpoint unavailable - using mock data for testing');
+            console.log('🧪 TESTING MODE: Real-time alerts will be available when backend API is deployed');
             // Add mock critical alert for testing
             if (alerts.length === 0) {
                 alerts = [{
