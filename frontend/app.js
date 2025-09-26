@@ -1449,7 +1449,9 @@ async function handleWhereAmI() {
         if (mascotText) {
             mascotText.textContent = smartMessage;
         }
-        speakText(smartMessage);
+        // Remove emoji for speech synthesis (voice can't read emoji properly)
+        const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
+        speakText(speechMessage);
     }, 1000);
     
     getUserLocation();
@@ -1469,7 +1471,9 @@ async function handleFindSafety() {
         if (mascotText) {
             mascotText.textContent = smartMessage;
         }
-        speakText(smartMessage);
+        // Remove emoji for speech synthesis (voice can't read emoji properly)
+        const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
+        speakText(speechMessage);
     }, 800);
 }
 
@@ -1487,7 +1491,9 @@ async function handleSafeRoute() {
         if (mascotText) {
             mascotText.textContent = smartMessage;
         }
-        speakText(smartMessage);
+        // Remove emoji for speech synthesis (voice can't read emoji properly)
+        const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
+        speakText(speechMessage);
     }, 800);
 }
 
@@ -1510,7 +1516,9 @@ async function handleEmergencyHelp() {
         if (mascotText) {
             mascotText.textContent = smartMessage;
         }
-        speakText(smartMessage);
+        // Remove emoji for speech synthesis (voice can't read emoji properly)
+        const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
+        speakText(speechMessage);
     }, 500);
 }
 
