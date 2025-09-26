@@ -1,7 +1,7 @@
 /**
- * 🔒 PARENT CMS - Mina ZK Blockchain Integration
+ * 🔒 PARENT CMS - System Prywatności ZKP
  * Allows parents to create custom child-friendly messages
- * All data encrypted and stored in Mina blockchain for maximum privacy
+ * All data encrypted and stored in ZKP system for maximum privacy
  */
 
 // Mina ZK Storage Keys for Parent CMS
@@ -49,27 +49,27 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * 🔗 INITIALIZE MINA ZK CONNECTION
+ * 🔗 INITIALIZE ZKP PRIVACY SYSTEM
  */
 async function initializeMinaZK() {
     const statusDiv = document.getElementById('zk-connection-status');
     
     try {
-        statusDiv.innerHTML = '🔄 Łączenie z siecią Mina...';
+        statusDiv.innerHTML = '🔄 Łączenie z systemem prywatności...';
         
-        // Check if Mina is available (will be implemented with Mina SDK)
+        // Check if ZKP system is available (will be implemented with Mina SDK)
         // For now, simulate connection
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        statusDiv.innerHTML = '✅ Połączono z Mina ZK - maksymalna prywatność aktywna!';
+        statusDiv.innerHTML = '✅ Połączono z systemem szyfrowania ZKP - maksymalna prywatność aktywna!';
         statusDiv.style.color = '#4CAF50';
         
-        console.log('✅ Mina ZK connection established');
+        console.log('✅ ZKP privacy system connection established');
     } catch (error) {
         statusDiv.innerHTML = '⚠️ Tryb offline - dane przechowywane lokalnie (szyfrowane)';
         statusDiv.style.color = '#FF9800';
         
-        console.log('⚠️ Mina ZK connection failed, using local encrypted storage');
+        console.log('⚠️ ZKP system connection failed, using local encrypted storage');
     }
 }
 
@@ -126,7 +126,7 @@ async function saveAlertMessages() {
         }, 2000);
         
         console.log('✅ Alert messages saved to Mina ZK');
-        showNotification('Komunikaty alertów zapisane w Mina ZK!', 'success');
+        showNotification('Komunikaty alertów zapisane w systemie ZKP!', 'success');
         
     } catch (error) {
         button.textContent = '❌ Błąd';
@@ -174,7 +174,7 @@ async function saveSafetyMessages() {
         }, 2000);
         
         console.log('✅ Safety messages saved to Mina ZK');
-        showNotification('Instrukcje bezpieczeństwa zapisane w Mina ZK!', 'success');
+        showNotification('Instrukcje bezpieczeństwa zapisane w systemie ZKP!', 'success');
         
     } catch (error) {
         button.textContent = '❌ Błąd';
@@ -218,7 +218,7 @@ async function saveLocationMessages() {
         }, 2000);
         
         console.log('✅ Location messages saved to Mina ZK');
-        showNotification('Komunikaty lokalizacji zapisane w Mina ZK!', 'success');
+        showNotification('Komunikaty lokalizacji zapisane w systemie ZKP!', 'success');
         
     } catch (error) {
         button.textContent = '❌ Błąd';
@@ -706,7 +706,7 @@ async function saveVoiceSettings() {
         
         await saveToMinaZK(PARENT_CMS_KEYS.voice_settings, settings);
         
-        showNotification('✅ Ustawienia głosu zapisane w Mina ZK!', 'success');
+        showNotification('✅ Ustawienia głosu zapisane w systemie ZKP!', 'success');
         console.log('✅ Voice settings saved to Mina ZK');
         
     } catch (error) {

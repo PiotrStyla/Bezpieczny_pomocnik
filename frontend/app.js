@@ -961,29 +961,91 @@ function startAlertMonitoring() {
 }
 
 /**
- * 🔍 CHECK FOR ALERTS
- * Fetches location-based alerts and processes them for children
+ * 🔍 CHECK FOR ALERTS - HIERARCHICAL SYSTEM
+ * Priority: GPS+ParentRegion → GPS → National → Always Critical
  */
 async function checkForAlerts() {
-    if (!userLocation) {
-        console.log('📍 No location available - skipping alert check');
+    if (!alertMonitoringActive) {
         return;
     }
     
     try {
-        console.log('🔍 Checking for new alerts...');
+        console.log('🔍 Checking for alerts using hierarchical system...');
         
-        const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lng}`);
+        let alerts = [];
         
-        if (response.ok) {
-            const alerts = await response.json();
-            await processNewAlerts(alerts);
-        } else {
-            console.log('⚠️ Alert service unavailable - using offline mode');
+        // 🥇 LEVEL 1: GPS + Parent Region (Best)
+        if (userLocation && await getParentRegion()) {
+            const parentRegion = await getParentRegion();
+            console.log(`📍 Using GPS + Parent region: ${parentRegion}`);
+            const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lng}&region=${parentRegion}`);
+            if (response.ok) {
+                alerts = await response.json();
+            }
         }
+        
+        // 🥈 LEVEL 2: GPS Only (Good)  
+        else if (userLocation) {
+            console.log('📍 Using GPS location only');
+            const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lng}`);
+            if (response.ok) {
+                alerts = await response.json();
+            }
+        }
+        
+        // 🥉 LEVEL 3: National Alerts (Basic)
+        else {
+            console.log('🏛️ Using national alerts (no location consent)');
+            const response = await fetch(`/api/alerts/national`);
+            if (response.ok) {
+                alerts = await response.json();
+            }
+        }
+        
+        // 🚨 LEVEL 4: Critical Alerts (Always)
+        const criticalResponse = await fetch(`/api/alerts/critical`);
+        if (criticalResponse.ok) {
+            const criticalAlerts = await criticalResponse.json();
+            // Merge and deduplicate
+            alerts = [...alerts, ...criticalAlerts.filter(c => 
+                !alerts.some(a => a.id === c.id)
+            )];
+        }
+        
+        await processNewAlerts(alerts);
+        
     } catch (error) {
         console.log('⚠️ Alert check failed:', error.message);
-        // Silent failure - app continues working normally
+        // Emergency fallback - try critical alerts only
+        try {
+            const criticalResponse = await fetch(`/api/alerts/critical`);
+            if (criticalResponse.ok) {
+                const criticalAlerts = await criticalResponse.json();
+                await processNewAlerts(criticalAlerts);
+            }
+        } catch (criticalError) {
+            console.log('🚨 Critical alert fallback also failed');
+        }
+    }
+}
+
+/**
+ * 🏠 GET PARENT REGION
+ * Retrieves parent-set region from Mina ZK storage
+ */
+async function getParentRegion() {
+    try {
+        if (!window.getParentMessage) {
+            return null;
+        }
+        
+        // Try to get parent-set region from preferences
+        const preferences = await window.loadFromMinaZK('zk_parent_preferences');
+        return preferences?.region || null;
+        
+    } catch (error) {
+        console.log('❌ Failed to get parent region:', error);
+        return null;
     }
 }
 
