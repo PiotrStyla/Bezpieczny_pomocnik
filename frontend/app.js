@@ -832,6 +832,79 @@ function handleLocationError(error) {
 /**
  * 🏠 GET ADDRESS FROM COORDINATES 
  */
+/**
+ * 👶 MAKE ADDRESS CHILD-FRIENDLY
+ * Converts detailed address to general, safe location information
+ */
+function makeAddressChildFriendly(fullAddress) {
+    if (!fullAddress) return null;
+    
+    // Split address parts
+    const parts = fullAddress.split(',').map(part => part.trim());
+    
+    let district = null;
+    let neighborhood = null;
+    let city = null;
+    
+    // Extract useful parts (district, neighborhood, city) and remove sensitive details
+    for (let part of parts) {
+        // Skip street numbers, postcodes, and detailed addresses
+        if (/^\d+/.test(part) || /\d{2}-\d{3}/.test(part)) continue;
+        
+        // Look for districts (common Polish district patterns)
+        if (part.toLowerCase().includes('podgórze') || 
+            part.toLowerCase().includes('krowodrza') ||
+            part.toLowerCase().includes('śródmieście') ||
+            part.toLowerCase().includes('nowa huta') ||
+            part.toLowerCase().includes('district') ||
+            part.toLowerCase().includes('dzielnica')) {
+            district = part;
+        }
+        
+        // Look for neighborhoods (osiedle, etc.)
+        if (part.toLowerCase().includes('osiedle') || 
+            part.toLowerCase().includes('kurdwanów') ||
+            part.toLowerCase().includes('prądnik') ||
+            part.toLowerCase().includes('bronowice')) {
+            neighborhood = part;
+        }
+        
+        // Look for city
+        if (part.toLowerCase().includes('kraków') ||
+            part.toLowerCase().includes('warszawa') ||
+            part.toLowerCase().includes('gdańsk') ||
+            part.toLowerCase().includes('wrocław') ||
+            part.toLowerCase().includes('poznań')) {
+            city = part;
+        }
+    }
+    
+    // Build child-friendly address
+    let friendlyAddress = [];
+    
+    if (district && neighborhood) {
+        // Best case: district + neighborhood
+        friendlyAddress.push(`dzielnicy ${district}`);
+        friendlyAddress.push(neighborhood);
+    } else if (neighborhood) {
+        // Good case: just neighborhood
+        friendlyAddress.push(neighborhood);
+    } else if (district) {
+        // Okay case: just district
+        friendlyAddress.push(`dzielnicy ${district}`);
+    } else if (city) {
+        // Fallback: just city
+        friendlyAddress.push(`mieście ${city}`);
+    }
+    
+    if (friendlyAddress.length === 0) {
+        // Ultimate fallback
+        return "bezpiecznej okolicy";
+    }
+    
+    return friendlyAddress.join(', ');
+}
+
 async function getAddressFromCoords(lat, lon) {
     try {
         // Use free Nominatim OpenStreetMap API
@@ -840,9 +913,14 @@ async function getAddressFromCoords(lat, lon) {
         if (response.ok) {
             const data = await response.json();
             if (data && data.display_name) {
-                const address = data.display_name;
-                showLocationMessage('address', { address });
-                console.log('🏠 Address found:', address);
+                const fullAddress = data.display_name;
+                console.log('🏠 Raw address found:', fullAddress);
+                
+                // Convert to child-friendly, general address
+                const childFriendlyAddress = makeAddressChildFriendly(fullAddress);
+                console.log('👶 Child-friendly address:', childFriendlyAddress);
+                
+                showLocationMessage('address', { address: childFriendlyAddress });
             } else {
                 console.log('ℹ️ No address data found');
             }
