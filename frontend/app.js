@@ -89,30 +89,10 @@ function updateVisitCount() {
                 speakText(smartWelcome);
             }
         }, 3000);
-    } else {
-        // Default welcome without age info
-        if (userMemory.visitCount === 1) {
-            setTimeout(() => {
-                const mascotText = document.getElementById('mascot-text');
-                if (mascotText) {
-                    mascotText.textContent = '👋 Witaj! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij na różne elementy aby się uczyć!';
-                }
-                if (speechEnabled) {
-                    speakText('Witaj po raz pierwszy! Jestem twoim pomocnikiem bezpieczeństwa. Kliknij na różne elementy aby się uczyć!');
-                }
-            }, 3000);
-        } else {
-            setTimeout(() => {
-                const mascotText = document.getElementById('mascot-text');
-                if (mascotText) {
-                    mascotText.textContent = `🔄 Witaj ponownie! To już twoja ${userMemory.visitCount}. wizyta. Pamiętam, że nauczyłeś się już ${userMemory.learnedTips.length} porad bezpieczeństwa!`;
-                }
-                if (speechEnabled) {
-                    speakText(`Witaj ponownie! To już twoja ${userMemory.visitCount}. wizyta. Pamiętam, że nauczyłeś się już ${userMemory.learnedTips.length} porad bezpieczeństwa!`);
-                }
-            }, 3000);
-        }
     }
+    
+    // REMOVED: Annoying visit count welcome messages
+    // Users don't want to hear about visit numbers
 }
 
 // Add learned tip to memory

@@ -189,6 +189,32 @@ async function saveSafetyMessages() {
 }
 
 /**
+ * 💾 SAVE EMERGENCY MESSAGES
+ */
+async function saveEmergencyMessages() {
+    try {
+        const emergencyFallback = document.getElementById('emergency-fallback').value.trim();
+        
+        if (!emergencyFallback) {
+            showNotification('Proszę wypełnić komunikat awaryjny!', 'error');
+            return;
+        }
+        
+        // Save to Mina ZK storage (simulated with localStorage for now)
+        await window.saveToMinaZK('zk_emergency_messages', {
+            fallback: emergencyFallback,
+            timestamp: Date.now()
+        });
+        
+        showNotification('Komunikat awaryjny zapisany w systemie ZKP!', 'success');
+        
+    } catch (error) {
+        console.error('❌ Failed to save emergency messages:', error);
+        showNotification('Błąd podczas zapisywania komunikatu awaryjnego!', 'error');
+    }
+}
+
+/**
  * 💾 SAVE LOCATION MESSAGES
  */
 async function saveLocationMessages() {

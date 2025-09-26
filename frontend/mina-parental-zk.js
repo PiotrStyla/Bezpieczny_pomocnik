@@ -243,29 +243,6 @@ class ZKParentalConsent {
      * ⚙️ ZK APP SETTINGS STORAGE
      */
     storeAppSettings(settings) {
-        const zkSettings = {
-            speechEnabled: settings.speechEnabled !== undefined ? settings.speechEnabled : true,
-            language: settings.language || 'pl',
-            theme: settings.theme || 'child_friendly',
-            volume: settings.volume || 0.8,
-            voiceRate: settings.voiceRate || 0.8,
-            voicePitch: settings.voicePitch || 1.2,
-            emergencyMode: settings.emergencyMode || false,
-            zkProtected: true,
-            lastUpdated: new Date().toISOString()
-        };
-        
-        localStorage.setItem('zk_app_settings', JSON.stringify(zkSettings));
-        console.log('🔐 App settings stored in ZK system');
-        return zkSettings;
-    }
-
-    /**
-     * ⚙️ LOAD APP SETTINGS FROM ZK
-     */
-    loadAppSettings() {
-        try {
-            const zkSettings = JSON.parse(localStorage.getItem('zk_app_settings') || '{}');
             
             // Migration from old system
             if (!zkSettings.zkProtected) {
