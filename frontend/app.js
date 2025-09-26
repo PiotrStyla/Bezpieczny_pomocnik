@@ -1986,8 +1986,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 🧪 ADD TEST BUTTONS for local testing
     setTimeout(() => {
-        addTestButtons();
+        // addTestButtons(); // DISABLED FOR PRODUCTION
     }, 7000); // Add test buttons after system initialization
 });
 
 console.log('📄 App.js loaded successfully');
+
