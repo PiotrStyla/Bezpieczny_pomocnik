@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 Parent CMS - Bezpieczny Pomocnik</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .cms-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .cms-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .cms-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .cms-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .cms-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .message-editor {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        .message-editor:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        
+        .age-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .age-tab {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .age-tab.active {
+            background: #4CAF50;
+            color: white;
+            border-color: #4CAF50;
+        }
+        
+        .save-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        
+        .save-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .zk-status {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4CAF50;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .preview-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .template-examples {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid #FFC107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cms-container">
+        <div class="cms-header">
+            <h1>🔒 Parent CMS - Kreator Komunikatów dla Dzieci</h1>
+            <p>Twórz własne, spersonalizowane komunikaty bezpieczeństwa dla swojego dziecka.<br>
+            Wszystkie dane są szyfrowane w blockchain Mina ZK - maksymalna prywatność!</p>
+        </div>
+
+        <div class="cms-cards">
+            <!-- Alert Messages -->
+            <div class="cms-card">
+                <h3>🚨 Komunikaty Alertów</h3>
+                <p>Jak Twoje dziecko ma rozumieć alerty pogodowe, pożary, powodzie itp.</p>
+                
+                <div class="age-tabs">
+                    <div class="age-tab active" onclick="switchAgeTab('alerts', '6')">4-6 lat</div>
+                    <div class="age-tab" onclick="switchAgeTab('alerts', '9')">7-9 lat</div>
+                    <div class="age-tab" onclick="switchAgeTab('alerts', '12')">10-12 lat</div>
+                </div>
+                
+                <div id="alerts-6" class="age-content">
+                    <label>💧 Woda niezdatna do picia:</label>
+                    <textarea class="message-editor" id="water-6" placeholder="Np: Nie pij wody z kranu, kochanie. Woda jest brudna i może cię rozchorować. Pij tylko wodę z butelek, którą mama ci da."></textarea>
+                    
+                    <label>⛈️ Burze i grad:</label>
+                    <textarea class="message-editor" id="storm-6" placeholder="Np: Nadchodzi burza! Chodź szybko do domu. Będzie głośno i może padać grad jak małe kulki lodu."></textarea>
+                </div>
+                
+                <button class="save-btn" onclick="saveAlertMessages()">💾 Zapisz w Mina ZK</button>
+                
+                <div class="template-examples">
+                    <strong>💡 Wskazówki:</strong>
+                    <ul>
+                        <li>Używaj prostych słów odpowiednich dla wieku</li>
+                        <li>Dodaj elementy uspokajające ("kochanie", "będzie dobrze")</li>
+                        <li>Konkretne instrukcje zamiast ogólników</li>
+                        <li>Unikaj straszenia - raczej wyjaśniaj spokojnie</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Safety Instructions -->
+            <div class="cms-card">
+                <h3>🛡️ Instrukcje Bezpieczeństwa</h3>
+                <p>Jak dziecko ma reagować w różnych sytuacjach</p>
+                
+                <div class="age-tabs">
+                    <div class="age-tab active" onclick="switchAgeTab('safety', '6')">4-6 lat</div>
+                    <div class="age-tab" onclick="switchAgeTab('safety', '9')">7-9 lat</div>
+                    <div class="age-tab" onclick="switchAgeTab('safety', '12')">10-12 lat</div>
+                </div>
+                
+                <div id="safety-6" class="age-content">
+                    <label>🏃 Gdzie szukać pomocy:</label>
+                    <textarea class="message-editor" id="help-6" placeholder="Np: Jeśli się zgubisz, znajdź sklep, szkołę lub policjanta. Powiedz swoje imię i nazwisko mamy i taty."></textarea>
+                    
+                    <label>🚶 Bezpieczna droga:</label>
+                    <textarea class="message-editor" id="route-6" placeholder="Np: Idź tylko głównymi ulicami, gdzie jest dużo ludzi. Nie skręcaj w ciemne uliczki."></textarea>
+                </div>
+                
+                <button class="save-btn" onclick="saveSafetyMessages()">💾 Zapisz w Mina ZK</button>
+            </div>
+
+            <!-- Location Messages -->
+            <div class="cms-card">
+                <h3>📍 Komunikaty Lokalizacji</h3>
+                <p>Co dziecko słyszy gdy aplikacja sprawdza lokalizację</p>
+                
+                <label>🔍 Sprawdzanie lokalizacji:</label>
+                <textarea class="message-editor" id="location-checking" placeholder="Np: Sprawdzam gdzie jesteś, żeby móc ci pomóc. To jest bezpieczne."></textarea>
+                
+                <label>✅ Lokalizacja znaleziona:</label>
+                <textarea class="message-editor" id="location-found" placeholder="Np: Znalazłem cię! Teraz mogę pokazać ci bezpieczne miejsca w okolicy."></textarea>
+                
+                <button class="save-btn" onclick="saveLocationMessages()">💾 Zapisz w Mina ZK</button>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <h3>👁️ Podgląd dla dziecka</h3>
+            <p>Tak będzie wyglądać komunikat dla Twojego dziecka:</p>
+            <div id="child-preview" style="background: #f0f8ff; border-radius: 10px; padding: 20px; border: 2px solid #4CAF50; margin-top: 15px;">
+                <div style="font-size: 18px; color: #333;">Wybierz komunikat powyżej, aby zobaczyć podgląd</div>
+            </div>
+            <button onclick="testPreview()" style="margin-top: 10px; padding: 10px 20px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer;">🎵 Test głosowy</button>
+        </div>
+
+        <div class="zk-status">
+            <h4>🔒 Status Mina ZK Blockchain</h4>
+            <div id="zk-connection-status">🔄 Łączenie z siecią Mina...</div>
+            <p><small>Wszystkie Twoje komunikaty są szyfrowane i przechowywane prywatnie w blockchain Mina. Nikt oprócz Ciebie nie może ich przeczytać.</small></p>
+        </div>
+    </div>
+
+    <script src="parent-cms.js"></script>
+</body>
+</html>

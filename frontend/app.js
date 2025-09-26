@@ -1016,7 +1016,7 @@ async function processNewAlerts(alerts) {
 
 /**
  * 👶 PROCESS CHILD-FRIENDLY ALERT
- * Converts official alert to age-appropriate message with LLM
+ * Converts official alert to age-appropriate message with LLM or Parent CMS
  */
 async function processChildFriendlyAlert(alert) {
     const childAge = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
@@ -1024,12 +1024,22 @@ async function processChildFriendlyAlert(alert) {
     console.log(`🚨 Processing alert for ${childAge}-year-old: ${alert.title}`);
     
     try {
-        // Generate child-friendly version using LLM
-        let childFriendlyMessage = await generateAlertMessage(alert, childAge);
+        // 🔒 FIRST: Check if parent created custom message for this alert type
+        let childFriendlyMessage = await getParentCustomMessage(alert, childAge);
         
-        // Fallback to rule-based if LLM fails
-        if (!childFriendlyMessage || childFriendlyMessage.length < 10) {
-            childFriendlyMessage = generateRuleBasedAlert(alert, childAge);
+        if (childFriendlyMessage) {
+            console.log('✅ Using parent-created custom message from Mina ZK');
+        } else {
+            // 🤖 SECOND: Try LLM generation
+            childFriendlyMessage = await generateAlertMessage(alert, childAge);
+            
+            // 📋 THIRD: Fallback to rule-based if LLM fails
+            if (!childFriendlyMessage || childFriendlyMessage.length < 10) {
+                childFriendlyMessage = generateRuleBasedAlert(alert, childAge);
+                console.log('✅ Using rule-based fallback message');
+            } else {
+                console.log('✅ Using LLM-generated message');
+            }
         }
         
         // Show alert to child
@@ -1042,6 +1052,47 @@ async function processChildFriendlyAlert(alert) {
         console.error('❌ Failed to process alert:', error);
         // Fallback to simple alert
         showChildAlert(alert, generateRuleBasedAlert(alert, childAge));
+    }
+}
+
+/**
+ * 🔒 GET PARENT CUSTOM MESSAGE
+ * Checks if parent created custom message in CMS for this alert type
+ */
+async function getParentCustomMessage(alert, childAge) {
+    try {
+        if (!window.getParentMessage) {
+            return null; // Parent CMS not available
+        }
+        
+        // Determine alert type
+        const title = alert.title.toLowerCase();
+        const content = alert.content.toLowerCase();
+        
+        let alertType = null;
+        
+        if (title.includes('woda niezdatna') || content.includes('nie nadaje się do spożycia')) {
+            alertType = 'water';
+        } else if (title.includes('burza') || title.includes('wiatr') || title.includes('grad')) {
+            alertType = 'storm';
+        } else if (title.includes('powódź') || content.includes('podtopienia')) {
+            alertType = 'flood';
+        } else if (title.includes('dron') || title.includes('obiekt')) {
+            alertType = 'drones';
+        } else if (title.includes('ćwiczenia')) {
+            alertType = 'exercises';
+        }
+        
+        if (alertType) {
+            const parentMessage = await window.getParentMessage('alerts', alertType, childAge);
+            return parentMessage;
+        }
+        
+        return null;
+        
+    } catch (error) {
+        console.error('❌ Failed to get parent custom message:', error);
+        return null;
     }
 }
 
@@ -1465,7 +1516,24 @@ async function handleFindSafety() {
         mascotText.textContent = '🏃 Szukam bezpiecznych miejsc...';
     }
     
-    const smartMessage = await generateSmartSpeech('find_safety');
+    // 🔒 FIRST: Try to get parent-created safety message
+    let smartMessage = null;
+    if (window.getParentMessage) {
+        try {
+            const childAge = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
+            smartMessage = await window.getParentMessage('safety', 'help', childAge);
+            if (smartMessage) {
+                console.log('✅ Using parent-created safety message from Mina ZK');
+            }
+        } catch (error) {
+            console.error('❌ Failed to get parent safety message:', error);
+        }
+    }
+    
+    // 🤖 FALLBACK: Use AI/rule-based if no parent message
+    if (!smartMessage) {
+        smartMessage = await generateSmartSpeech('find_safety');
+    }
     
     setTimeout(() => {
         if (mascotText) {
@@ -1485,7 +1553,24 @@ async function handleSafeRoute() {
         mascotText.textContent = '🚶 Planuję bezpieczną trasę...';
     }
     
-    const smartMessage = await generateSmartSpeech('safe_route');
+    // 🔒 FIRST: Try to get parent-created route message
+    let smartMessage = null;
+    if (window.getParentMessage) {
+        try {
+            const childAge = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
+            smartMessage = await window.getParentMessage('safety', 'route', childAge);
+            if (smartMessage) {
+                console.log('✅ Using parent-created route message from Mina ZK');
+            }
+        } catch (error) {
+            console.error('❌ Failed to get parent route message:', error);
+        }
+    }
+    
+    // 🤖 FALLBACK: Use AI/rule-based if no parent message
+    if (!smartMessage) {
+        smartMessage = await generateSmartSpeech('safe_route');
+    }
     
     setTimeout(() => {
         if (mascotText) {
