@@ -9,12 +9,20 @@ const PARENT_CMS_KEYS = {
     alerts: 'zk_parent_alert_messages',
     safety: 'zk_parent_safety_messages', 
     location: 'zk_parent_location_messages',
-    preferences: 'zk_parent_cms_preferences'
+    preferences: 'zk_parent_cms_preferences',
+    voice_settings: 'zk_parent_voice_settings'
 };
 
 // Current editing state
 let currentAge = '6';
 let currentCategory = 'alerts';
+let availableVoices = [];
+let currentVoiceSettings = {
+    selectedVoice: null,
+    speed: 0.8,
+    pitch: 1.0,
+    volume: 0.9
+};
 
 /**
  * 🎯 INITIALIZE PARENT CMS
@@ -25,11 +33,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Mina ZK connection
     initializeMinaZK();
     
+    // Initialize voice system
+    initializeVoices();
+    
     // Load existing messages
     loadAllMessages();
     
     // Setup real-time preview
     setupPreviewUpdates();
+    
+    // Load voice settings
+    loadVoiceSettings();
     
     console.log('✅ Parent CMS ready');
 });
@@ -425,16 +439,37 @@ function testPreview() {
         // Remove emoji for speech test
         const speechText = text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
         
-        // Use Web Speech API for testing
+        // Use Web Speech API for testing with parent settings
         if ('speechSynthesis' in window) {
+            // Stop any current speech
+            speechSynthesis.cancel();
+            
             const utterance = new SpeechSynthesisUtterance(speechText);
+            
+            // Apply parent voice settings
+            if (currentVoiceSettings.selectedVoice) {
+                const voice = availableVoices.find(v => v.name === currentVoiceSettings.selectedVoice);
+                if (voice) {
+                    utterance.voice = voice;
+                }
+            }
+            
+            utterance.rate = currentVoiceSettings.speed;
+            utterance.pitch = currentVoiceSettings.pitch;
+            utterance.volume = currentVoiceSettings.volume;
             utterance.lang = 'pl-PL';
-            utterance.rate = 0.8;
-            utterance.pitch = 1.1;
+            
+            utterance.onstart = () => {
+                showNotification('🎵 Test komunikatu odtwarzany z Twoimi ustawieniami...', 'info');
+            };
+            
+            utterance.onerror = (error) => {
+                console.error('❌ Speech test error:', error);
+                showNotification('❌ Błąd testu komunikatu', 'error');
+            };
             
             speechSynthesis.speak(utterance);
             
-            showNotification('🎵 Test głosowy odtwarzany...', 'info');
         } else {
             showNotification('⚠️ Przeglądarka nie obsługuje syntezy mowy', 'warning');
         }
@@ -529,5 +564,228 @@ window.getParentMessage = async function(category, type, childAge) {
         return null;
     }
 };
+
+/**
+ * 🎵 INITIALIZE VOICES SYSTEM
+ */
+function initializeVoices() {
+    if ('speechSynthesis' in window) {
+        // Load voices
+        loadVoices();
+        
+        // Setup event listeners
+        setupVoiceControls();
+        
+        // Voices might load asynchronously
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
+    } else {
+        console.error('❌ Speech synthesis not supported in this browser');
+        showNotification('⚠️ Przeglądarka nie obsługuje syntezy mowy', 'warning');
+    }
+}
+
+/**
+ * 📢 LOAD AVAILABLE VOICES
+ */
+function loadVoices() {
+    availableVoices = speechSynthesis.getVoices();
+    
+    // Filter and prioritize Polish voices
+    const polishVoices = availableVoices.filter(voice => 
+        voice.lang.includes('pl') || voice.lang.includes('PL')
+    );
+    
+    const otherVoices = availableVoices.filter(voice => 
+        !voice.lang.includes('pl') && !voice.lang.includes('PL')
+    );
+    
+    // Populate voice select
+    const voiceSelect = document.getElementById('voice-select');
+    voiceSelect.innerHTML = '';
+    
+    // Add Polish voices first
+    if (polishVoices.length > 0) {
+        const polishGroup = document.createElement('optgroup');
+        polishGroup.label = '🇵🇱 Głosy Polskie (Zalecane)';
+        
+        polishVoices.forEach((voice, index) => {
+            const option = document.createElement('option');
+            option.value = voice.name;
+            option.textContent = `${voice.name} (${voice.lang})`;
+            if (voice.default) option.textContent += ' ⭐';
+            polishGroup.appendChild(option);
+        });
+        
+        voiceSelect.appendChild(polishGroup);
+    }
+    
+    // Add other voices
+    if (otherVoices.length > 0) {
+        const otherGroup = document.createElement('optgroup');
+        otherGroup.label = '🌍 Inne głosy';
+        
+        // Group by language
+        const languageGroups = {};
+        otherVoices.forEach(voice => {
+            const lang = voice.lang.split('-')[0];
+            if (!languageGroups[lang]) languageGroups[lang] = [];
+            languageGroups[lang].push(voice);
+        });
+        
+        Object.keys(languageGroups).sort().forEach(lang => {
+            languageGroups[lang].forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                otherGroup.appendChild(option);
+            });
+        });
+        
+        voiceSelect.appendChild(otherGroup);
+    }
+    
+    console.log(`🎵 Loaded ${availableVoices.length} voices (${polishVoices.length} Polish)`);
+    
+    // Auto-select best Polish voice
+    if (polishVoices.length > 0 && !currentVoiceSettings.selectedVoice) {
+        const bestVoice = polishVoices.find(v => v.name.includes('Paulina')) || 
+                         polishVoices.find(v => v.name.includes('Zofia')) || 
+                         polishVoices[0];
+        
+        voiceSelect.value = bestVoice.name;
+        currentVoiceSettings.selectedVoice = bestVoice.name;
+    }
+}
+
+/**
+ * 🎛️ SETUP VOICE CONTROLS
+ */
+function setupVoiceControls() {
+    const voiceSelect = document.getElementById('voice-select');
+    const speedControl = document.getElementById('speed-control');
+    const speedDisplay = document.getElementById('speed-display');
+    
+    // Voice selection change
+    voiceSelect.addEventListener('change', function() {
+        currentVoiceSettings.selectedVoice = this.value;
+        console.log(`🎤 Voice changed to: ${this.value}`);
+    });
+    
+    // Speed control change
+    speedControl.addEventListener('input', function() {
+        currentVoiceSettings.speed = parseFloat(this.value);
+        speedDisplay.textContent = `${this.value}x`;
+        console.log(`⚡ Speed changed to: ${this.value}x`);
+    });
+}
+
+/**
+ * 🎵 TEST VOICE SETTINGS
+ */
+function testVoiceSettings() {
+    const testText = "Cześć! To jest test głosu i tempa czytania dla Twojego dziecka. Jak brzmi ten głos?";
+    
+    if ('speechSynthesis' in window) {
+        // Stop any current speech
+        speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(testText);
+        
+        // Apply current settings
+        if (currentVoiceSettings.selectedVoice) {
+            const voice = availableVoices.find(v => v.name === currentVoiceSettings.selectedVoice);
+            if (voice) {
+                utterance.voice = voice;
+            }
+        }
+        
+        utterance.rate = currentVoiceSettings.speed;
+        utterance.pitch = currentVoiceSettings.pitch;
+        utterance.volume = currentVoiceSettings.volume;
+        utterance.lang = 'pl-PL';
+        
+        utterance.onstart = () => {
+            console.log('🎵 Voice test started');
+            showNotification('🎵 Test głosu odtwarzany...', 'info');
+        };
+        
+        utterance.onend = () => {
+            console.log('✅ Voice test completed');
+        };
+        
+        utterance.onerror = (error) => {
+            console.error('❌ Voice test error:', error);
+            showNotification('❌ Błąd testu głosu', 'error');
+        };
+        
+        speechSynthesis.speak(utterance);
+        
+    } else {
+        showNotification('⚠️ Przeglądarka nie obsługuje syntezy mowy', 'warning');
+    }
+}
+
+/**
+ * 💾 SAVE VOICE SETTINGS
+ */
+async function saveVoiceSettings() {
+    try {
+        const settings = {
+            selectedVoice: currentVoiceSettings.selectedVoice,
+            speed: currentVoiceSettings.speed,
+            pitch: currentVoiceSettings.pitch,
+            volume: currentVoiceSettings.volume,
+            timestamp: new Date().toISOString()
+        };
+        
+        await saveToMinaZK(PARENT_CMS_KEYS.voice_settings, settings);
+        
+        showNotification('✅ Ustawienia głosu zapisane w Mina ZK!', 'success');
+        console.log('✅ Voice settings saved to Mina ZK');
+        
+    } catch (error) {
+        console.error('❌ Failed to save voice settings:', error);
+        showNotification('❌ Błąd zapisu ustawień głosu', 'error');
+    }
+}
+
+/**
+ * 📥 LOAD VOICE SETTINGS
+ */
+async function loadVoiceSettings() {
+    try {
+        const settings = await loadFromMinaZK(PARENT_CMS_KEYS.voice_settings);
+        
+        if (settings) {
+            currentVoiceSettings = {
+                selectedVoice: settings.selectedVoice || null,
+                speed: settings.speed || 0.8,
+                pitch: settings.pitch || 1.0,
+                volume: settings.volume || 0.9
+            };
+            
+            // Apply to UI
+            const voiceSelect = document.getElementById('voice-select');
+            const speedControl = document.getElementById('speed-control');
+            const speedDisplay = document.getElementById('speed-display');
+            
+            if (voiceSelect && currentVoiceSettings.selectedVoice) {
+                voiceSelect.value = currentVoiceSettings.selectedVoice;
+            }
+            
+            if (speedControl) {
+                speedControl.value = currentVoiceSettings.speed;
+                speedDisplay.textContent = `${currentVoiceSettings.speed}x`;
+            }
+            
+            console.log('✅ Voice settings loaded from Mina ZK');
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to load voice settings:', error);
+    }
+}
 
 console.log('🔒 Parent CMS module loaded');
