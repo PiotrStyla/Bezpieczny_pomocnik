@@ -948,16 +948,16 @@ function startAlertMonitoring() {
     // Initial check
     checkForAlerts();
     
-    // Check every 30 seconds for new alerts - LIFE SAVING SPEED vs 3-4 hour official propagation
+    // Check every 90 seconds during development - PRODUCTION will be 30s for life-saving speed vs 3-4 hour official propagation
     if (alertMonitorInterval) {
         clearInterval(alertMonitorInterval);
     }
     
     alertMonitorInterval = setInterval(() => {
         checkForAlerts();
-    }, 30000); // 30 seconds - CRITICAL for child safety vs 3-4 hour official propagation!
+    }, 90000); // 90 seconds - DEVELOPMENT MODE (production will be 30s for critical child safety)
     
-    console.log('✅ Alert monitoring system active - checking every 30 seconds (vs 3-4 HOURS official systems!)');
+    console.log('✅ Alert monitoring system active - checking every 90 seconds (DEVELOPMENT MODE - production will be 30s vs 3-4 HOURS official systems!)');
 }
 
 /**
