@@ -104,17 +104,11 @@ async function saveAlertMessages() {
     
     try {
         const messages = {
-            water: {
-                age6: document.getElementById('water-6')?.value || '',
-                age9: document.getElementById('water-9')?.value || '',
-                age12: document.getElementById('water-12')?.value || ''
-            },
-            storm: {
-                age6: document.getElementById('storm-6')?.value || '',
-                age9: document.getElementById('storm-9')?.value || '',
-                age12: document.getElementById('storm-12')?.value || ''
-            },
-            // Add more alert types
+            water: document.getElementById('water-alert')?.value || '',
+            storm: document.getElementById('storm-alert')?.value || '',
+            flood: document.getElementById('flood-alert')?.value || '',
+            drones: document.getElementById('drone-alert')?.value || '',
+            exercises: document.getElementById('exercise-alert')?.value || '',
             timestamp: new Date().toISOString(),
             parentId: await getParentIdentifier()
         };
@@ -161,16 +155,9 @@ async function saveSafetyMessages() {
     
     try {
         const messages = {
-            help: {
-                age6: document.getElementById('help-6')?.value || '',
-                age9: document.getElementById('help-9')?.value || '',
-                age12: document.getElementById('help-12')?.value || ''
-            },
-            route: {
-                age6: document.getElementById('route-6')?.value || '',
-                age9: document.getElementById('route-9')?.value || '',
-                age12: document.getElementById('route-12')?.value || ''
-            },
+            help: document.getElementById('help-message')?.value || '',
+            route: document.getElementById('route-message')?.value || '',
+            emergency: document.getElementById('emergency-message')?.value || '',
             timestamp: new Date().toISOString(),
             parentId: await getParentIdentifier()
         };
@@ -368,20 +355,32 @@ async function loadAllMessages() {
  * 📝 POPULATE FORM FIELDS
  */
 function populateAlertFields(messages) {
-    if (messages.water) {
-        if (document.getElementById('water-6')) document.getElementById('water-6').value = messages.water.age6 || '';
+    if (messages.water && document.getElementById('water-alert')) {
+        document.getElementById('water-alert').value = messages.water || '';
     }
-    if (messages.storm) {
-        if (document.getElementById('storm-6')) document.getElementById('storm-6').value = messages.storm.age6 || '';
+    if (messages.storm && document.getElementById('storm-alert')) {
+        document.getElementById('storm-alert').value = messages.storm || '';
+    }
+    if (messages.flood && document.getElementById('flood-alert')) {
+        document.getElementById('flood-alert').value = messages.flood || '';
+    }
+    if (messages.drones && document.getElementById('drone-alert')) {
+        document.getElementById('drone-alert').value = messages.drones || '';
+    }
+    if (messages.exercises && document.getElementById('exercise-alert')) {
+        document.getElementById('exercise-alert').value = messages.exercises || '';
     }
 }
 
 function populateSafetyFields(messages) {
-    if (messages.help && document.getElementById('help-6')) {
-        document.getElementById('help-6').value = messages.help.age6 || '';
+    if (messages.help && document.getElementById('help-message')) {
+        document.getElementById('help-message').value = messages.help || '';
     }
-    if (messages.route && document.getElementById('route-6')) {
-        document.getElementById('route-6').value = messages.route.age6 || '';
+    if (messages.route && document.getElementById('route-message')) {
+        document.getElementById('route-message').value = messages.route || '';
+    }
+    if (messages.emergency && document.getElementById('emergency-message')) {
+        document.getElementById('emergency-message').value = messages.emergency || '';
     }
 }
 
@@ -537,7 +536,7 @@ function showNotification(message, type = 'info') {
  * 🔗 EXPORT TO MAIN APP
  * Function that main app can use to get parent-created messages
  */
-window.getParentMessage = async function(category, type, childAge) {
+window.getParentMessage = async function(category, type) {
     try {
         const messages = await loadFromMinaZK(PARENT_CMS_KEYS[category]);
         
@@ -545,15 +544,10 @@ window.getParentMessage = async function(category, type, childAge) {
             return null; // Fallback to default messages
         }
         
-        // Get age-appropriate message
-        let ageKey = 'age6';
-        if (childAge > 9) ageKey = 'age12';
-        else if (childAge > 6) ageKey = 'age9';
-        
-        const message = messages[type][ageKey];
+        const message = messages[type];
         
         if (message && message.trim()) {
-            console.log(`✅ Using parent-created message for ${category}/${type}/${ageKey}`);
+            console.log(`✅ Using parent-created message for ${category}/${type}`);
             return message;
         }
         
@@ -592,70 +586,43 @@ function initializeVoices() {
 function loadVoices() {
     availableVoices = speechSynthesis.getVoices();
     
-    // Filter and prioritize Polish voices
+    // Filter ONLY Polish voices - aplikacja jest polska
     const polishVoices = availableVoices.filter(voice => 
         voice.lang.includes('pl') || voice.lang.includes('PL')
     );
     
-    const otherVoices = availableVoices.filter(voice => 
-        !voice.lang.includes('pl') && !voice.lang.includes('PL')
-    );
-    
-    // Populate voice select
+    // Populate voice select with Polish voices only
     const voiceSelect = document.getElementById('voice-select');
     voiceSelect.innerHTML = '';
     
-    // Add Polish voices first
     if (polishVoices.length > 0) {
-        const polishGroup = document.createElement('optgroup');
-        polishGroup.label = '🇵🇱 Głosy Polskie (Zalecane)';
-        
         polishVoices.forEach((voice, index) => {
             const option = document.createElement('option');
             option.value = voice.name;
             option.textContent = `${voice.name} (${voice.lang})`;
             if (voice.default) option.textContent += ' ⭐';
-            polishGroup.appendChild(option);
+            voiceSelect.appendChild(option);
         });
         
-        voiceSelect.appendChild(polishGroup);
-    }
-    
-    // Add other voices
-    if (otherVoices.length > 0) {
-        const otherGroup = document.createElement('optgroup');
-        otherGroup.label = '🌍 Inne głosy';
+        console.log(`🎵 Loaded ${polishVoices.length} Polish voices`);
         
-        // Group by language
-        const languageGroups = {};
-        otherVoices.forEach(voice => {
-            const lang = voice.lang.split('-')[0];
-            if (!languageGroups[lang]) languageGroups[lang] = [];
-            languageGroups[lang].push(voice);
-        });
+        // Auto-select best Polish voice
+        if (!currentVoiceSettings.selectedVoice) {
+            const bestVoice = polishVoices.find(v => v.name.includes('Paulina')) || 
+                             polishVoices.find(v => v.name.includes('Zofia')) || 
+                             polishVoices[0];
+            
+            voiceSelect.value = bestVoice.name;
+            currentVoiceSettings.selectedVoice = bestVoice.name;
+        }
+    } else {
+        // Fallback if no Polish voices found
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = '⚠️ Brak polskich głosów - używany będzie domyślny';
+        voiceSelect.appendChild(option);
         
-        Object.keys(languageGroups).sort().forEach(lang => {
-            languageGroups[lang].forEach(voice => {
-                const option = document.createElement('option');
-                option.value = voice.name;
-                option.textContent = `${voice.name} (${voice.lang})`;
-                otherGroup.appendChild(option);
-            });
-        });
-        
-        voiceSelect.appendChild(otherGroup);
-    }
-    
-    console.log(`🎵 Loaded ${availableVoices.length} voices (${polishVoices.length} Polish)`);
-    
-    // Auto-select best Polish voice
-    if (polishVoices.length > 0 && !currentVoiceSettings.selectedVoice) {
-        const bestVoice = polishVoices.find(v => v.name.includes('Paulina')) || 
-                         polishVoices.find(v => v.name.includes('Zofia')) || 
-                         polishVoices[0];
-        
-        voiceSelect.value = bestVoice.name;
-        currentVoiceSettings.selectedVoice = bestVoice.name;
+        console.log('⚠️ No Polish voices found, using default');
     }
 }
 

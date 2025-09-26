@@ -140,26 +140,27 @@
                 <h3>🚨 Komunikaty Alertów</h3>
                 <p>Jak Twoje dziecko ma rozumieć alerty pogodowe, pożary, powodzie itp.</p>
                 
-                <div class="age-tabs">
-                    <div class="age-tab active" onclick="switchAgeTab('alerts', '6')">4-6 lat</div>
-                    <div class="age-tab" onclick="switchAgeTab('alerts', '9')">7-9 lat</div>
-                    <div class="age-tab" onclick="switchAgeTab('alerts', '12')">10-12 lat</div>
-                </div>
+                <label>💧 Woda niezdatna do picia:</label>
+                <textarea class="message-editor" id="water-alert" placeholder="Np: Nie pij wody z kranu, kochanie. Woda jest brudna i może cię rozchorować. Pij tylko wodę z butelek, którą mama ci da."></textarea>
                 
-                <div id="alerts-6" class="age-content">
-                    <label>💧 Woda niezdatna do picia:</label>
-                    <textarea class="message-editor" id="water-6" placeholder="Np: Nie pij wody z kranu, kochanie. Woda jest brudna i może cię rozchorować. Pij tylko wodę z butelek, którą mama ci da."></textarea>
-                    
-                    <label>⛈️ Burze i grad:</label>
-                    <textarea class="message-editor" id="storm-6" placeholder="Np: Nadchodzi burza! Chodź szybko do domu. Będzie głośno i może padać grad jak małe kulki lodu."></textarea>
-                </div>
+                <label>⛈️ Burze i grad:</label>
+                <textarea class="message-editor" id="storm-alert" placeholder="Np: Nadchodzi burza! Chodź szybko do domu. Będzie głośno i może padać grad jak małe kulki lodu."></textarea>
+
+                <label>🌊 Powódź i podtopienia:</label>
+                <textarea class="message-editor" id="flood-alert" placeholder="Np: Za dużo wody w okolicy! Nie chodź blisko rzek ani potoczków. Zostań z mamą w bezpiecznym miejscu."></textarea>
+
+                <label>🚁 Drony i obiekty wojskowe:</label>
+                <textarea class="message-editor" id="drone-alert" placeholder="Np: Niebezpieczne latające rzeczy! Idź szybko do domu. Nie dotykaj niczego co spadło z nieba."></textarea>
+
+                <label>🎯 Ćwiczenia wojskowe:</label>
+                <textarea class="message-editor" id="exercise-alert" placeholder="Np: Wojsko ćwiczy dzisiaj. Będzie głośno ale to nie prawdziwa wojna. Zostań blisko dorosłych."></textarea>
                 
                 <button class="save-btn" onclick="saveAlertMessages()">💾 Zapisz w Mina ZK</button>
                 
                 <div class="template-examples">
                     <strong>💡 Wskazówki:</strong>
                     <ul>
-                        <li>Używaj prostych słów odpowiednich dla wieku</li>
+                        <li>Używaj słów odpowiednich dla Twojego dziecka</li>
                         <li>Dodaj elementy uspokajające ("kochanie", "będzie dobrze")</li>
                         <li>Konkretne instrukcje zamiast ogólników</li>
                         <li>Unikaj straszenia - raczej wyjaśniaj spokojnie</li>
@@ -172,19 +173,14 @@
                 <h3>🛡️ Instrukcje Bezpieczeństwa</h3>
                 <p>Jak dziecko ma reagować w różnych sytuacjach</p>
                 
-                <div class="age-tabs">
-                    <div class="age-tab active" onclick="switchAgeTab('safety', '6')">4-6 lat</div>
-                    <div class="age-tab" onclick="switchAgeTab('safety', '9')">7-9 lat</div>
-                    <div class="age-tab" onclick="switchAgeTab('safety', '12')">10-12 lat</div>
-                </div>
+                <label>🏃 Gdzie szukać pomocy:</label>
+                <textarea class="message-editor" id="help-message" placeholder="Np: Jeśli się zgubisz, znajdź sklep, szkołę lub policjanta. Powiedz swoje imię i nazwisko mamy i taty."></textarea>
                 
-                <div id="safety-6" class="age-content">
-                    <label>🏃 Gdzie szukać pomocy:</label>
-                    <textarea class="message-editor" id="help-6" placeholder="Np: Jeśli się zgubisz, znajdź sklep, szkołę lub policjanta. Powiedz swoje imię i nazwisko mamy i taty."></textarea>
-                    
-                    <label>🚶 Bezpieczna droga:</label>
-                    <textarea class="message-editor" id="route-6" placeholder="Np: Idź tylko głównymi ulicami, gdzie jest dużo ludzi. Nie skręcaj w ciemne uliczki."></textarea>
-                </div>
+                <label>🚶 Bezpieczna droga:</label>
+                <textarea class="message-editor" id="route-message" placeholder="Np: Idź tylko głównymi ulicami, gdzie jest dużo ludzi. Nie skręcaj w ciemne uliczki."></textarea>
+
+                <label>🚨 Sytuacja awaryjna:</label>
+                <textarea class="message-editor" id="emergency-message" placeholder="Np: W niebezpieczeństwie dzwoń 112! Poproś dorosłego o pomoc! Mama i tata zawsze Cię znajdą."></textarea>
                 
                 <button class="save-btn" onclick="saveSafetyMessages()">💾 Zapisz w Mina ZK</button>
             </div>

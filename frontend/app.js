@@ -1084,7 +1084,7 @@ async function getParentCustomMessage(alert, childAge) {
         }
         
         if (alertType) {
-            const parentMessage = await window.getParentMessage('alerts', alertType, childAge);
+            const parentMessage = await window.getParentMessage('alerts', alertType);
             return parentMessage;
         }
         
@@ -1520,8 +1520,7 @@ async function handleFindSafety() {
     let smartMessage = null;
     if (window.getParentMessage) {
         try {
-            const childAge = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
-            smartMessage = await window.getParentMessage('safety', 'help', childAge);
+            smartMessage = await window.getParentMessage('safety', 'help');
             if (smartMessage) {
                 console.log('✅ Using parent-created safety message from Mina ZK');
             }
@@ -1557,8 +1556,7 @@ async function handleSafeRoute() {
     let smartMessage = null;
     if (window.getParentMessage) {
         try {
-            const childAge = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
-            smartMessage = await window.getParentMessage('safety', 'route', childAge);
+            smartMessage = await window.getParentMessage('safety', 'route');
             if (smartMessage) {
                 console.log('✅ Using parent-created route message from Mina ZK');
             }
