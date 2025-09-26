@@ -1030,6 +1030,38 @@ async function checkForAlerts() {
 }
 
 /**
+ * 🚨 GENERATE EMERGENCY FALLBACK MESSAGE
+ * Uses parent-created emergency message or safe default
+ */
+async function generateEmergencyFallbackMessage(alert, childAge) {
+    try {
+        // 🔒 FIRST: Try to get parent-created emergency message
+        if (window.getParentMessage) {
+            const parentEmergencyMessage = await window.getParentMessage('emergency', 'fallback');
+            if (parentEmergencyMessage && parentEmergencyMessage.trim()) {
+                console.log('✅ Using parent-created emergency fallback message');
+                return parentEmergencyMessage;
+            }
+        }
+        
+        // 🛡️ SAFE DEFAULT: No SMS, no stress, focus on finding adults
+        const isYoung = childAge <= 6;
+        
+        const safeDefaults = {
+            young: `🚨 Uwaga, kochanie! Jest ważne ostrzeżenie w okolicy. Znajdź mamę, tatę lub innego dorosłego i zostań przy nim. Dorośli wiedzą co robić i zadbają o Twoje bezpieczeństwo.`,
+            older: `🚨 Uwaga! Otrzymano ważne ostrzeżenie bezpieczeństwa. Skontaktuj się z rodzicami lub znajdź dorosłego. Słuchaj instrukcji dorosłych i służb ratunkowych.`
+        };
+        
+        return isYoung ? safeDefaults.young : safeDefaults.older;
+        
+    } catch (error) {
+        console.error('❌ Emergency fallback generation failed:', error);
+        // Ultra-safe fallback
+        return `🚨 Ważne ostrzeżenie! Znajdź dorosłego i zostań przy nim. Dorośli zadbają o Twoje bezpieczeństwo.`;
+    }
+}
+
+/**
  * 🏠 GET PARENT REGION
  * Retrieves parent-set region from Mina ZK storage
  */
@@ -1102,6 +1134,12 @@ async function processChildFriendlyAlert(alert) {
             } else {
                 console.log('✅ Using LLM-generated message');
             }
+        }
+        
+        // 🚨 EMERGENCY FALLBACK: Universal safety message for unrecognized alerts
+        if (!childFriendlyMessage || childFriendlyMessage.length < 10) {
+            childFriendlyMessage = generateEmergencyFallbackMessage(alert, childAge);
+            console.log('🚨 Using emergency fallback for unrecognized alert type');
         }
         
         // Show alert to child

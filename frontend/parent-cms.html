@@ -163,7 +163,7 @@
                         <li>Używaj słów odpowiednich dla Twojego dziecka</li>
                         <li>Dodaj elementy uspokajające ("kochanie", "będzie dobrze")</li>
                         <li>Konkretne instrukcje zamiast ogólników</li>
-                        <li>Unikaj straszenia - raczej wyjaśniaj spokojnie</li>
+                        <li>Skonsultuj komunikaty z pedagogiem, psychologiem szkolnym lub społecznością rodziców w Twojej okolicy</li>
                     </ul>
                 </div>
             </div>
@@ -197,6 +197,27 @@
                 <textarea class="message-editor" id="location-found" placeholder="Np: Znalazłem cię! Teraz mogę pokazać ci bezpieczne miejsca w okolicy."></textarea>
                 
                 <button class="save-btn" onclick="saveLocationMessages()">🔒 Zaszyfruj i zapisz</button>
+            </div>
+
+            <!-- Emergency Fallback Messages -->
+            <div class="cms-card">
+                <h3>🚨 Komunikat Awaryjny</h3>
+                <p>Co dziecko usłyszy gdy pojawi się nieznany typ alertu (np. nowe zagrożenia)</p>
+                
+                <label>🆘 Uniwersalny komunikat bezpieczeństwa:</label>
+                <textarea class="message-editor" id="emergency-fallback" placeholder="Np: Kochanie, jest ważne ostrzeżenie w okolicy. Znajdź mamę, tatę lub innego dorosłego i zostań przy nim. Dorośli wiedzą co robić i zadbają o Twoje bezpieczeństwo."></textarea>
+                
+                <button class="save-btn" onclick="saveEmergencyMessages()">🔒 Zaszyfruj i zapisz</button>
+                
+                <div class="template-examples">
+                    <strong>💡 Wskazówki:</strong>
+                    <ul>
+                        <li>Unikaj szczegółów - dziecko nie zna nowego zagrożenia</li>
+                        <li>Kieruj do konkretnych dorosłych (mama, tata, nauczyciel)</li>
+                        <li>Nie wspominaj o SMS ani mediach społecznościowych</li>
+                        <li>Skonsultuj z psychologiem dziecięcym lub lokalnym forum rodziców</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -243,6 +264,35 @@
             <p><small>Wszystkie Twoje komunikaty są szyfrowane i przechowywane prywatnie w systemie ZKP. Nikt oprócz Ciebie nie może ich przeczytać.</small></p>
         </div>
     </div>
+
+    <!-- Footer with Foundation info -->
+    <footer style="background: #f8f9fa; border-top: 2px solid #e9ecef; margin-top: 40px; padding: 30px 0;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 30px; margin-bottom: 25px;">
+                <div style="font-size: 48px;">💝</div>
+                <div style="text-align: center; flex: 1; min-width: 300px;">
+                    <h4 style="color: #2c3e50; margin: 0 0 10px 0; font-size: 18px;">Stworzone z ❤️ przez</h4>
+                    <a href="https://fundacja-hospicjum.org/" target="_blank" style="color: #e74c3c; text-decoration: none; font-size: 24px; font-weight: bold; margin-bottom: 15px; display: block;">
+                        <strong>Fundację Hospicjum</strong>
+                    </a>
+                    <p style="color: #666; margin: 0 0 15px 0; line-height: 1.5;">
+                        Ta aplikacja jest <strong>całkowicie bezpłatna</strong>.<br>
+                        Jeśli chcesz wspierać rozwój aplikacji,<br>
+                        możesz przekazać darowiznę na konto Fundacji.
+                    </p>
+                    <a href="https://fundacja-hospicjum.org/" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #f39c12, #e67e22); color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 10px; transition: all 0.3s ease;">
+                        🌟 Wspieraj Fundację
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Copyright Notice -->
+            <div style="text-align: center; padding-top: 20px; border-top: 1px solid #dee2e6; color: #6c757d; font-size: 14px;">
+                <p style="margin: 0 0 5px 0;">&copy; 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostółów w Krakowie</p>
+                <p style="margin: 0; font-size: 12px;">All Rights Reserved. Proprietary and Confidential.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="parent-cms.js"></script>
 </body>
