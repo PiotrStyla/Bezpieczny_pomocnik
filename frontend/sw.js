@@ -2,19 +2,15 @@
 const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1';
 const EMERGENCY_ESSENTIALS = [
     // Core App Files
-    '/',
-    '/index.html',
-    '/app.js',
-    '/style.css',
-    '/manifest.json',
+    './',
+    './index.html',
+    './app.js',
+    './style.css',
+    './manifest.json',
     
-    // Emergency Data (will be created)
-    '/data/offline-emergency.json',
-    
-    // Images & Icons
-    '/images/logo_192x192.png',
-    '/images/logo_512x512.png',
-    '/favicon.ico'
+    // Images & Icons (skip missing files for now)
+    './images/logo_192x192.png'
+    // Skip files that might not exist to prevent cache failures
 ];
 
 // Install - Cache emergency essentials

@@ -36,7 +36,7 @@ class AdaptiveLearningSystem {
     async initializeLearning() {
         try {
             // Check if we have ZK parental consent for learning
-            const zkConsent = window.ZKParentalConsent ? new window.ZKParentalConsent() : null;
+            const zkConsent = window.ZKParentalConsent && typeof window.ZKParentalConsent === 'object' ? window.ZKParentalConsent : null;
             const consentData = zkConsent ? zkConsent.verifyAnonymousConsent() : null;
             
             if (!consentData || !consentData.hasConsent) {

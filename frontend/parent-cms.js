@@ -54,20 +54,25 @@ document.addEventListener('DOMContentLoaded', function() {
 async function initializeMinaZK() {
     const statusDiv = document.getElementById('zk-connection-status');
     
+    if (!statusDiv) {
+        console.log('⚠️ ZK status element not found - running in main app mode');
+        return;
+    }
+    
     try {
         statusDiv.innerHTML = '🔄 Łączenie z systemem prywatności...';
         
         // Check if ZKP system is available (will be implemented with Mina SDK)
         // For now, simulate connection
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
         statusDiv.innerHTML = '✅ Połączono z systemem szyfrowania ZKP - maksymalna prywatność aktywna!';
         statusDiv.style.color = '#4CAF50';
         
         console.log('✅ ZKP privacy system connection established');
     } catch (error) {
-        statusDiv.innerHTML = '⚠️ Tryb offline - dane przechowywane lokalnie (szyfrowane)';
-        statusDiv.style.color = '#FF9800';
+        if (statusDiv) {
+            statusDiv.innerHTML = '⚠️ Tryb offline - dane przechowywane lokalnie (szyfrowane)';
+            statusDiv.style.color = '#FF9800';
+        }
         
         console.log('⚠️ ZKP system connection failed, using local encrypted storage');
     }

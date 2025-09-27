@@ -742,5 +742,9 @@ setTimeout(() => {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    window.ZKParentalConsent.initialize();
+    if (window.ZKParentalConsent && typeof window.ZKParentalConsent.initialize === 'function') {
+        window.ZKParentalConsent.initialize();
+    } else {
+        console.warn('⚠️ ZKParentalConsent not properly loaded - using fallback consent system');
+    }
 });
