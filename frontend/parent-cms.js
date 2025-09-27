@@ -778,4 +778,91 @@ async function loadVoiceSettings() {
     }
 }
 
+/**
+ * 🌍 SAVE LOCATION SETTINGS
+ */
+async function saveLocationSettings() {
+    try {
+        const locationEnabled = document.getElementById('location-enabled')?.checked ?? true;
+        const criticalAlertsOnly = document.getElementById('critical-alerts-only')?.checked ?? false;
+        
+        const locationSettings = {
+            locationEnabled: locationEnabled,
+            criticalAlertsOnly: criticalAlertsOnly,
+            timestamp: new Date().toISOString()
+        };
+        
+        await saveToMinaZK('zk_parent_location_settings', locationSettings);
+        
+        showNotification('✅ Ustawienia lokalizacji zapisane w systemie ZKP!', 'success');
+        console.log('✅ Location settings saved to Mina ZK:', locationSettings);
+        
+    } catch (error) {
+        console.error('❌ Failed to save location settings:', error);
+        showNotification('❌ Błąd zapisu ustawień lokalizacji', 'error');
+    }
+}
+
+/**
+ * 📥 GET LOCATION SETTINGS
+ */
+async function getParentLocationSettings() {
+    try {
+        const settings = await loadFromMinaZK('zk_parent_location_settings');
+        
+        if (settings) {
+            console.log('✅ Location settings loaded from Mina ZK:', settings);
+            return settings;
+        } else {
+            // Default settings
+            const defaultSettings = {
+                locationEnabled: true,  // Default: use location for better alerts
+                criticalAlertsOnly: false  // Default: all alert levels
+            };
+            console.log('ℹ️ Using default location settings:', defaultSettings);
+            return defaultSettings;
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to load location settings:', error);
+        // Fallback to default
+        return {
+            locationEnabled: true,
+            criticalAlertsOnly: false
+        };
+    }
+}
+
+/**
+ * 🔄 LOAD LOCATION SETTINGS INTO UI
+ */
+async function loadLocationSettingsUI() {
+    try {
+        const settings = await getParentLocationSettings();
+        
+        const locationEnabledCheckbox = document.getElementById('location-enabled');
+        const criticalAlertsOnlyCheckbox = document.getElementById('critical-alerts-only');
+        
+        if (locationEnabledCheckbox) {
+            locationEnabledCheckbox.checked = settings.locationEnabled ?? true;
+        }
+        
+        if (criticalAlertsOnlyCheckbox) {
+            criticalAlertsOnlyCheckbox.checked = settings.criticalAlertsOnly ?? false;
+        }
+        
+        console.log('✅ Location settings UI loaded');
+        
+    } catch (error) {
+        console.error('❌ Failed to load location settings UI:', error);
+    }
+}
+
+// Initialize location settings when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadLocationSettingsUI);
+} else {
+    loadLocationSettingsUI();
+}
+
 console.log('🔒 Parent CMS module loaded');

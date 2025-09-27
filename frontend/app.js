@@ -988,6 +988,33 @@ function startAlertMonitoring() {
 }
 
 /**
+ * 🌍 GET PARENT LOCATION SETTINGS
+ * Helper function to access parent location preferences
+ */
+async function getParentLocationSettings() {
+    // Try to get from parent CMS if available
+    if (window.getParentLocationSettings) {
+        return await window.getParentLocationSettings();
+    }
+    
+    // Fallback: try direct ZK access
+    try {
+        const settings = await loadFromMinaZK('zk_parent_location_settings');
+        if (settings) {
+            return settings;
+        }
+    } catch (error) {
+        console.warn('⚠️ Could not load parent location settings:', error);
+    }
+    
+    // Default: allow location for better safety
+    return {
+        locationEnabled: true,
+        criticalAlertsOnly: false
+    };
+}
+
+/**
  * 🔍 CHECK FOR ALERTS - HIERARCHICAL SYSTEM
  * Priority: GPS+ParentRegion → GPS → National → Always Critical
  */
@@ -999,30 +1026,35 @@ async function checkForAlerts() {
     try {
         console.log('🔍 Checking for alerts using hierarchical system...');
         
+        // 🌍 CHECK PARENT LOCATION PREFERENCES
+        const parentLocationSettings = await getParentLocationSettings();
+        const useLocation = parentLocationSettings?.locationEnabled ?? true;
+        
         let alerts = [];
         
-        // 🥇 LEVEL 1: GPS + Parent Region (Best)
-        if (userLocation && await getParentRegion()) {
+        // 🥇 LEVEL 1: GPS + Parent Region (Best) - only if parent allows
+        if (useLocation && userLocation && await getParentRegion()) {
             const parentRegion = await getParentRegion();
-            console.log(`📍 Using GPS + Parent region: ${parentRegion}`);
+            console.log(`📍 Using GPS + Parent region: ${parentRegion} (parent permission: enabled)`);
             const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lon}&region=${parentRegion}`);
             if (response.ok) {
                 alerts = await response.json();
             }
         }
         
-        // 🥈 LEVEL 2: GPS Only (Good)  
-        else if (userLocation) {
-            console.log('📍 Using GPS location only');
+        // 🥈 LEVEL 2: GPS Only (Good) - only if parent allows  
+        else if (useLocation && userLocation) {
+            console.log('📍 Using GPS location only (parent permission: enabled)');
             const response = await fetch(`/api/alerts/location?lat=${userLocation.lat}&lon=${userLocation.lon}`);
             if (response.ok) {
                 alerts = await response.json();
             }
         }
         
-        // 🥉 LEVEL 3: National Alerts (Basic)
+        // 🥉 LEVEL 3: National Alerts (Basic) - always available
         else {
-            console.log('🏛️ Using national alerts (no location consent)');
+            const reason = !useLocation ? 'parent disabled location' : 'no location consent';
+            console.log(`🏛️ Using national alerts (${reason})`);
             try {
                 const response = await fetch(`/api/alerts/national`);
                 if (response.ok) {
