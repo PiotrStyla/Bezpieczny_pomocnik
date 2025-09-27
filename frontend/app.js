@@ -588,8 +588,8 @@ function generateLocationMessage() {
     const childAge = getChildAgeForAI();
     
     // Check if LLM is available
-    const bielikClient = window.BielikClient;
-    const hasLLM = bielikClient && bielikClient.isAvailable();
+    const polishAIClient = window.BielikClient; // Legacy name for compatibility
+    const hasLLM = polishAIClient && polishAIClient.isAvailable();
     
     console.log(`📍 Generating location message for age: ${childAge}, LLM available: ${hasLLM}`);
     

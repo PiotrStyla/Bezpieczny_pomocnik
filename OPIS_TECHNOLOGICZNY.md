@@ -33,7 +33,7 @@
 │• Voice Synthesis │    │• Emergency Ctrl  │    │• IMGW Weather   │
 │• Safety Education│    │• Child Age Mgmt  │    │• Local Gov APIs │
 │• Emergency Btns  │    │• ZKP Encryption  │    │• OpenStreetMap  │
-│• Real-time Alert │    │• Parental Consent│    │• Bielik AI      │
+│• Real-time Alert │    │• Parental Consent│    │• Polish AI (LLM)│
 └──────────────────┘    └──────────────────┘    └─────────────────┘
            │                       │                       │
            └───────────────────────┼───────────────────────┘
@@ -185,7 +185,7 @@ Volume: 0.9   (Wyraźny, pewny głos)
 - **Features:** PWA, Offline, Responsive, A11y
 
 ### **Backend/AI:**
-- **AI:** Bielik (Polish LLM), custom NLP
+- **AI:** Polish LLM (OpenAI/PLLuM), custom NLP
 - **Data:** RCB, IMGW, Local Gov APIs
 - **Privacy:** Mina Protocol ZKP
 - **Security:** Client-side encryption, no server storage
