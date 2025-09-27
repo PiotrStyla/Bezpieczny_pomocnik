@@ -1,7 +1,8 @@
 # OŚWIADCZENIE O DOSTĘPNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Data opublikowania:** 19 stycznia 2025 r.  
-**Data ostatniej aktualizacji:** 19 stycznia 2025 r.
+**Data ostatniej aktualizacji:** 27 września 2025 r.
+**Aktualizacja:** Background Alert System, visual monitoring dashboard, accessibility w alertach
 
 ---
 
@@ -59,6 +60,14 @@
 - **Kompatybilność:** Testowane z popularnymi czytnikami ekranu
 - **Walidacja HTML:** Kod zgodny ze standardami W3C
 - **Semantyka:** Poprawne użycie elementów HTML5
+- **🚨 Background Alert Accessibility:** System alertów w tle zapewnia dostępność 24/7
+  - **Browser notifications** z pełną accessibility support
+  - **Vibration patterns** dla użytkowników z wadami słuchu
+  - **RequireInteraction** - powiadomienia nie znikają automatycznie
+  - **Screen reader compatible** - wszystkie alerty czytane przez assistive tech
+  - **Visual monitoring indicators** - status system zawsze widoczny
+  - **Keyboard accessible** - pełna nawigacja bez myszy
+  - **High contrast support** - alerty wyróżniają się wizualnie
 
 ---
 

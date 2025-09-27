@@ -1,7 +1,7 @@
 # POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Zgodna z RODO | Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja: Dodano funkcje blockchain (Mina Protocol), emergency mode i zk-proof privacy**
+**Aktualizacja 27.09.2025: Dodano Background Alert System, location caching, RCB monitoring**
 
 ---
 
@@ -58,14 +58,21 @@
 - **Cel:** Zapewnienie poprawnego działania aplikacji
 - **Podstawa prawna:** Prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO)
 
-#### **🚨 Offline Emergency Cache (Service Worker):**
-- **Emergency contacts data** (112, 997, 998, 999) - TYLKO lokalnie w przeglądarce
-- **Safety instructions** (instrukcje bezpieczeństwa) - TYLKO lokalnie w przeglądarce
-- **App core files** (HTML/CSS/JS) - cache dla działania offline
-- **Cel:** Zapewnienie działania aplikacji podczas katastrof gdy brak internetu
-- **Przechowywanie:** WYŁĄCZNIE w cache przeglądarki (NIE na serwerach Fundacji)
+#### **🚨 Background Alert System (Service Worker):**
+- **Background sync data** - cache dla okresowego sprawdzania alertów (co 15 minut)
+- **Cached location data** - ostatnia znana lokalizacja dla alertów lokalnych w tle
+- **Alert notification history** - lista otrzymanych alertów (max 50, tylko ID)
+- **RCB RSS feed cache** - tymczasowe przechowywanie alertów RCB z gov.pl
+- **CORS proxy data** - techniczne dane dla omijania ograniczeń przeglądarki
+- **Emergency contacts cache** (112, 997, 998, 999) - TYLKO lokalnie w przeglądarce
+- **Safety instructions cache** - instrukcje bezpieczeństwa dla działania offline
+- **App core files cache** - HTML/CSS/JS dla działania bez internetu
+- **Cel:** 24/7 monitoring zagrożeń nawet gdy aplikacja zamknięta (30s vs 3-4h oficjalne)
+- **Przechowywanie:** WYŁĄCZNIE w Service Worker cache (NIE na serwerach Fundacji)
+- **Frequencja:** Automatic background sync co 15 minut + manual triggers
+- **Źródła danych:** RCB RSS (gov.pl), backend APIs, emergency fallback
 - **Podstawa prawna:** Żywotny interes osoby fizycznej (art. 6 ust. 1 lit. d RODO)
-- **Szczególne uzasadnienie:** Bezpieczeństwo dzieci podczas sytuacji awaryjnych
+- **Szczególne uzasadnienie:** Ochrona życia dzieci - natychmiastowe alerty vs godziny opóźnienia
 
 ### 👨‍👩‍👧‍👦 **MODUŁY ROZSZERZONE (planowane - po rejestracji Rodzica/Opiekuna):**
 

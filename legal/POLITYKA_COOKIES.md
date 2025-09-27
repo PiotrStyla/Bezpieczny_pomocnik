@@ -1,7 +1,7 @@
 # POLITYKA COOKIES APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja: Dodano emergency cache i blockchain localStorage**
+**Aktualizacja 27.09.2025: Dodano Background Alert System, periodic sync, RCB monitoring**
 
 ---
 
@@ -25,6 +25,12 @@
 | `bezpieczny_pomocnik_progress` | Postęp gracza: XP, poziom, osiągnięcia, bohater | Do ręcznego usunięcia | localStorage |
 | `hero_selection_data` | Wybrany bohater bezpieczeństwa | Do ręcznego usunięcia | localStorage |
 | `daily_achievements` | Dzienne osiągnięcia i streaki | Do ręcznego usunięcia | localStorage |
+| **🚨 BACKGROUND ALERT SYSTEM** | **System alertów w tle** | **Cache lifetime** | **Service Worker** |
+| `emergency-data/user-location` | Cache ostatniej lokalizacji dla alertów | Cache przeglądarki | Service Worker |
+| `emergency-data/notified-alerts` | Historia otrzymanych alertów (max 50 ID) | Cache przeglądarki | Service Worker |
+| `emergency-data/rcb-rss-cache` | Tymczasowy cache alertów RCB RSS | 1 godzina | Service Worker |
+| `alert_monitoring_status` | Status systemu monitorowania alertów | Sesja | localStorage |
+| `location_settings` | Ustawienia lokalizacji z Parent CMS | Do zmiany | localStorage |
 | **🚨 EMERGENCY CACHE** | **Cache awaryjnych danych offline** | **Do usunięcia cache** | **Service Worker** |
 | `emergency_contacts` | Numery alarmowe (112,997,998,999) offline | Cache przeglądarki | Service Worker |
 | `safety_instructions` | Instrukcje bezpieczeństwa offline | Cache przeglądarki | Service Worker |

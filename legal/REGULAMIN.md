@@ -1,8 +1,7 @@
 # REGULAMIN UŻYTKOWANIA APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja: Dodano emergency mode, blockchain features i smart banner**
-**Aktualizacja: Dodano funkcję geolokalizacji i kompletne pokrycie Polski**
+**Aktualizacja 27.09.2025: Background Alert System, 24/7 monitoring, direct RCB integration**
 
 ---
 
@@ -20,9 +19,14 @@
 
 2.1. **Wersja podstawowa** Aplikacji dostępna jest bez rejestracji i obejmuje:
 - Przeglądanie alertów pogodowych i ostrzeżeń bezpieczeństwa dla całej Polski
+- **Background Alert System** - 24/7 monitoring zagrożeń nawet gdy aplikacja zamknięta
+- **Periodic Background Sync** - automatyczne sprawdzanie co 15 minut (vs 3-4h oficjalne systemy)
+- **Direct RCB Integration** - bezpośrednie pobieranie z gov.pl/web/rcb/ostrzezenia-rcb-rss
 - **Automatyczne wykrywanie lokalizacji** (z wyraźną zgodą Użytkownika) dla wszystkich gmin, miast i województw Polski
+- **Location-aware background alerts** - cache lokalizacji dla alertów lokalnych w tle
 - **Inteligentne dopasowanie źródeł alertów** - krajowe (RCB, IMGW), wojewódzkie i miejskie
 - **Kompletne pokrycie Polski** - 16 województw, 380 powiatów, wszystkie gminy
+- **Visual monitoring dashboard** - real-time status systemu alertów
 - Edukacyjne treści o bezpieczeństwie dla dzieci
 - Informacje o numerach alarmowych  
 - Funkcje text-to-speech w językach polskim, angielskim i ukraińskim
