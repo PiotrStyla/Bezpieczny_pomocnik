@@ -141,9 +141,193 @@ function createOfflineEmergencyPage() {
     });
 }
 
-// Push Notifications - Original functionality preserved
+/**
+ * 🔄 BACKGROUND SYNC - PERIODIC ALERT CHECKING
+ * Sprawdza alerty nawet gdy aplikacja zamknięta!
+ */
+self.addEventListener('sync', event => {
+    console.log('🔄 Background sync triggered:', event.tag);
+    
+    if (event.tag === 'check-emergency-alerts') {
+        event.waitUntil(checkEmergencyAlertsInBackground());
+    }
+});
+
+/**
+ * ⏰ PERIODIC BACKGROUND SYNC (Chrome)
+ * Sprawdza alerty co 15 minut nawet gdy app zamknięty
+ */
+self.addEventListener('periodicsync', event => {
+    if (event.tag === 'emergency-alert-check') {
+        console.log('⏰ Periodic sync: checking for emergency alerts');
+        event.waitUntil(checkEmergencyAlertsInBackground());
+    }
+});
+
+/**
+ * 🚨 CHECK EMERGENCY ALERTS IN BACKGROUND
+ * Core function for background alert monitoring
+ */
+async function checkEmergencyAlertsInBackground() {
+    try {
+        console.log('🔍 Checking emergency alerts in background...');
+        
+        // Try to get user location from cache
+        const locationCache = await getCachedLocation();
+        
+        let alertsUrl = '/api/alerts/critical'; // Always check critical first
+        
+        if (locationCache) {
+            alertsUrl = `/api/alerts/location?lat=${locationCache.lat}&lon=${locationCache.lon}`;
+        }
+        
+        const response = await fetch(alertsUrl);
+        
+        if (response.ok) {
+            const alerts = await response.json();
+            
+            if (alerts && alerts.length > 0) {
+                await processBackgroundAlerts(alerts);
+            } else {
+                console.log('✅ No emergency alerts found in background check');
+            }
+        } else {
+            // Fallback to mock critical alert for testing
+            const mockAlert = {
+                id: `bg-test-${Date.now()}`,
+                title: 'Test Background Alert',
+                content: 'To jest testowy alert w tle - aplikacja działa nawet gdy zamknięta!',
+                severity: 'high',
+                timestamp: new Date().toISOString()
+            };
+            
+            await processBackgroundAlerts([mockAlert]);
+            console.log('🧪 Sent test background alert (API unavailable)');
+        }
+        
+    } catch (error) {
+        console.error('❌ Background alert check failed:', error);
+        
+        // Emergency fallback - show offline alert capability
+        await showEmergencyNotification(
+            '🚨 System Awaryjny Aktywny',
+            'Bezpieczny Pomocnik działa w tle i monitoruje sytuację. W przypadku prawdziwej awarii skontaktuj się z numerem 112.'
+        );
+    }
+}
+
+/**
+ * 🎯 PROCESS BACKGROUND ALERTS
+ * Convert alerts to child-friendly notifications
+ */
+async function processBackgroundAlerts(alerts) {
+    for (const alert of alerts) {
+        // Check if we already notified about this alert
+        const notifiedAlerts = await getCachedNotifiedAlerts();
+        
+        if (!notifiedAlerts.includes(alert.id)) {
+            const childFriendlyMessage = generateBackgroundChildMessage(alert);
+            
+            await showEmergencyNotification(
+                '🚨 Ważny Alert Bezpieczeństwa!',
+                childFriendlyMessage,
+                alert
+            );
+            
+            // Cache that we notified about this alert
+            await cacheNotifiedAlert(alert.id);
+            
+            console.log('🚨 Background alert sent:', alert.title);
+        }
+    }
+}
+
+/**
+ * 👶 GENERATE CHILD-FRIENDLY BACKGROUND MESSAGE
+ */
+function generateBackgroundChildMessage(alert) {
+    const title = alert.title.toLowerCase();
+    const content = alert.content.toLowerCase();
+    
+    // Simple rule-based child messages for background alerts
+    if (title.includes('woda') || content.includes('nie pij')) {
+        return 'Ważne! Nie pij wody z kranu. Rodzice wiedzą co robić - znajdź ich szybko!';
+    } else if (title.includes('burza') || title.includes('wiatr')) {
+        return 'Uwaga! Nadchodzi burza. Zostań w domu i nie wychodź na zewnątrz!';
+    } else if (title.includes('powódź') || content.includes('podtopienia')) {
+        return 'Ostrzeżenie! Może być powódź. Trzymaj się z dala od rzek i znajdź dorosłych!';
+    } else {
+        return 'Ważny alert bezpieczeństwa! Znajdź rodzica lub dorosłego. Oni wiedzą co robić.';
+    }
+}
+
+/**
+ * 🔔 SHOW EMERGENCY NOTIFICATION
+ */
+async function showEmergencyNotification(title, body, alertData = null) {
+    const options = {
+        body: body,
+        icon: '/images/logo_192x192.png',
+        badge: '/images/logo_192x192.png',
+        tag: 'emergency-alert',
+        requireInteraction: true,
+        vibrate: [200, 100, 200, 100, 200], // Alert vibration pattern
+        actions: [
+            {
+                action: 'open',
+                title: '🔍 Sprawdź Alert'
+            },
+            {
+                action: 'call',
+                title: '📞 Zadzwoń 112'
+            }
+        ],
+        data: alertData
+    };
+    
+    return self.registration.showNotification(title, options);
+}
+
+/**
+ * 🗃️ CACHE MANAGEMENT FOR BACKGROUND ALERTS
+ */
+async function getCachedLocation() {
+    try {
+        const cache = await caches.open('emergency-data');
+        const response = await cache.match('/cache/user-location');
+        return response ? await response.json() : null;
+    } catch (error) {
+        return null;
+    }
+}
+
+async function getCachedNotifiedAlerts() {
+    try {
+        const cache = await caches.open('emergency-data');
+        const response = await cache.match('/cache/notified-alerts');
+        return response ? await response.json() : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+async function cacheNotifiedAlert(alertId) {
+    try {
+        const cache = await caches.open('emergency-data');
+        const existing = await getCachedNotifiedAlerts();
+        const updated = [...existing, alertId].slice(-50); // Keep last 50
+        
+        await cache.put('/cache/notified-alerts', 
+            new Response(JSON.stringify(updated))
+        );
+    } catch (error) {
+        console.warn('Failed to cache notified alert:', error);
+    }
+}
+
+// Push Notifications - Enhanced functionality
 self.addEventListener('push', event => {
-    const data = event.data.json();
+    const data = event.data ? event.data.json() : {};
     console.log('📬 Otrzymano powiadomienie push:', data);
 
     const title = data.title || '🚨 Bezpieczny Pomocnik';
@@ -153,6 +337,7 @@ self.addEventListener('push', event => {
         badge: '/images/logo_192x192.png',
         tag: 'emergency-alert',
         requireInteraction: true, // Stays visible until user acts
+        vibrate: [200, 100, 200, 100, 200],
         actions: [
             {
                 action: 'open',

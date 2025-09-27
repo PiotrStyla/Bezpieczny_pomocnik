@@ -702,6 +702,9 @@ function getUserLocation() {
                     .openPopup();
                     
                 map.setView([lat, lon], 12);
+                
+                // Cache location for background alerts
+                cacheLocationForBackground(lat, lon);
             }
             
             // Try to get address details for better communication
@@ -2031,15 +2034,17 @@ if ('serviceWorker' in navigator) {
         .then(registration => {
             console.log('✅ Service Worker registered for background alerts');
             
+            // Setup periodic background sync for emergency alerts
+            setupBackgroundSync(registration);
+            
             // Check for push notification permission
             return registration.pushManager.getSubscription();
         })
         .then(subscription => {
             if (!subscription) {
-                console.log('💡 Push notifications not set up - alerts only work when app is open');
-                // Could request push permission here if needed for backend alerts
+                console.log('💡 Push notifications not set up - using background sync instead');
             } else {
-                console.log('✅ Push notifications active - background alerts available');
+                console.log('✅ Push notifications active - full background alerts available');
             }
         })
         .catch(error => {
@@ -2048,6 +2053,82 @@ if ('serviceWorker' in navigator) {
         });
 } else {
     console.warn('⚠️ Service Worker not supported - background alerts disabled');
+}
+
+/**
+ * 🔄 SETUP BACKGROUND SYNC FOR EMERGENCY ALERTS
+ */
+async function setupBackgroundSync(registration) {
+    try {
+        // Register periodic background sync (Chrome)
+        if ('periodicSync' in registration) {
+            const status = await navigator.permissions.query({
+                name: 'periodic-background-sync',
+            });
+            
+            if (status.state === 'granted') {
+                await registration.periodicSync.register('emergency-alert-check', {
+                    minInterval: 15 * 60 * 1000, // 15 minutes - critical for child safety
+                });
+                console.log('✅ Periodic background sync registered - checking alerts every 15 minutes');
+            } else {
+                console.log('⚠️ Periodic background sync not permitted - using manual sync');
+                // Fallback to manual background sync triggers
+                setupManualBackgroundSync(registration);
+            }
+        } else {
+            console.log('⚠️ Periodic background sync not supported - using manual sync');
+            setupManualBackgroundSync(registration);
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to setup background sync:', error);
+    }
+}
+
+/**
+ * 🔧 MANUAL BACKGROUND SYNC SETUP
+ */
+function setupManualBackgroundSync(registration) {
+    // Trigger background sync on app visibility change
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            // App is being hidden/closed - trigger background sync
+            if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+                registration.sync.register('check-emergency-alerts')
+                    .then(() => console.log('🔄 Background sync registered on app close'))
+                    .catch(err => console.warn('Background sync failed:', err));
+            }
+        }
+    });
+    
+    // Also trigger sync periodically when app is active
+    setInterval(() => {
+        if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+            registration.sync.register('check-emergency-alerts')
+                .catch(err => console.warn('Periodic background sync failed:', err));
+        }
+    }, 10 * 60 * 1000); // Every 10 minutes as backup
+}
+
+/**
+ * 🗃️ CACHE USER LOCATION FOR BACKGROUND ALERTS
+ */
+async function cacheLocationForBackground(lat, lon) {
+    try {
+        if ('caches' in window) {
+            const cache = await caches.open('emergency-data');
+            const locationData = { lat, lon, timestamp: Date.now() };
+            
+            await cache.put('/cache/user-location', 
+                new Response(JSON.stringify(locationData))
+            );
+            
+            console.log('📍 Location cached for background alerts');
+        }
+    } catch (error) {
+        console.warn('Failed to cache location:', error);
+    }
 }
 
 console.log('📄 App.js loaded successfully');
