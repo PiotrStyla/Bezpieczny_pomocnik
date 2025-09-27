@@ -2022,5 +2022,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 7000); // Add test buttons after system initialization
 });
 
+/**
+ * 🔧 REGISTER SERVICE WORKER FOR BACKGROUND ALERTS
+ * Critical for receiving alerts when app is closed!
+ */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+            console.log('✅ Service Worker registered for background alerts');
+            
+            // Check for push notification permission
+            return registration.pushManager.getSubscription();
+        })
+        .then(subscription => {
+            if (!subscription) {
+                console.log('💡 Push notifications not set up - alerts only work when app is open');
+                // Could request push permission here if needed for backend alerts
+            } else {
+                console.log('✅ Push notifications active - background alerts available');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Service Worker registration failed:', error);
+            console.warn('⚠️ Background alerts disabled - app must be open for alerts');
+        });
+} else {
+    console.warn('⚠️ Service Worker not supported - background alerts disabled');
+}
+
 console.log('📄 App.js loaded successfully');
 
