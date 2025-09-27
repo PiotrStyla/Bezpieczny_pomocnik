@@ -698,10 +698,10 @@ lub dostarczyć osobiście pod adres: 30-404 Kraków, ul. Cegielniana 6B/45
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        window.ZKParentalConsent = new ZKParentalConsent();
+        window.ZKParentalConsent = new ParentalConsentManager();
     });
 } else {
-    window.ZKParentalConsent = new ZKParentalConsent();
+    window.ZKParentalConsent = new ParentalConsentManager();
 }
 
 // EMERGENCY DEBUGGING FUNCTIONS
@@ -720,12 +720,19 @@ window.forceUnblurApp = function() {
 };
 
 window.resetParentalConsent = function() {
-    console.log('Resetting parental consent system');
+    console.log('🔄 Resetting parental consent system');
+    localStorage.removeItem('parental_consent');
     localStorage.removeItem('zk_parental_consent');
     localStorage.removeItem('zk_child_age');
     localStorage.removeItem('pending_parental_verification');
+    
+    // Clear any existing consent manager
+    if (window.ZKParentalConsent) {
+        window.ZKParentalConsent.consentData = null;
+    }
+    
     window.forceUnblurApp();
-    console.log('Parental consent reset - reload page to start fresh');
+    console.log('✅ Parental consent reset - reload page to see consent banner');
 };
 
 // Auto-check if app is stuck blurred
@@ -742,9 +749,10 @@ setTimeout(() => {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.ZKParentalConsent && typeof window.ZKParentalConsent.initialize === 'function') {
-        window.ZKParentalConsent.initialize();
+    if (window.ZKParentalConsent && typeof window.ZKParentalConsent === 'object') {
+        console.log('✅ ZKParentalConsent loaded and initialized automatically');
     } else {
-        console.warn('⚠️ ZKParentalConsent not properly loaded - using fallback consent system');
+        console.warn('⚠️ ZKParentalConsent not properly loaded - creating fallback consent system');
+        window.ZKParentalConsent = new ParentalConsentManager();
     }
 });
