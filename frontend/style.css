@@ -1960,6 +1960,21 @@ body {
     100% { transform: scale(1); }
 }
 
+@keyframes gentle-pulse {
+    0% { 
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.02);
+    }
+    100% { 
+        opacity: 0.8;
+        transform: scale(1);
+    }
+}
+
 .alert-notification {
     position: fixed;
     top: 20px;

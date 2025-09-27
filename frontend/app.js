@@ -2225,7 +2225,7 @@ function showAlertMonitoringStatus() {
         z-index: 1000;
         font-weight: bold;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        animation: pulse 3s ease-in-out infinite;
+        /* animation: gentle-pulse 6s ease-in-out infinite; */ /* Disabled - no distracting animations */
     `;
     
     statusDiv.innerHTML = '🚨 System Alertów: AKTYWNY';
