@@ -1066,8 +1066,8 @@ async function fetchDirectRCBAlerts() {
  */
 async function getParentLocationSettings() {
     // Try to get from parent CMS if available
-    if (window.getParentLocationSettings) {
-        return await window.getParentLocationSettings();
+    if (window.getParentLocationSettingsFromCMS) {
+        return await window.getParentLocationSettingsFromCMS();
     }
     
     // Fallback: try direct ZK access
@@ -2104,7 +2104,7 @@ document.addEventListener('DOMContentLoaded', function() {
  * Critical for receiving alerts when app is closed!
  */
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('./sw.js')
         .then(registration => {
             console.log('✅ Service Worker registered for background alerts');
             
@@ -2225,7 +2225,7 @@ function showAlertMonitoringStatus() {
         z-index: 1000;
         font-weight: bold;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        animation: pulse 2s infinite;
+        animation: pulse 3s ease-in-out infinite;
     `;
     
     statusDiv.innerHTML = '🚨 System Alertów: AKTYWNY';

@@ -243,9 +243,30 @@ class ZKParentalConsent {
      * ⚙️ ZK APP SETTINGS STORAGE
      */
     storeAppSettings(settings) {
+        try {
+            const zkSettings = {
+                ...settings,
+                zkProtected: true,
+                timestamp: Date.now()
+            };
+            
+            // Save to ZK system
+            saveToMinaZK('zk_app_settings', zkSettings);
+            console.log('⚙️ App settings stored in ZK system');
+            return zkSettings;
+            
+        } catch (e) {
+            console.warn('⚠️ Failed to store ZK settings:', e);
+            return this.createDefaultSettings();
+        }
+    }
+    
+    loadAppSettings() {
+        try {
+            const zkSettings = loadFromMinaZK('zk_app_settings');
             
             // Migration from old system
-            if (!zkSettings.zkProtected) {
+            if (!zkSettings || !zkSettings.zkProtected) {
                 const migration = this.migrateOldSettings();
                 return migration;
             }
