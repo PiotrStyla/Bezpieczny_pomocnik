@@ -1656,15 +1656,49 @@ function addTestButtons() {
 
 // Frontend AI - Polish AI + ZK privacy  
 async function generateSmartSpeech(action, context = {}) {
-    // Get child age using ZK-protected method
-    const age = window.getChildAgeForAI ? window.getChildAgeForAI() : 8;
+    // 🔒 FIRST PRIORITY: Check Parent CMS for custom messages
+    if (window.getParentMessage) {
+        try {
+            // Get current child ID for child-specific messages
+            let childId = null;
+            if (window.childSessionManager) {
+                childId = await window.childSessionManager.getCurrentChildId();
+            }
+            
+            // Map actions to CMS categories/types
+            let category, type;
+            if (action === 'welcome') {
+                category = 'safety';
+                type = 'welcome';
+            } else if (action === 'emergency_help') {
+                category = 'safety';
+                type = 'help';
+            } else if (action === 'find_safety') {
+                category = 'safety';
+                type = 'lost';
+            }
+            
+            if (category && type) {
+                const parentMessage = await window.getParentMessage(category, type, childId);
+                if (parentMessage && parentMessage.trim()) {
+                    console.log(`✅ Using parent-created message from CMS: ${category}.${type}`);
+                    return parentMessage;
+                }
+            }
+        } catch (error) {
+            console.log('⚠️ Failed to get parent message from CMS:', error);
+        }
+    }
     
-    const timeOfDay = new Date().getHours() < 12 ? 'rano' : new Date().getHours() < 18 ? 'popołudnie' : 'wieczór';
-    const isFirstVisit = userMemory.visitCount === 1;
-    const hasLocation = userLocation ? true : false;
-    
-    console.log(`🤖🇵🇱 Polish AI: action=${action}, age=${age}, time=${timeOfDay}`);
-    
+    // 🚫 NO PARENT MESSAGES = SILENT MODE
+    // If parent hasn't set up CMS messages, stay silent
+    console.log(`🔇 No parent messages configured for "${action}" - staying silent`);
+    return null;
+}
+
+// 🔇 FUNCTION DISABLED - generateLocalSmartSpeech no longer used in silent mode
+/* ORIGINAL generateLocalSmartSpeech FUNCTION DISABLED:
+function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocation) {
     // Try client-side Polish AI first
     if (window.polishAI && window.polishAI.isConfigured()) {
         try {
@@ -1769,6 +1803,7 @@ function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocat
             return 'Cześć! Jestem twoim pomocnikiem bezpieczeństwa!';
     }
 }
+END OF DISABLED FUNCTION */
 
 async function handleWhereAmI() {
     console.log('🧭 Where Am I clicked');
