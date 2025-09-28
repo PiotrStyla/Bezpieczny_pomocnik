@@ -149,10 +149,23 @@ class ChildSessionManager {
             // Create new child handler
             document.getElementById('create-child-btn').addEventListener('click', async () => {
                 const name = document.getElementById('child-name').value.trim();
-                const age = parseInt(document.getElementById('child-age').value);
+                const ageValue = document.getElementById('child-age').value.trim();
+                const age = parseInt(ageValue);
                 
-                if (!name || !age || age < 6 || age > 15) {
-                    alert('❌ Proszę podać prawidłowe imię i wiek dziecka (6-15 lat)');
+                // 🧪 DEBUG VALIDATION
+                console.log('🧪 Validation debug:', { 
+                    name, 
+                    ageValue, 
+                    age, 
+                    isNaN: isNaN(age),
+                    nameEmpty: !name,
+                    ageInvalid: age < 6 || age > 15 
+                });
+                
+                if (!name || !ageValue || isNaN(age) || age < 6 || age > 15) {
+                    const errorMsg = `❌ Błąd walidacji:\n- Imię: "${name}"\n- Wiek: "${ageValue}" (parsed: ${age})\nWymagania: imię nie puste, wiek 6-15 lat`;
+                    alert(errorMsg);
+                    console.error('❌ Validation failed:', { name, ageValue, age });
                     return;
                 }
                 
