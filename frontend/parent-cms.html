@@ -132,6 +132,31 @@
             <h1>🔒 Parent CMS - Kreator Komunikatów dla Dzieci</h1>
             <p>Twórz własne, spersonalizowane komunikaty bezpieczeństwa dla swojego dziecka.<br>
             Wszystkie dane są szyfrowane w systemie prywatności opartym o ZKP - maksymalna prywatność!</p>
+            
+            <!-- 🧒 CHILD SELECTOR -->
+            <div class="child-selector-section" style="margin-top: 25px; padding: 20px; background: rgba(52, 152, 219, 0.1); border: 2px solid #3498db; border-radius: 10px;">
+                <h3 style="margin-top: 0; color: #2c3e50;">👨‍👩‍👧‍👦 Wybierz Dziecko</h3>
+                <p style="margin-bottom: 15px; color: #7f8c8d;">Komunikaty będą zapisane dla wybranego dziecka. Każde dziecko ma osobny, bezpieczny profil.</p>
+                
+                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <select id="child-selector" style="padding: 10px; border: 2px solid #3498db; border-radius: 8px; font-size: 16px; min-width: 200px;">
+                        <option value="">Wybierz dziecko...</option>
+                        <option value="general">📢 Ogólne (dla wszystkich dzieci)</option>
+                    </select>
+                    
+                    <button id="new-child-btn" style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                        ➕ Dodaj Nowe Dziecko
+                    </button>
+                    
+                    <button id="manage-children-btn" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                        ⚙️ Zarządzaj Dziećmi
+                    </button>
+                </div>
+                
+                <div id="selected-child-info" style="margin-top: 15px; padding: 10px; background: rgba(76, 175, 80, 0.1); border-radius: 8px; display: none;">
+                    <strong>✅ Wybrane dziecko:</strong> <span id="selected-child-name"></span>
+                </div>
+            </div>
         </div>
 
         <div class="cms-cards">
@@ -336,6 +361,8 @@
         </div>
     </footer>
 
+    <script src="enhanced-security-zk.js"></script>
+    <script src="child-session-manager.js"></script>
     <script src="parent-cms.js"></script>
 </body>
 </html>

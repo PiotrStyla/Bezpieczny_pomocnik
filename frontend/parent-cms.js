@@ -13,7 +13,7 @@ const PARENT_CMS_KEYS = {
     voice_settings: 'zk_parent_voice_settings'
 };
 
-// Current editing state
+// Current editing state  
 let currentAge = '6';
 let currentCategory = 'alerts';
 let availableVoices = [];
@@ -24,6 +24,115 @@ let currentVoiceSettings = {
     volume: 0.9
 };
 
+// Child Selection State
+let currentSelectedChild = null; // null = general messages, childId = specific child
+let childProfiles = [];
+
+/**
+ * 🧒 INITIALIZE CHILD SELECTION
+ */
+async function initializeChildSelection() {
+    console.log('🧒 Initializing child selection...');
+    
+    // Load existing child profiles
+    await loadChildProfiles();
+    
+    // Setup event listeners
+    const childSelector = document.getElementById('child-selector');
+    const newChildBtn = document.getElementById('new-child-btn');
+    const manageChildrenBtn = document.getElementById('manage-children-btn');
+    
+    if (childSelector) {
+        childSelector.addEventListener('change', handleChildSelection);
+    }
+    
+    if (newChildBtn) {
+        newChildBtn.addEventListener('click', showAddChildModal);
+    }
+    
+    if (manageChildrenBtn) {
+        manageChildrenBtn.addEventListener('click', showManageChildrenModal);
+    }
+    
+    // Update child selector options
+    updateChildSelector();
+}
+
+/**
+ * 📋 LOAD CHILD PROFILES
+ */
+async function loadChildProfiles() {
+    try {
+        const profiles = await loadFromMinaZK('zk_family_children_profiles');
+        if (profiles && Array.isArray(profiles)) {
+            childProfiles = profiles;
+            console.log(`✅ Loaded ${childProfiles.length} child profiles`);
+        } else {
+            childProfiles = [];
+            console.log('ℹ️ No child profiles found - starting fresh');
+        }
+    } catch (error) {
+        console.error('❌ Error loading child profiles:', error);
+        childProfiles = [];
+    }
+}
+
+/**
+ * 🔄 UPDATE CHILD SELECTOR
+ */
+function updateChildSelector() {
+    const selector = document.getElementById('child-selector');
+    if (!selector) return;
+    
+    // Clear current options (keep general option)
+    selector.innerHTML = `
+        <option value="">Wybierz dziecko...</option>
+        <option value="general">📢 Ogólne (dla wszystkich dzieci)</option>
+    `;
+    
+    // Add child profiles
+    childProfiles.forEach(child => {
+        const option = document.createElement('option');
+        option.value = child.id;
+        option.textContent = `🧒 ${child.name} (${child.age} lat)`;
+        selector.appendChild(option);
+    });
+    
+    console.log(`🔄 Updated child selector with ${childProfiles.length} profiles`);
+}
+
+/**
+ * 🎯 HANDLE CHILD SELECTION
+ */
+function handleChildSelection(event) {
+    const selectedValue = event.target.value;
+    const selectedChild = selectedValue === 'general' ? null : childProfiles.find(c => c.id === selectedValue);
+    
+    currentSelectedChild = selectedValue === 'general' ? 'general' : selectedValue || null;
+    
+    // Update UI
+    const infoDiv = document.getElementById('selected-child-info');
+    const nameSpan = document.getElementById('selected-child-name');
+    
+    if (selectedValue && infoDiv && nameSpan) {
+        if (selectedValue === 'general') {
+            nameSpan.textContent = '📢 Ogólne komunikaty (dla wszystkich dzieci)';
+        } else if (selectedChild) {
+            nameSpan.textContent = `🧒 ${selectedChild.name} (${selectedChild.age} lat)`;
+        } else {
+            nameSpan.textContent = 'Nieznane dziecko';
+        }
+        infoDiv.style.display = 'block';
+        
+        // Reload messages for selected child
+        loadAllMessages();
+    } else {
+        infoDiv.style.display = 'none';
+    }
+    
+    console.log(`👶 Selected child: ${currentSelectedChild}`);
+}
+
 /**
  * 🎯 INITIALIZE PARENT CMS
  */
@@ -32,6 +141,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize Mina ZK connection
     initializeMinaZK();
+    
+    // Initialize child selection
+    initializeChildSelection();
     
     // Initialize voice system
     initializeVoices();
@@ -118,8 +230,20 @@ async function saveAlertMessages() {
             parentId: await getParentIdentifier()
         };
         
+        // 🧒 CHILD-SPECIFIC STORAGE
+        let storageKey;
+        if (currentSelectedChild && currentSelectedChild !== 'general') {
+            // Save for specific child
+            storageKey = `zk_parent_alerts_child_${currentSelectedChild}`;
+            console.log(`💾 Saving alert messages for child: ${currentSelectedChild}`);
+        } else {
+            // Save as general messages
+            storageKey = PARENT_CMS_KEYS.alerts;
+            console.log('💾 Saving general alert messages');
+        }
+        
         // Save to Mina ZK (encrypted)
-        await saveToMinaZK(PARENT_CMS_KEYS.alerts, messages);
+        await saveToMinaZK(storageKey, messages);
         
         button.textContent = '✅ Zapisano!';
         button.style.background = '#4CAF50';
@@ -357,25 +481,50 @@ async function getParentIdentifier() {
  */
 async function loadAllMessages() {
     try {
+        // 🧒 DETERMINE STORAGE KEYS BASED ON SELECTED CHILD
+        let alertsKey, safetyKey, locationKey;
+        
+        if (currentSelectedChild && currentSelectedChild !== 'general') {
+            // Load child-specific messages
+            alertsKey = `zk_parent_alerts_child_${currentSelectedChild}`;
+            safetyKey = `zk_parent_safety_child_${currentSelectedChild}`;
+            locationKey = `zk_parent_location_child_${currentSelectedChild}`;
+            console.log(`📥 Loading messages for child: ${currentSelectedChild}`);
+        } else {
+            // Load general messages
+            alertsKey = PARENT_CMS_KEYS.alerts;
+            safetyKey = PARENT_CMS_KEYS.safety;
+            locationKey = PARENT_CMS_KEYS.location;
+            console.log('📥 Loading general messages');
+        }
+        
         // Load alert messages
-        const alertMessages = await loadFromMinaZK(PARENT_CMS_KEYS.alerts);
+        const alertMessages = await loadFromMinaZK(alertsKey);
         if (alertMessages) {
             populateAlertFields(alertMessages);
+        } else {
+            clearAlertFields(); // Clear if no messages found for this child
         }
         
         // Load safety messages
-        const safetyMessages = await loadFromMinaZK(PARENT_CMS_KEYS.safety);
+        const safetyMessages = await loadFromMinaZK(safetyKey);
         if (safetyMessages) {
             populateSafetyFields(safetyMessages);
+        } else {
+            clearSafetyFields(); // Clear if no messages found for this child
         }
         
         // Load location messages
-        const locationMessages = await loadFromMinaZK(PARENT_CMS_KEYS.location);
+        const locationMessages = await loadFromMinaZK(locationKey);
         if (locationMessages) {
             populateLocationFields(locationMessages);
+        } else {
+            clearLocationFields(); // Clear if no messages found for this child
         }
         
-        console.log('✅ All messages loaded from Mina ZK');
+        const childName = currentSelectedChild === 'general' ? 'general messages' : 
+                         (childProfiles.find(c => c.id === currentSelectedChild)?.name || 'selected child');
+        console.log(`✅ All messages loaded for: ${childName}`);
         
     } catch (error) {
         console.error('❌ Failed to load messages:', error);
@@ -881,6 +1030,42 @@ async function getParentLocationSettings() {
             criticalAlertsOnly: false
         };
     }
+}
+
+/**
+ * 🧹 CLEAR FORM FIELDS (for child-specific loading)
+ */
+function clearAlertFields() {
+    const fields = ['water-alert', 'storm-alert', 'flood-alert', 'drone-alert', 'exercise-alert'];
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) field.value = '';
+    });
+}
+
+function clearSafetyFields() {
+    const fields = ['safety-help', 'safety-emergency', 'safety-lost', 'safety-stranger'];
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) field.value = '';
+    });
+}
+
+function clearLocationFields() {
+    const fields = ['location-checking', 'location-found'];
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) field.value = '';
+    });
+}
+
+// 🧒 CHILD MODAL FUNCTIONS (placeholder)
+async function showAddChildModal() {
+    alert('🚧 Add Child Modal - Coming Soon!\nFor now, children are added automatically when they first use the main app.');
+}
+
+async function showManageChildrenModal() {
+    alert('🚧 Manage Children Modal - Coming Soon!\nChildren can be managed through the main application settings.');
 }
 
 /**
