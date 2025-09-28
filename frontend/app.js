@@ -1549,13 +1549,22 @@ function trackAlertForParents(alert, childMessage) {
     };
     
     // Store in ZK system for privacy
-    if (window.saveZKUserProgress) {
-        const existingAlerts = window.getZKUserProgress('alert_history') || [];
-        existingAlerts.push(alertData);
+    if (window.saveZKUserProgress && window.getZKUserProgress) {
+        const userProgress = window.getZKUserProgress() || {};
+        const existingAlerts = userProgress.alert_history || [];
         
-        // Keep only last 50 alerts
-        const recentAlerts = existingAlerts.slice(-50);
-        window.saveZKUserProgress('alert_history', recentAlerts);
+        // Ensure it's an array
+        if (!Array.isArray(existingAlerts)) {
+            console.warn('⚠️ alert_history is not an array, resetting to empty array');
+            userProgress.alert_history = [];
+        } else {
+            existingAlerts.push(alertData);
+            
+            // Keep only last 50 alerts
+            userProgress.alert_history = existingAlerts.slice(-50);
+        }
+        
+        window.saveZKUserProgress(userProgress);
         
         console.log('📊 Alert tracked in ZK system for parental review');
     }
