@@ -545,6 +545,9 @@ class ParentalConsentManager {
         this.hideConsentBanner();
         this.blurAppContent(false);
         
+        // 🔄 REDIRECT TO PARENT CMS FOR MESSAGE SETUP
+        this.showRedirectToParentCMS();
+        
         // Clean up pending verification
         localStorage.removeItem('pending_parental_verification');
         
@@ -945,6 +948,102 @@ lub dostarczyć osobiście pod adres: 30-404 Kraków, ul. Cegielniana 6B/45
                this.consentData.granted && 
                this.consentData.verified &&  // 🔑 MUST BE EMAIL VERIFIED
                !this.isConsentExpired();
+    }
+
+    /**
+     * 🔄 SHOW REDIRECT TO PARENT CMS
+     * After consent verification, guide parent to CMS for message setup
+     */
+    showRedirectToParentCMS() {
+        const modal = document.createElement('div');
+        modal.className = 'parent-cms-redirect-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000001;
+            font-family: 'Comic Neue', sans-serif;
+        `;
+        
+        modal.innerHTML = `
+            <div style="
+                background: white;
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 500px;
+                margin: 20px;
+                text-align: center;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            ">
+                <h2 style="color: #2c3e50; margin-bottom: 20px;">
+                    ✅ Zgoda Potwierdzona!
+                </h2>
+                
+                <div style="background: rgba(76, 175, 80, 0.1); border-radius: 10px; padding: 20px; margin-bottom: 25px;">
+                    <p style="margin: 0; color: #2d5016; font-size: 16px;">
+                        <strong>🎉 Świetnie!</strong> Twoje dziecko może już bezpiecznie korzystać z aplikacji.
+                    </p>
+                </div>
+                
+                <div style="background: rgba(52, 152, 219, 0.1); border-radius: 10px; padding: 20px; margin-bottom: 25px;">
+                    <h3 style="color: #2c3e50; margin-top: 0;">👨‍👩‍👧‍👦 Następny Krok - Parent CMS</h3>
+                    <p style="color: #34495e; margin-bottom: 15px;">
+                        Teraz możesz <strong>spersonalizować komunikaty</strong> które dziecko będzie widzieć:
+                    </p>
+                    <ul style="text-align: left; color: #34495e; margin-bottom: 15px;">
+                        <li>🚨 <strong>Alerty bezpieczeństwa</strong> - własne komunikaty o zagrożeniach</li>
+                        <li>🆘 <strong>Instrukcje pomocy</strong> - co robić w sytuacji awaryjnej</li>
+                        <li>📍 <strong>Komunikaty lokalizacji</strong> - gdy dziecko się zgubi</li>
+                    </ul>
+                    <p style="color: #7f8c8d; font-size: 14px; margin: 0;">
+                        <em>Bez Twoich komunikatów aplikacja pozostanie w trybie cichym.</em>
+                    </p>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="window.open('parent-cms.html', '_blank'); this.parentElement.parentElement.parentElement.remove();" 
+                            style="
+                                background: #27ae60; 
+                                color: white; 
+                                border: none; 
+                                padding: 15px 25px; 
+                                border-radius: 10px; 
+                                font-size: 16px; 
+                                cursor: pointer;
+                                font-weight: bold;
+                            ">
+                        🔧 Otwórz Parent CMS
+                    </button>
+                    
+                    <button onclick="this.parentElement.parentElement.parentElement.remove();" 
+                            style="
+                                background: #95a5a6; 
+                                color: white; 
+                                border: none; 
+                                padding: 15px 25px; 
+                                border-radius: 10px; 
+                                font-size: 16px; 
+                                cursor: pointer;
+                            ">
+                        ⏭️ Pomiń na później
+                    </button>
+                </div>
+                
+                <p style="color: #7f8c8d; font-size: 12px; margin-top: 20px; margin-bottom: 0;">
+                    💡 <strong>Wskazówka:</strong> Możesz wrócić do Parent CMS w każdej chwili przez zakładkę przeglądarki
+                </p>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        console.log('🔄 Parent CMS redirect modal shown');
     }
 }
 
