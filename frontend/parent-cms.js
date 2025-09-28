@@ -563,32 +563,77 @@ function showNotification(message, type = 'info') {
 /**
  * 🔗 EXPORT TO MAIN APP
  * Function that main app can use to get parent-created messages
+ * Now supports child-specific messages for multi-child families
  */
-window.getParentMessage = async function(category, type) {
+window.getParentMessage = async function(category, type, childId = null) {
     try {
+        // If childId provided, use child-specific storage
+        if (childId) {
+            const childSpecificKey = `zk_parent_${category}_child_${childId}`;
+            const childMessages = await loadFromMinaZK(childSpecificKey);
+            
+            if (childMessages && childMessages[type]) {
+                console.log(`✅ Child-specific parent message found for ${childId} ${category}.${type}:`, childMessages[type]);
+                return childMessages[type];
+            }
+        }
+        
+        // Fallback to general parent messages
         const messages = await loadFromMinaZK(PARENT_CMS_KEYS[category]);
         
-        if (!messages || !messages[type]) {
-            return null; // Fallback to default messages
+        if (messages && messages[type]) {
+            console.log(`✅ General parent message found for ${category}.${type}:`, messages[type]);
+            return messages[type];
         }
         
-        const message = messages[type];
-        
-        if (message && message.trim()) {
-            console.log(`✅ Using parent-created message for ${category}/${type}`);
-            return message;
-        }
-        
-        return null; // Fallback to default
+        console.log(`ℹ️ No parent message for ${category}.${type} - using fallback`);
+        return null;
         
     } catch (error) {
-        console.error('❌ Failed to get parent message:', error);
+        console.error('❌ Error loading parent message:', error);
         return null;
     }
 };
 
 /**
- * 🎵 INITIALIZE VOICES SYSTEM
+ * 👶 SAVE CHILD-SPECIFIC PARENT MESSAGE
+ * Allows parent to create messages for specific child
+ */
+window.saveParentMessageForChild = async function(childId, category, type, message) {
+    try {
+        const childSpecificKey = `zk_parent_${category}_child_${childId}`;
+        const existingMessages = await loadFromMinaZK(childSpecificKey) || {};
+        
+        existingMessages[type] = message;
+        existingMessages.lastUpdated = new Date().toISOString();
+        existingMessages.childId = childId;
+        
+        await saveToMinaZK(childSpecificKey, existingMessages);
+        
+        console.log(`✅ Saved child-specific message for ${childId}:`, { category, type, message });
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Error saving child-specific parent message:', error);
+        return false;
+    }
+};
+
+/**
+ * 📋 GET ALL CHILDREN WITH CUSTOM MESSAGES
+ */
+window.getChildrenWithCustomMessages = async function() {
+    try {
+        const familyProfiles = await window.loadFromMinaZK('zk_family_children_profiles') || {};
+        return Object.values(familyProfiles);
+    } catch (error) {
+        console.error('❌ Error loading children profiles:', error);
+        return [];
+    }
+};
+
+/**
+ * 🎵 INITIALIZE VOICES
  */
 function initializeVoices() {
     if ('speechSynthesis' in window) {

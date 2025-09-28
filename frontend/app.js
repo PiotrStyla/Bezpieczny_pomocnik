@@ -1206,7 +1206,13 @@ async function generateEmergencyFallbackMessage(alert, childAge) {
     try {
         // 🔒 FIRST: Try to get parent-created emergency message
         if (window.getParentMessage) {
-            const parentEmergencyMessage = await window.getParentMessage('emergency', 'fallback');
+            // Get current child ID for child-specific messages
+            let childId = null;
+            if (window.childSessionManager) {
+                childId = await window.childSessionManager.getCurrentChildId();
+            }
+            
+            const parentEmergencyMessage = await window.getParentMessage('emergency', 'fallback', childId);
             if (parentEmergencyMessage && parentEmergencyMessage.trim()) {
                 console.log('✅ Using parent-created emergency fallback message');
                 return parentEmergencyMessage;
@@ -1353,7 +1359,14 @@ async function getParentCustomMessage(alert, childAge) {
         }
         
         if (alertType) {
-            const parentMessage = await window.getParentMessage('alerts', alertType);
+            // Get current child ID for child-specific messages
+            let childId = null;
+            if (window.childSessionManager) {
+                childId = await window.childSessionManager.getCurrentChildId();
+            }
+            
+            // Try child-specific message first, then fallback to general
+            const parentMessage = await window.getParentMessage('alerts', alertType, childId);
             return parentMessage;
         }
         
@@ -1790,7 +1803,13 @@ async function handleFindSafety() {
     let smartMessage = null;
     if (window.getParentMessage) {
         try {
-            smartMessage = await window.getParentMessage('safety', 'help');
+            // Get current child ID for child-specific messages
+            let childId = null;
+            if (window.childSessionManager) {
+                childId = await window.childSessionManager.getCurrentChildId();
+            }
+            
+            smartMessage = await window.getParentMessage('safety', 'help', childId);
             if (smartMessage) {
                 console.log('✅ Using parent-created safety message from Mina ZK');
             }
@@ -1826,7 +1845,13 @@ async function handleSafeRoute() {
     let smartMessage = null;
     if (window.getParentMessage) {
         try {
-            smartMessage = await window.getParentMessage('safety', 'route');
+            // Get current child ID for child-specific messages
+            let childId = null;
+            if (window.childSessionManager) {
+                childId = await window.childSessionManager.getCurrentChildId();
+            }
+            
+            smartMessage = await window.getParentMessage('safety', 'route', childId);
             if (smartMessage) {
                 console.log('✅ Using parent-created route message from Mina ZK');
             }
