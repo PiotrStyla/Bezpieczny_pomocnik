@@ -567,6 +567,163 @@ class ParentalConsentManager {
         setTimeout(() => confirmation.classList.add('show'), 100);
     }
 
+    startVerificationProcess() {
+        console.log('🔒 Starting parental verification process...');
+        
+        // Show adult verification section
+        const adultVerification = document.getElementById('adult-verification');
+        if (adultVerification) {
+            adultVerification.style.display = 'block';
+            document.getElementById('start-verification').style.display = 'none';
+            document.getElementById('send-verification-email').style.display = 'inline-block';
+        }
+    }
+    
+    async sendVerificationEmail() {
+        console.log('📧 Attempting to send verification email...');
+        
+        const email = document.getElementById('parent-email')?.value;
+        const childAge = document.getElementById('child-age')?.value;
+        const adultAnswer = document.getElementById('adult-answer')?.value;
+        const parentDeclaration = document.getElementById('parent-declaration')?.checked;
+        
+        // Validate form
+        if (!email || !childAge || !adultAnswer || !parentDeclaration) {
+            this.showError('❌ Proszę wypełnić wszystkie pola');
+            return;
+        }
+        
+        // Check adult question (17 + 23 = 40)
+        if (parseInt(adultAnswer) !== 40) {
+            this.showError('❌ Nieprawidłowa odpowiedź na pytanie. Sprawdź obliczenie.');
+            return;
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            this.showError('❌ Proszę podać prawidłowy adres email');
+            return;
+        }
+        
+        try {
+            // Generate verification token
+            const verificationToken = this.generateVerificationToken();
+            
+            // Store pending verification data (local simulation)
+            const verificationData = {
+                email: email,
+                childAge: parseInt(childAge),
+                token: verificationToken,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('pending_parental_verification', JSON.stringify(verificationData));
+            
+            // Simulate email sending (since no backend)
+            this.simulateEmailSending(email, verificationToken);
+            
+        } catch (error) {
+            console.error('❌ Email sending failed:', error);
+            this.showError('❌ Wystąpił błąd podczas wysyłania emaila. Spróbuj ponownie.');
+        }
+    }
+    
+    simulateEmailSending(email, token) {
+        console.log(`📧 SIMULATING EMAIL SEND to: ${email}`);
+        console.log(`🔗 Verification link: ${window.location.origin}${window.location.pathname}?verify=${token}`);
+        
+        // Show success message
+        this.showEmailSentConfirmation(email, token);
+    }
+    
+    showEmailSentConfirmation(email, token) {
+        const modal = document.createElement('div');
+        modal.className = 'email-sent-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000000;
+        `;
+        
+        modal.innerHTML = `
+            <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; text-align: center;">
+                <h3>📧 Email wysłany!</h3>
+                <p><strong>Na adres ${email} został wysłany link weryfikacyjny.</strong></p>
+                <hr style="margin: 20px 0;">
+                <p><strong>🧪 TRYB DEWELOPERSKI - Symulacja emaila:</strong></p>
+                <p style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all;">
+                    ${window.location.origin}${window.location.pathname}?verify=${token}
+                </p>
+                <p style="color: #666; font-size: 14px;">W prawdziwej aplikacji rodzic kliknąłby link w emailu</p>
+                <hr style="margin: 20px 0;">
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="window.location.href = '${window.location.origin}${window.location.pathname}?verify=${token}'" 
+                            style="background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        🔗 Symuluj kliknięcie linku
+                    </button>
+                    <button onclick="this.closest('.email-sent-modal').remove()" 
+                            style="background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        Zamknij
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+    }
+    
+    generateVerificationToken() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let token = '';
+        for (let i = 0; i < 32; i++) {
+            token += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return token;
+    }
+    
+    generateMathQuestion() {
+        // For now, always use 17 + 23 = 40 (simple for adults, hard for kids)
+        const questionElement = document.getElementById('math-question');
+        if (questionElement) {
+            questionElement.textContent = 'Ile to jest 17 + 23?';
+        }
+    }
+    
+    showError(message) {
+        // Remove existing error
+        const existingError = document.querySelector('.consent-error');
+        if (existingError) existingError.remove();
+        
+        const error = document.createElement('div');
+        error.className = 'consent-error';
+        error.style.cssText = `
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-weight: bold;
+        `;
+        error.textContent = message;
+        
+        const adultVerification = document.getElementById('adult-verification');
+        if (adultVerification) {
+            adultVerification.appendChild(error);
+            
+            // Remove error after 5 seconds
+            setTimeout(() => error.remove(), 5000);
+        }
+    }
+
     denyAccess(texts) {
         document.getElementById('access-denied').style.display = 'block';
         document.querySelector('.consent-actions').style.display = 'none';
