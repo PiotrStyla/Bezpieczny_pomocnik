@@ -445,8 +445,8 @@ class ParentalConsentManager {
             window.location.hostname === '127.0.0.1' || 
             window.location.hostname.includes('github.io')) {
             console.log('🧪 DEV MODE: Auto-verifying consent in 2 seconds...');
-            setTimeout(() => {
-                this.processVerification(token);
+            setTimeout(async () => {
+                await this.processVerification(token);
                 console.log('✅ DEV MODE: Consent auto-verified!');
             }, 2000);
         }
@@ -503,7 +503,7 @@ class ParentalConsentManager {
     }
 
     // Process verification from email link
-    processVerification(token) {
+    async processVerification(token) {
         const pendingData = localStorage.getItem('pending_parental_verification');
         if (!pendingData) {
             this.showError('Brak oczekującej weryfikacji');
@@ -527,10 +527,10 @@ class ParentalConsentManager {
         }
         
         // Grant consent with verification data
-        this.grantVerifiedParentalConsent(verification);
+        await this.grantVerifiedParentalConsent(verification);
     }
     
-    grantVerifiedParentalConsent(verificationData) {
+    async grantVerifiedParentalConsent(verificationData) {
         const consentData = {
             granted: true,
             verified: true,  // 🔑 CRITICAL: Mark as verified
@@ -542,6 +542,10 @@ class ParentalConsentManager {
         };
         
         this.saveConsent(consentData);
+        
+        // 🧒 AUTO-CREATE CHILD PROFILE FOR PARENT CMS
+        await this.createChildProfileFromConsent(verificationData);
+        
         this.hideConsentBanner();
         this.blurAppContent(false);
         
@@ -1044,6 +1048,64 @@ lub dostarczyć osobiście pod adres: 30-404 Kraków, ul. Cegielniana 6B/45
         document.body.appendChild(modal);
         
         console.log('🔄 Parent CMS redirect modal shown');
+    }
+
+    /**
+     * 🧒 CREATE CHILD PROFILE FROM CONSENT DATA
+     * Automatically creates child profile in family system for Parent CMS
+     */
+    async createChildProfileFromConsent(verificationData) {
+        try {
+            // Generate child profile from consent data
+            const childProfile = {
+                id: 'child_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                name: `Dziecko`, // Default name - parent can change in CMS
+                age: parseInt(verificationData.childAge),
+                createdAt: new Date().toISOString(),
+                source: 'parental_consent',
+                parentEmail: verificationData.email
+            };
+
+            // Load existing profiles
+            let existingProfiles = [];
+            try {
+                if (window.loadFromMinaZK) {
+                    existingProfiles = await window.loadFromMinaZK('zk_family_children_profiles') || [];
+                } else {
+                    // Fallback to localStorage if Mina ZK not available
+                    const stored = localStorage.getItem('zk_family_children_profiles');
+                    existingProfiles = stored ? JSON.parse(stored) : [];
+                }
+            } catch (e) {
+                console.log('ℹ️ Starting fresh child profiles list');
+                existingProfiles = [];
+            }
+
+            // Add new profile
+            if (!Array.isArray(existingProfiles)) {
+                existingProfiles = [];
+            }
+            existingProfiles.push(childProfile);
+
+            // Save updated profiles
+            try {
+                if (window.saveToMinaZK) {
+                    await window.saveToMinaZK('zk_family_children_profiles', existingProfiles);
+                } else {
+                    // Fallback to localStorage
+                    localStorage.setItem('zk_family_children_profiles', JSON.stringify(existingProfiles));
+                }
+                
+                console.log(`✅ Created child profile: ${childProfile.name} (${childProfile.age} lat) - ID: ${childProfile.id}`);
+                console.log('👨‍👩‍👧‍👦 Child will be available in Parent CMS selector');
+                
+            } catch (saveError) {
+                console.error('❌ Failed to save child profile:', saveError);
+            }
+
+        } catch (error) {
+            console.error('❌ Failed to create child profile from consent:', error);
+        }
     }
 }
 
