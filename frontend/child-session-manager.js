@@ -296,4 +296,56 @@ window.childSessionManager = new ChildSessionManager();
 window.switchChild = () => window.childSessionManager.switchChild();
 window.getCurrentChildInfo = () => window.childSessionManager.getCurrentChildInfo();
 
+// 🧪 DEBUG FUNCTIONS FOR TESTING PARENT CMS
+window.testParentCMS = async function() {
+    console.log('🧪 Testing Parent CMS connection...');
+    
+    const childId = await window.childSessionManager.getCurrentChildId();
+    console.log(`🧒 Current child ID: ${childId}`);
+    
+    if (window.getParentMessage) {
+        // Test different message types
+        const categories = ['location', 'alerts', 'safety'];
+        const types = {
+            location: ['checking', 'found'],
+            alerts: ['water', 'storm', 'flood'],
+            safety: ['help', 'route']
+        };
+        
+        for (const category of categories) {
+            for (const type of types[category]) {
+                const message = await window.getParentMessage(category, type, childId);
+                if (message) {
+                    console.log(`✅ Found parent message: ${category}.${type} = "${message}"`);
+                } else {
+                    console.log(`ℹ️ No parent message: ${category}.${type}`);
+                }
+            }
+        }
+    } else {
+        console.error('❌ window.getParentMessage not available');
+    }
+};
+
+window.createTestParentMessage = async function(category = 'location', type = 'checking', message = 'Test parent message') {
+    console.log(`🧪 Creating test parent message: ${category}.${type}`);
+    
+    const childId = await window.childSessionManager.getCurrentChildId();
+    if (!childId) {
+        console.error('❌ No child ID available');
+        return false;
+    }
+    
+    if (window.saveParentMessageForChild) {
+        const result = await window.saveParentMessageForChild(childId, category, type, message);
+        console.log(`${result ? '✅' : '❌'} Test message ${result ? 'saved' : 'failed'}`);
+        return result;
+    } else {
+        console.error('❌ window.saveParentMessageForChild not available');
+        return false;
+    }
+};
+
 console.log('🧒 Child Session Manager loaded - Multi-child support active');
+console.log('🧪 Debug functions: testParentCMS(), createTestParentMessage()');
+

@@ -8,7 +8,13 @@ async function showLocationMessage(stage, data = {}) {
     // 🔒 FIRST: Try to get parent-created location messages
     if (window.getParentMessage) {
         try {
-            const parentMessage = await window.getParentMessage('location', stage === 'checking' ? 'checking' : 'found');
+            // Get current child ID for child-specific messages
+            let childId = null;
+            if (window.childSessionManager) {
+                childId = await window.childSessionManager.getCurrentChildId();
+            }
+            
+            const parentMessage = await window.getParentMessage('location', stage === 'checking' ? 'checking' : 'found', childId);
             if (parentMessage && parentMessage.trim()) {
                 console.log('✅ Using parent-created location message from ZKP system');
                 message = parentMessage;

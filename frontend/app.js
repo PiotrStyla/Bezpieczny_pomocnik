@@ -1901,8 +1901,25 @@ async function handleEmergencyHelp() {
 }
 
 // DOM Content Loaded
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     console.log('🎯 DOM CONTENT LOADED');
+    
+    // 🧒 INITIALIZE CHILD SESSION - CRITICAL FOR MULTI-CHILD SUPPORT
+    if (window.childSessionManager) {
+        try {
+            const childId = await window.childSessionManager.getCurrentChildId();
+            console.log(`🧒 Child Session initialized: ${childId}`);
+            
+            const childInfo = await window.childSessionManager.getCurrentChildInfo();
+            if (childInfo) {
+                console.log(`👶 Child info: ${childInfo.name} (${childInfo.age} lat)`);
+            }
+        } catch (error) {
+            console.error('❌ Child Session Manager initialization failed:', error);
+        }
+    } else {
+        console.warn('⚠️ Child Session Manager not found - multi-child support disabled');
+    }
     
     // Initialize child-friendly voices
     console.log('🎵 Initializing child-friendly voice system...');
