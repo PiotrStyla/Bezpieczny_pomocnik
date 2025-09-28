@@ -1,7 +1,8 @@
 # POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Zgodna z RODO | Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja 27.09.2025: Dodano Background Alert System, location caching, RCB monitoring**
+**Aktualizacja 28.09.2025: Dodano Multi-Child Architecture, Child Session Manager, child-specific storage separation**
+**Poprzednia aktualizacja 27.09.2025: Background Alert System, location caching, RCB monitoring**
 
 ---
 
@@ -73,6 +74,20 @@
 - **Źródła danych:** RCB RSS (gov.pl), backend APIs, emergency fallback
 - **Podstawa prawna:** Żywotny interes osoby fizycznej (art. 6 ust. 1 lit. d RODO)
 - **Szczególne uzasadnienie:** Ochrona życia dzieci - natychmiastowe alerty vs godziny opóźnienia
+
+#### **🧒 Multi-Child Architecture (Child Session Manager):**
+- **Child Profiles** - imię dziecka, wiek (6-15 lat), unikalny identyfikator
+- **Child-specific storage** - osobne przestrzenie danych dla każdego dziecka (zk_*_child_${childId})
+- **Family profiles management** - zarządzanie profilami dzieci w ramach jednej rodziny
+- **Child-specific parent messages** - niestandardowe komunikaty rodzica dla konkretnego dziecka
+- **Session management** - automatyczne rozpoznanie dziecka przy uruchomieniu aplikacji
+- **URL-based child identification** (?child=anna vs ?child=tomek)
+- **Perfect data separation** - zero mixing między danymi rodzeństwa
+- **Cel:** Zapewnienie że każde dziecko ma osobny, bezpieczny profil zgodny z RODO Art. 8
+- **Przechowywanie:** WYŁĄCZNIE w localStorage przeglądarki rodzica (zk_family_children_profiles)
+- **Separacja danych:** Każde dziecko ma własną przestrzeń zk_*_child_[unikalny_id]
+- **Podstawa prawna:** Zgodność z RODO Art. 8 - ochrona danych dzieci poniżej 16 roku życia
+- **Uzasadnienie krytyczne:** Brak mieszania danych między rodzeństwem - każde dziecko chronione osobno
 
 ### 👨‍👩‍👧‍👦 **MODUŁY ROZSZERZONE (planowane - po rejestracji Rodzica/Opiekuna):**
 

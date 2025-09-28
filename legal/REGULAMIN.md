@@ -1,7 +1,8 @@
 # REGULAMIN UŻYTKOWANIA APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja 27.09.2025: Background Alert System, 24/7 monitoring, direct RCB integration**
+**Aktualizacja 28.09.2025: Multi-Child Architecture, Child Session Manager, enhanced child data protection**
+**Poprzednia aktualizacja 27.09.2025: Background Alert System, 24/7 monitoring, direct RCB integration**
 
 ---
 
@@ -92,7 +93,17 @@ Użytkownikom zabrania się:
 - Numery alarmowe są prezentowane z odpowiednimi instrukcjami
 - Bohaterowie bezpieczeństwa używają pozytywnego wzmocnienia i gamifikacji
 
-4.3. **Zgłaszanie problemów:**
+4.3. **🧒 Multi-Child Architecture (wsparcie dla wielu dzieci):**
+- **Child Session Manager:** system rozpoznawania dziecka przy uruchomieniu aplikacji
+- **Separacja danych:** każde dziecko ma własną, oddzielną przestrzeń danych (zk_*_child_${childId})
+- **Family profiles:** zarządzanie profilami wszystkich dzieci w ramach jednej rodziny
+- **Child-specific parent messages:** rodzice mogą tworzyć spersonalizowane komunikaty dla każdego dziecka osobno
+- **Perfect isolation:** zero ryzyka mieszania danych między rodzeństwem
+- **URL-based access:** możliwość bezpośredniego dostępu konkretnego dziecka (?child=anna)
+- **Enhanced RODO Art. 8 compliance:** każde dziecko traktowane jako oddzielny podmiot danych
+- **Security benefits:** eliminacja ryzyka przypadkowego dostępu dziecka do danych rodzeństwa
+
+4.4. **Zgłaszanie problemów:**
 Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adres: kontakt@fundacja-hospicjum.org
 
 ## § 5. ODPOWIEDZIALNOŚĆ
