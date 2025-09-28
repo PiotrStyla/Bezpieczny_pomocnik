@@ -769,11 +769,30 @@ class ParentalConsentManager {
     enableChildModalInteraction() {
         const childModals = document.querySelectorAll('.child-selection-modal');
         childModals.forEach(modal => {
+            // Enable modal itself
             modal.style.pointerEvents = 'auto';
             modal.style.filter = 'none';
             modal.style.position = 'fixed';
             modal.style.zIndex = '1000001'; // Above everything
-            console.log('🧒 Child Selection Modal excluded from blur - interaction enabled');
+            
+            // 🔧 CRITICAL: Enable ALL form elements inside modal
+            const inputs = modal.querySelectorAll('input, button, select, textarea');
+            inputs.forEach(input => {
+                input.style.pointerEvents = 'auto';
+                input.style.filter = 'none';
+                input.disabled = false; // Ensure not disabled
+                input.readOnly = false; // Ensure not readonly
+                console.log(`🔧 Enabled input: ${input.id || input.type || 'unnamed'}`);
+            });
+            
+            // 🔧 Also enable any divs or other interactive elements
+            const interactiveElements = modal.querySelectorAll('[onclick], .clickable, button');
+            interactiveElements.forEach(element => {
+                element.style.pointerEvents = 'auto';
+                element.style.filter = 'none';
+            });
+            
+            console.log('🧒 Child Selection Modal + ALL INPUTS excluded from blur - full interaction enabled');
         });
     }
     
@@ -808,6 +827,9 @@ class ParentalConsentManager {
             childList: true,
             subtree: true
         });
+        
+        // 🔄 Also trigger immediate check in case modal already exists
+        setTimeout(() => this.enableChildModalInteraction(), 100);
     }
 
     showConsentConfirmation() {
@@ -914,35 +936,41 @@ if (document.readyState === 'loading') {
     window.ZKParentalConsent = new ParentalConsentManager();
 }
 
-// EMERGENCY DEBUGGING FUNCTIONS
-window.forceUnblurApp = function() {
-    console.log(' EMERGENCY: Force unblurring app');
-    const appContainer = document.querySelector('.kids-container') || document.body;
-    appContainer.style.filter = 'none';
-    appContainer.style.pointerEvents = 'auto';
-    appContainer.removeAttribute('aria-hidden');
-    
-    // Remove any consent banners
-    const banners = document.querySelectorAll('#parental-consent-banner, .consent-confirmation');
-    banners.forEach(banner => banner.remove());
-    
-    console.log(' App force-unblurred - should be accessible now');
+// Global helper functions
+window.forceUnblurApp = () => {
+    if (window.ZKParentalConsent) {
+        window.ZKParentalConsent.blurAppContent(false);
+        console.log('🔓 App force unblurred');
+    }
 };
 
-window.resetParentalConsent = function() {
-    console.log('🔄 Resetting parental consent system');
-    localStorage.removeItem('parental_consent');
-    localStorage.removeItem('zk_parental_consent');
-    localStorage.removeItem('zk_child_age');
-    localStorage.removeItem('pending_parental_verification');
-    
-    // Clear any existing consent manager
+window.resetParentalConsent = () => {
+    localStorage.removeItem('parental_consent_verified');
+    localStorage.removeItem('parental_consent_timestamp');
+    console.log('🔄 Parental consent reset - refresh page');
+};
+
+// 🧒 HELPER: Force enable child modal interaction
+window.forceEnableChildModal = () => {
     if (window.ZKParentalConsent) {
-        window.ZKParentalConsent.consentData = null;
+        window.ZKParentalConsent.enableChildModalInteraction();
+        console.log('🔧 Child modal interaction force enabled');
+    } else {
+        // Fallback - enable manually
+        const childModals = document.querySelectorAll('.child-selection-modal');
+        childModals.forEach(modal => {
+            modal.style.pointerEvents = 'auto';
+            modal.style.filter = 'none';
+            
+            const inputs = modal.querySelectorAll('input, button, select, textarea');
+            inputs.forEach(input => {
+                input.style.pointerEvents = 'auto';
+                input.disabled = false;
+                input.readOnly = false;
+            });
+        });
+        console.log('🔧 Child modal enabled manually (fallback)');
     }
-    
-    window.forceUnblurApp();
-    console.log('✅ Parental consent reset - reload page to see consent banner');
 };
 
 // Auto-check if app is stuck blurred
