@@ -99,7 +99,7 @@ class ChildSessionManager {
                         <div class="new-child-section" style="margin-bottom: 20px;">
                             <input type="text" id="child-name" placeholder="Imię dziecka" 
                                    style="padding: 12px; border: 2px solid #3498db; border-radius: 10px; font-size: 16px; width: 200px; margin-right: 10px;">
-                            <input type="text" id="child-age" placeholder="Wiek (6-15)" maxlength="2"
+                            <input type="text" id="child-selection-age" placeholder="Wiek (6-15)" maxlength="2"
                                    style="padding: 12px; border: 2px solid #3498db; border-radius: 10px; font-size: 16px; width: 80px;">
                         </div>
                         
@@ -167,7 +167,7 @@ class ChildSessionManager {
             
             // 🔧 ENSURE INPUTS ARE ALWAYS ENABLED
             const nameInput = document.getElementById('child-name');
-            const ageInput = document.getElementById('child-age');
+            const ageInput = document.getElementById('child-selection-age');
             
             [nameInput, ageInput].forEach(input => {
                 if (input) {
@@ -194,12 +194,12 @@ class ChildSessionManager {
             // Create new child handler
             document.getElementById('create-child-btn').addEventListener('click', async () => {
                 const name = document.getElementById('child-name').value.trim();
-                const ageValue = document.getElementById('child-age').value.trim();
+                const ageValue = document.getElementById('child-selection-age').value.trim();
                 const age = parseInt(ageValue);
                 
                 // 🧪 AGGRESSIVE DEBUG VALIDATION
                 const nameField = document.getElementById('child-name');
-                const ageField = document.getElementById('child-age');
+                const ageField = document.getElementById('child-selection-age');
                 
                 console.log('🧪 DETAILED VALIDATION DEBUG:');
                 console.log('📝 Name field:', { 
@@ -376,7 +376,7 @@ window.getCurrentChildInfo = () => window.childSessionManager.getCurrentChildInf
 // 🧪 DIRECT FIELD VALUE SETTER FOR TESTING
 window.setChildValues = function(name = 'Piotr', age = '7') {
     const nameField = document.getElementById('child-name');
-    const ageField = document.getElementById('child-age');
+    const ageField = document.getElementById('child-selection-age');
     
     if (nameField) {
         nameField.value = name;
