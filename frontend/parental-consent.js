@@ -749,12 +749,65 @@ class ParentalConsentManager {
             appContainer.style.pointerEvents = 'none';
             appContainer.setAttribute('aria-hidden', 'true');
             console.log('🚨 APP BLURRED - waiting for parental consent');
+            
+            // 🧒 CRITICAL: Allow Child Selection Modal to work despite blur
+            // Child Selection Modal has z-index 1000000 and should remain interactive
+            this.enableChildModalInteraction();
+            
+            // 👀 Watch for new child modals appearing
+            this.watchForChildModals();
+            
         } else {
             appContainer.style.filter = 'none';
             appContainer.style.pointerEvents = 'auto';
             appContainer.removeAttribute('aria-hidden');
             console.log('✅ APP UNBLURRED - parental consent granted');
         }
+    }
+
+    // 🧒 ENABLE CHILD MODAL INTERACTION (despite blur)
+    enableChildModalInteraction() {
+        const childModals = document.querySelectorAll('.child-selection-modal');
+        childModals.forEach(modal => {
+            modal.style.pointerEvents = 'auto';
+            modal.style.filter = 'none';
+            modal.style.position = 'fixed';
+            modal.style.zIndex = '1000001'; // Above everything
+            console.log('🧒 Child Selection Modal excluded from blur - interaction enabled');
+        });
+    }
+    
+    // 👀 WATCH FOR NEW CHILD MODALS
+    watchForChildModals() {
+        if (this.modalObserver) {
+            this.modalObserver.disconnect();
+        }
+        
+        this.modalObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        // Check if this is a child selection modal
+                        if (node.classList && node.classList.contains('child-selection-modal')) {
+                            console.log('👀 New Child Selection Modal detected - enabling interaction');
+                            this.enableChildModalInteraction();
+                        }
+                        
+                        // Also check children
+                        const childModals = node.querySelectorAll && node.querySelectorAll('.child-selection-modal');
+                        if (childModals && childModals.length > 0) {
+                            console.log('👀 Child Selection Modal found in new content - enabling interaction');
+                            this.enableChildModalInteraction();
+                        }
+                    }
+                });
+            });
+        });
+        
+        this.modalObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
     }
 
     showConsentConfirmation() {

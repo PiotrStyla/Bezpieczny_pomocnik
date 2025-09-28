@@ -1059,16 +1059,9 @@ async function fetchDirectRCBAlerts() {
     } catch (error) {
         console.warn('❌ Direct RCB fetch failed:', error.message);
         
-        // Final fallback - test alert to prove system works
-        return [{
-            id: `fallback-test-${Date.now()}`,
-            title: 'System Test - Bezpieczny Pomocnik Aktywny',
-            content: 'To jest testowy alert potwierdzający, że system monitorowania działa. W przypadku prawdziwego zagrożenia otrzymasz natychmiastowe powiadomienie.',
-            severity: 'info',
-            timestamp: new Date().toISOString(),
-            location: 'Polska',
-            source: 'System Test'
-        }];
+        // Final fallback - no test alerts in production
+        console.log('ℹ️ No alert sources available - running in silent mode');
+        return [];
     }
 }
 
