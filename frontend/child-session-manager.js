@@ -54,6 +54,25 @@ class ChildSessionManager {
         return new Promise((resolve) => {
             const modal = document.createElement('div');
             modal.className = 'child-selection-modal';
+            
+            // 🔧 CRITICAL: Immediately enable interaction in case parental consent is blurring
+            setTimeout(() => {
+                modal.style.pointerEvents = 'auto';
+                modal.style.filter = 'none';
+                
+                // Enable all inputs
+                const inputs = modal.querySelectorAll('input, button, select, textarea');
+                inputs.forEach(input => {
+                    input.style.pointerEvents = 'auto';
+                    input.disabled = false;
+                    input.readOnly = false;
+                    input.style.filter = 'none';
+                    console.log(`🔧 Child Modal: Enabled ${input.id || input.type} input`);
+                });
+                
+                console.log('🧒 Child Selection Modal: ALL INPUTS FORCE ENABLED');
+            }, 50);
+            
             modal.style.cssText = `
                 position: fixed;
                 top: 0;
@@ -142,6 +161,32 @@ class ChildSessionManager {
                             modal.remove();
                             resolve(childId);
                         });
+                    });
+                }
+            });
+            
+            // 🔧 ENSURE INPUTS ARE ALWAYS ENABLED
+            const nameInput = document.getElementById('child-name');
+            const ageInput = document.getElementById('child-age');
+            
+            [nameInput, ageInput].forEach(input => {
+                if (input) {
+                    // Force enable on focus
+                    input.addEventListener('focus', () => {
+                        input.style.pointerEvents = 'auto';
+                        input.disabled = false;
+                        input.readOnly = false;
+                        input.style.filter = 'none';
+                        console.log(`🔧 Input focused: ${input.id} - force enabled`);
+                    });
+                    
+                    // Force enable on click
+                    input.addEventListener('click', () => {
+                        input.style.pointerEvents = 'auto';
+                        input.disabled = false;
+                        input.readOnly = false;
+                        input.style.filter = 'none';
+                        console.log(`🔧 Input clicked: ${input.id} - force enabled`);
                     });
                 }
             });
