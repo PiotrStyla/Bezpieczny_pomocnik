@@ -99,7 +99,7 @@ class ChildSessionManager {
                         <div class="new-child-section" style="margin-bottom: 20px;">
                             <input type="text" id="child-name" placeholder="Imię dziecka" 
                                    style="padding: 12px; border: 2px solid #3498db; border-radius: 10px; font-size: 16px; width: 200px; margin-right: 10px;">
-                            <input type="number" id="child-age" placeholder="Wiek" min="6" max="15" 
+                            <input type="text" id="child-age" placeholder="Wiek (6-15)" maxlength="2"
                                    style="padding: 12px; border: 2px solid #3498db; border-radius: 10px; font-size: 16px; width: 80px;">
                         </div>
                         
@@ -197,8 +197,26 @@ class ChildSessionManager {
                 const ageValue = document.getElementById('child-age').value.trim();
                 const age = parseInt(ageValue);
                 
-                // 🧪 DEBUG VALIDATION
-                console.log('🧪 Validation debug:', { 
+                // 🧪 AGGRESSIVE DEBUG VALIDATION
+                const nameField = document.getElementById('child-name');
+                const ageField = document.getElementById('child-age');
+                
+                console.log('🧪 DETAILED VALIDATION DEBUG:');
+                console.log('📝 Name field:', { 
+                    element: nameField, 
+                    value: nameField?.value, 
+                    disabled: nameField?.disabled, 
+                    readOnly: nameField?.readOnly,
+                    pointerEvents: nameField?.style.pointerEvents 
+                });
+                console.log('📝 Age field:', { 
+                    element: ageField, 
+                    value: ageField?.value, 
+                    disabled: ageField?.disabled, 
+                    readOnly: ageField?.readOnly,
+                    pointerEvents: ageField?.style.pointerEvents 
+                });
+                console.log('📊 Parsed values:', { 
                     name, 
                     ageValue, 
                     age, 
@@ -355,6 +373,30 @@ window.switchChild = () => window.childSessionManager.switchChild();
 window.getCurrentChildInfo = () => window.childSessionManager.getCurrentChildInfo();
 
 // 🧪 DEBUG FUNCTIONS FOR TESTING PARENT CMS
+// 🧪 DIRECT FIELD VALUE SETTER FOR TESTING
+window.setChildValues = function(name = 'Piotr', age = '7') {
+    const nameField = document.getElementById('child-name');
+    const ageField = document.getElementById('child-age');
+    
+    if (nameField) {
+        nameField.value = name;
+        nameField.style.pointerEvents = 'auto';
+        nameField.disabled = false;
+        nameField.readOnly = false;
+        console.log(`✅ Set name field: "${name}"`);
+    }
+    
+    if (ageField) {
+        ageField.value = age;
+        ageField.style.pointerEvents = 'auto';
+        ageField.disabled = false;
+        ageField.readOnly = false;
+        console.log(`✅ Set age field: "${age}"`);
+    }
+    
+    console.log('🧪 Test values set - now try clicking "Utwórz Nowy Profil"');
+};
+
 window.testParentCMS = async function() {
     console.log('🧪 Testing Parent CMS connection...');
     
