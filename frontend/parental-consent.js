@@ -73,6 +73,14 @@ class ParentalConsentManager {
         // Check if consent is needed
         if (!this.consentData || this.isConsentExpired()) {
             this.showParentalConsentBanner();
+        } else if (this.hasValidConsent()) {
+            // 🔓 CONSENT IS VALID - UNBLUR APP IMMEDIATELY
+            console.log('✅ Valid parental consent found - unblurring app');
+            this.blurAppContent(false);
+        } else {
+            // Consent exists but not verified - still need verification
+            console.log('⚠️ Consent exists but not verified - keeping app blurred');
+            this.blurAppContent(true);
         }
     }
 
@@ -431,6 +439,17 @@ class ParentalConsentManager {
         // For development, show the verification link in console
         console.log('🔗 VERIFICATION LINK (for testing):', 
                    `${window.location.origin}?verify=${token}`);
+        
+        // 🧪 DEV MODE: Auto-verify after 2 seconds (simulate email click)
+        if (window.location.hostname === 'localhost' || 
+            window.location.hostname === '127.0.0.1' || 
+            window.location.hostname.includes('github.io')) {
+            console.log('🧪 DEV MODE: Auto-verifying consent in 2 seconds...');
+            setTimeout(() => {
+                this.processVerification(token);
+                console.log('✅ DEV MODE: Consent auto-verified!');
+            }, 2000);
+        }
     }
 
     showVerificationEmailSent(email) {
@@ -514,6 +533,7 @@ class ParentalConsentManager {
     grantVerifiedParentalConsent(verificationData) {
         const consentData = {
             granted: true,
+            verified: true,  // 🔑 CRITICAL: Mark as verified
             parentEmail: verificationData.email,
             childAge: verificationData.childAge,
             method: 'email_verified',
@@ -923,6 +943,7 @@ lub dostarczyć osobiście pod adres: 30-404 Kraków, ul. Cegielniana 6B/45
     hasValidConsent() {
         return this.consentData && 
                this.consentData.granted && 
+               this.consentData.verified &&  // 🔑 MUST BE EMAIL VERIFIED
                !this.isConsentExpired();
     }
 }
