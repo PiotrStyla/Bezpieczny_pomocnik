@@ -184,7 +184,8 @@ function initMap() {
         markersLayer = L.layerGroup().addTo(map);
         console.log('✅ Map initialization completed!');
         
-        getUserLocation();
+        // DON'T auto-get location - wait for user action
+        console.log('📍 Location ready - waiting for user to click "Gdzie jestem?" button');
     } catch (error) {
         console.error('❌ ERROR during map initialization:', error);
     }
@@ -666,8 +667,8 @@ async function enhanceLocationMessageWithAI(childAge, fallbackMessage) {
 }
 
 // Location functions
-function getUserLocation() {
-    console.log('📍 Getting user location...');
+function getUserLocation(userRequested = false) {
+    console.log(`📍 Getting user location... (user requested: ${userRequested})`);
     
     if (!navigator.geolocation) {
         console.error('❌ Geolocation not supported');
@@ -675,8 +676,11 @@ function getUserLocation() {
         return;
     }
 
-    // Show starting message
-    showLocationMessage('checking');
+    // Only show/speak messages if user explicitly requested location
+    if (userRequested) {
+        // Show starting message
+        showLocationMessage('checking');
+    }
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -687,8 +691,11 @@ function getUserLocation() {
             
             userLocation = { lat, lon };
             
-            // Show success message with location details
-            showLocationMessage('success', { lat, lon });
+            // Only show success message if user explicitly requested location
+            if (userRequested) {
+                // Show success message with location details
+                showLocationMessage('success', { lat, lon });
+            }
             
             // Update map
             if (map) {
@@ -707,8 +714,10 @@ function getUserLocation() {
                 cacheLocationForBackground(lat, lon);
             }
             
-            // Try to get address details for better communication
-            getAddressFromCoords(lat, lon);
+            // Try to get address details only if user requested location
+            if (userRequested) {
+                getAddressFromCoords(lat, lon, userRequested);
+            }
         },
         (error) => {
             console.error('❌ Geolocation error:', error);
@@ -934,7 +943,7 @@ function makeAddressChildFriendly(fullAddress) {
     return friendlyAddress.join(', ');
 }
 
-async function getAddressFromCoords(lat, lon) {
+async function getAddressFromCoords(lat, lon, userRequested = false) {
     try {
         // Use free Nominatim OpenStreetMap API
         const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=pl`);
@@ -949,7 +958,10 @@ async function getAddressFromCoords(lat, lon) {
                 const childFriendlyAddress = makeAddressChildFriendly(fullAddress);
                 console.log('👶 Child-friendly address:', childFriendlyAddress);
                 
-                showLocationMessage('address', { address: childFriendlyAddress });
+                // Only speak address if user requested location
+                if (userRequested) {
+                    showLocationMessage('address', { address: childFriendlyAddress });
+                }
             } else {
                 console.log('ℹ️ No address data found');
             }
@@ -1762,7 +1774,8 @@ async function handleWhereAmI() {
         speakText(speechMessage);
     }, 1000);
     
-    getUserLocation();
+    // User explicitly clicked "Where am I?" - get location WITH messages/speech
+    getUserLocation(true);
 }
 
 async function handleFindSafety() {
@@ -2026,7 +2039,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (locationBtn) {
         locationBtn.addEventListener('click', () => {
             console.log('📍 Location button clicked');
-            getUserLocation();
+            getUserLocation(true);
             
             // Generate age-appropriate location message
             const locationMessage = generateLocationMessage();
