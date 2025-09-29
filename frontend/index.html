@@ -250,18 +250,55 @@
     <script src="mina-safety-core.js"></script>
     <script type="module" src="emergency-mina-integration.js"></script>
     
+    <!-- 🔒 PERSISTENT SETTINGS & PWA SYSTEM -->
+    <script src="enhanced-security-zk.js"></script>
+    <script src="persistent-settings-zk.js"></script>
+    <script src="pwa-installer.js"></script>
+    
     <script>
-        // 🛡️ EMERGENCY DETECTION
-        window.addEventListener('load', () => {
+        // 🛡️ EMERGENCY DETECTION & APP INITIALIZATION
+        window.addEventListener('load', async () => {
             console.log('🚨 Emergency Mina system loading...');
             console.log('⚔️ Times are not safe - privacy protection active');
-            
+
+            // 🔄 RESTORE PERSISTENT SETTINGS FIRST
+            try {
+                if (window.PersistentSettings) {
+                    const settings = await window.PersistentSettings.loadSettings();
+                    console.log('✅ Settings restored:', settings);
+                    
+                    // Apply restored settings to UI
+                    if (settings.language && settings.language !== 'pl') {
+                        const langBtn = document.getElementById(`lang-${settings.language}`);
+                        if (langBtn) {
+                            langBtn.click();
+                            console.log(`🌐 Language restored: ${settings.language}`);
+                        }
+                    }
+                    
+                    // Apply sound settings
+                    if (typeof settings.soundEnabled === 'boolean') {
+                        window.soundEnabled = settings.soundEnabled;
+                        console.log(`🔊 Sound setting restored: ${settings.soundEnabled}`);
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Failed to restore settings:', error);
+            }
+
+            // 📱 PWA INSTALLATION CHECK
+            setTimeout(() => {
+                if (window.PWAInstaller && !window.PWAInstaller.isInstalled) {
+                    console.log('📱 Checking PWA installation availability...');
+                }
+            }, 2000);
+
             // Check for crisis conditions
             const isLowBattery = navigator.getBattery?.()?.then(b => b.level < 0.3);
             const isOffline = !navigator.onLine;
-            const isSlowConnection = navigator.connection?.effectiveType === 'slow-2g' || 
+            const isSlowConnection = navigator.connection?.effectiveType === 'slow-2g' ||
                                    navigator.connection?.effectiveType === '2g';
-            
+
             if (isOffline || isLowBattery || isSlowConnection) {
                 console.log('🚨 Crisis conditions detected - activating emergency mode');
                 if (window.emergencyMina) {

@@ -1,16 +1,24 @@
 // 🚨 EMERGENCY OFFLINE CACHE - Critical for when internet is down during disasters
-const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1';
+const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1.2.0';
+const STATIC_CACHE = 'static-resources-v1.2.0';
+const DYNAMIC_CACHE = 'dynamic-content-v1.2.0';
+
 const EMERGENCY_ESSENTIALS = [
     // Core App Files
     './',
     './index.html',
     './app.js',
     './style.css',
+    './parental-consent.css',
+    './parental-consent.js',
+    './persistent-settings-zk.js',
+    './pwa-installer.js',
+    './enhanced-security-zk.js',
     './manifest.json',
     
-    // Images & Icons (skip missing files for now)
-    './images/logo_192x192.png'
-    // Skip files that might not exist to prevent cache failures
+    // Images & Icons
+    './images/logo_192x192.png',
+    './images/logo_512x512.png'
 ];
 
 // Install - Cache emergency essentials

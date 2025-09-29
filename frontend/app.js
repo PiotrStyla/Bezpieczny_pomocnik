@@ -37,35 +37,129 @@ let userLocation = null;
 let userLocationMarker = null;
 let speechEnabled = localStorage.getItem('speech_enabled') === 'true' || true;
 
+// 🔄 PERSISTENT STORAGE MIGRATION
+// Migrate from localStorage to ZK secure storage when available
+async function migrateToZKStorage() {
+    if (window.PersistentSettings) {
+        try {
+            const currentSettings = await window.PersistentSettings.loadSettings();
+            
+            // Migrate speech setting if not already in ZK
+            if (currentSettings.soundEnabled === undefined) {
+                const legacySpeechEnabled = localStorage.getItem('speech_enabled') === 'true';
+                currentSettings.soundEnabled = legacySpeechEnabled;
+                await window.PersistentSettings.saveSettings(currentSettings);
+                console.log('🔄 Migrated speech setting to ZK storage');
+            }
+            
+            // Update global variable from ZK storage
+            speechEnabled = currentSettings.soundEnabled;
+            
+        } catch (error) {
+            console.warn('⚠️ Failed to migrate to ZK storage:', error);
+        }
+    }
+}
+
+// Initialize migration when page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        migrateToZKStorage();
+        migrateUserMemoryToZK();
+    });
+} else {
+    setTimeout(() => {
+        migrateToZKStorage();
+        migrateUserMemoryToZK();
+    }, 100);
+}
+
 // Alert monitoring system
 let alertMonitoringActive = false;
 let alertMonitorInterval = null;
 let activeAlerts = [];
 
-// User memory/progress system
+// 🔒 ZK-SECURE USER MEMORY SYSTEM (migrated from localStorage)
 let userMemory = {
-    visitCount: parseInt(localStorage.getItem('visit_count')) || 0,
-    lastVisit: localStorage.getItem('last_visit') || null,
-    learnedTips: JSON.parse(localStorage.getItem('learned_tips')) || [],
-    emergencyCallsCount: parseInt(localStorage.getItem('emergency_calls_count')) || 0,
-    locationUsageCount: parseInt(localStorage.getItem('location_usage_count')) || 0,
-    favoriteFeatures: JSON.parse(localStorage.getItem('favorite_features')) || [],
-    safetyLevel: parseInt(localStorage.getItem('safety_level')) || 1,
-    achievements: JSON.parse(localStorage.getItem('achievements')) || []
+    visitCount: 0,
+    lastVisit: null,
+    learnedTips: [],
+    emergencyCallsCount: 0,
+    locationUsageCount: 0,
+    favoriteFeatures: [],
+    safetyLevel: 1,
+    achievements: []
 };
 
-// Save user memory to localStorage
+// 🔄 MIGRATE USER MEMORY TO ZK STORAGE
+async function migrateUserMemoryToZK() {
+    try {
+        if (window.PersistentSettings) {
+            // Try to load from ZK storage first
+            const zkData = await window.PersistentSettings.loadSecureZK('user_progress');
+            
+            if (zkData) {
+                userMemory = { ...userMemory, ...zkData };
+                console.log('✅ User memory loaded from ZK storage');
+                return;
+            }
+        }
+        
+        // Fallback: migrate from legacy localStorage
+        const legacyData = {
+            visitCount: parseInt(localStorage.getItem('visit_count')) || 0,
+            lastVisit: localStorage.getItem('last_visit') || null,
+            learnedTips: JSON.parse(localStorage.getItem('learned_tips') || '[]'),
+            emergencyCallsCount: parseInt(localStorage.getItem('emergency_calls_count')) || 0,
+            locationUsageCount: parseInt(localStorage.getItem('location_usage_count')) || 0,
+            favoriteFeatures: JSON.parse(localStorage.getItem('favorite_features') || '[]'),
+            safetyLevel: parseInt(localStorage.getItem('safety_level')) || 1,
+            achievements: JSON.parse(localStorage.getItem('achievements') || '[]')
+        };
+        
+        // Only migrate if there's actual data
+        if (legacyData.visitCount > 0 || legacyData.learnedTips.length > 0) {
+            userMemory = { ...userMemory, ...legacyData };
+            await saveUserMemoryZK(); // Save to ZK storage
+            
+            // Clean up legacy localStorage keys
+            ['visit_count', 'last_visit', 'learned_tips', 'emergency_calls_count', 
+             'location_usage_count', 'favorite_features', 'safety_level', 'achievements'].forEach(key => {
+                localStorage.removeItem(key);
+            });
+            
+            console.log('🔄 Migrated user memory from localStorage to ZK storage');
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Failed to migrate user memory:', error);
+    }
+}
+
+// 💾 SAVE USER MEMORY TO ZK STORAGE (secure)
+async function saveUserMemoryZK() {
+    try {
+        if (window.PersistentSettings) {
+            const success = await window.PersistentSettings.saveSecureZK('user_progress', userMemory);
+            if (success) {
+                console.log('✅ User memory saved to ZK storage');
+                return;
+            }
+        }
+        
+        // Fallback to obfuscated localStorage
+        const obfuscated = btoa(JSON.stringify(userMemory)).split('').reverse().join('');
+        localStorage.setItem('zk_user_progress', obfuscated);
+        console.log('🔄 User memory saved to localStorage (obfuscated fallback)');
+        
+    } catch (error) {
+        console.error('❌ Failed to save user memory:', error);
+    }
+}
+
+// Legacy function name kept for compatibility
 function saveUserMemory() {
-    localStorage.setItem('visit_count', userMemory.visitCount.toString());
-    localStorage.setItem('last_visit', new Date().toISOString());
-    localStorage.setItem('learned_tips', JSON.stringify(userMemory.learnedTips));
-    localStorage.setItem('emergency_calls_count', userMemory.emergencyCallsCount.toString());
-    localStorage.setItem('location_usage_count', userMemory.locationUsageCount.toString());
-    localStorage.setItem('favorite_features', JSON.stringify(userMemory.favoriteFeatures));
-    localStorage.setItem('safety_level', userMemory.safetyLevel.toString());
-    localStorage.setItem('achievements', JSON.stringify(userMemory.achievements));
-    
-    console.log('💾 User memory saved:', userMemory);
+    saveUserMemoryZK();
 }
 
 // Update visit count and show smart welcome message
@@ -568,8 +662,23 @@ function initializeVoices() {
 
 function toggleSpeech() {
     speechEnabled = !speechEnabled;
-    localStorage.setItem('speech_enabled', speechEnabled.toString());
-    console.log('🔊 Speech toggled:', speechEnabled);
+    
+    // 🔒 SAVE TO ZK STORAGE (secure) with fallback to localStorage
+    if (window.saveChildSetting) {
+        window.saveChildSetting('soundEnabled', speechEnabled)
+            .then(() => {
+                console.log('✅ Speech setting saved to ZK storage:', speechEnabled);
+            })
+            .catch(() => {
+                // Fallback to localStorage
+                localStorage.setItem('speech_enabled', speechEnabled.toString());
+                console.log('🔄 Speech setting saved to localStorage (fallback):', speechEnabled);
+            });
+    } else {
+        // Direct localStorage fallback
+        localStorage.setItem('speech_enabled', speechEnabled.toString());
+        console.log('🔄 Speech setting saved to localStorage:', speechEnabled);
+    }
     
     const btn = document.getElementById('speech-toggle-btn');
     if (btn) {
