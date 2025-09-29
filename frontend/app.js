@@ -635,6 +635,26 @@ function generateLocationMessage() {
 }
 
 /**
+ * 🧭 GENERATE LOCATION MESSAGE FOR WHERE_AM_I ACTION
+ * Fallback when no parent location message is configured
+ */
+function generateLocationMessageForWhereAmI() {
+    const childAge = getChildAgeForAI();
+    let baseMsg;
+    
+    if (childAge <= 6) {
+        baseMsg = `🧭 Maluszku, sprawdzam gdzie jesteś...`;
+    } else if (childAge <= 9) {
+        baseMsg = `🧭 Sprawdzam gdzie jesteś, żeby móc ci pomóc.`;
+    } else if (childAge <= 12) {
+        baseMsg = `🧭 Sprawdzam twoją lokalizację, żeby dać ci najlepsze rady bezpieczeństwa.`;
+    } else {
+        baseMsg = `🧭 Sprawdzam twoją pozycję GPS, żeby przygotować informacje o bezpieczeństwie w okolicy.`;
+    }
+    
+    return baseMsg;
+}
+/**
  * 🤖 ENHANCE LOCATION MESSAGE WITH AI
  * Asynchronously improves the message using LLM
  */
@@ -1768,17 +1788,27 @@ function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocat
             }
             
         case 'where_am_i':
-            let baseMsg = `🧭 ${agePrefix ? 'Maluszku, s' : 'S'}prawdzam gdzie jesteś...`;
-            
-            if (timeOfDay === 'wieczór') {
-                baseMsg += ` Jest już wieczór, pamiętaj o bezpieczeństwie!`;
+            // 🔒 Try to get parent location message first
+            if (window.getParentMessage) {
+                try {
+                    // Get current child ID for child-specific messages
+                    let childId = null;
+                    if (window.childSessionManager) {
+                        childId = await window.childSessionManager.getCurrentChildId();
+                    }
+                    
+                    const parentLocationMessage = await window.getParentMessage('location', 'checking', childId);
+                    if (parentLocationMessage && parentLocationMessage.trim()) {
+                        console.log('✅ Using parent-created location checking message from Mina ZK');
+                        return parentLocationMessage;
+                    }
+                } catch (error) {
+                    console.log('⚠️ Failed to get parent location message:', error);
+                }
             }
             
-            if (hasLocation) {
-                baseMsg += ` Zapamiętaj ważne miejsca wokół siebie: nazwy ulic, sklepy, numery budynków.`;
-            }
-            
-            return baseMsg;
+            // 🤖 Fallback to rule-based if no parent message
+            return generateLocationMessageForWhereAmI();
             
         case 'welcome':
             if (isFirstVisit) {
