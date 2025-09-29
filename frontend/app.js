@@ -1768,17 +1768,9 @@ function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocat
             }
             
         case 'where_am_i':
-            let baseMsg = `🧭 ${agePrefix ? 'Maluszku, s' : 'S'}prawdzam gdzie jesteś...`;
-            
-            if (timeOfDay === 'wieczór') {
-                baseMsg += ` Jest już wieczór, pamiętaj o bezpieczeństwie!`;
-            }
-            
-            if (hasLocation) {
-                baseMsg += ` Zapamiętaj ważne miejsca wokół siebie: nazwy ulic, sklepy, numery budynków.`;
-            }
-            
-            return baseMsg;
+            // 🔇 NO FALLBACK - Only Parent CMS messages allowed for location checking
+            // If no parent message configured, stay silent
+            return null;
             
         case 'welcome':
             if (isFirstVisit) {
@@ -1807,20 +1799,17 @@ END OF DISABLED FUNCTION */
 
 async function handleWhereAmI() {
     console.log('🧭 Where Am I clicked');
-    
-    const mascotText = document.getElementById('mascot-text');
-    if (mascotText) {
-        mascotText.textContent = '🧭 Sprawdzam gdzie jesteś...';
-    }
-    
+
+    // 🎯 Get CMS message immediately - NO default text
     const smartMessage = await generateSmartSpeech('where_am_i');
-    
+
     // 🔇 SILENT MODE: If no parent message, stay silent and don't get location
     if (!smartMessage) {
         console.log('🔇 No parent message for where_am_i - staying silent');
         return;
     }
-    
+
+    const mascotText = document.getElementById('mascot-text');
     setTimeout(() => {
         if (mascotText) {
             mascotText.textContent = smartMessage;
@@ -1829,7 +1818,7 @@ async function handleWhereAmI() {
         const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
         speakText(speechMessage);
     }, 1000);
-    
+
     // 🎯 Get location WITHOUT messages (silent) since parent message already provided
     getUserLocation(false);
 }
