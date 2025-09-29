@@ -1815,6 +1815,12 @@ async function handleWhereAmI() {
     
     const smartMessage = await generateSmartSpeech('where_am_i');
     
+    // 🔇 SILENT MODE: If no parent message, stay silent and don't get location
+    if (!smartMessage) {
+        console.log('🔇 No parent message for where_am_i - staying silent');
+        return;
+    }
+    
     setTimeout(() => {
         if (mascotText) {
             mascotText.textContent = smartMessage;
@@ -1824,8 +1830,8 @@ async function handleWhereAmI() {
         speakText(speechMessage);
     }, 1000);
     
-    // User explicitly clicked "Where am I?" - get location WITH messages/speech
-    getUserLocation(true);
+    // 🎯 Get location WITHOUT messages (silent) since parent message already provided
+    getUserLocation(false);
 }
 
 async function handleFindSafety() {
