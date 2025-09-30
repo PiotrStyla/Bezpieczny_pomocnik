@@ -2599,10 +2599,25 @@ function renderSafetyTips(tips) {
 }
 
 // 🚀 LOAD SAFETY TIPS ON PAGE LOAD
+// Wait for both DOM and parent-cms.js to be ready
+function initializeSafetyTips() {
+    console.log('🚀 Initializing safety tips...');
+    
+    // Check if parent-cms.js is loaded
+    if (typeof window.loadFromMinaZK === 'function') {
+        console.log('✅ parent-cms.js loaded, calling loadSafetyTipsFromCMS');
+        loadSafetyTipsFromCMS();
+    } else {
+        console.warn('⚠️ parent-cms.js not ready yet, retrying in 100ms...');
+        setTimeout(initializeSafetyTips, 100);
+    }
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadSafetyTipsFromCMS);
+    document.addEventListener('DOMContentLoaded', initializeSafetyTips);
 } else {
-    loadSafetyTipsFromCMS();
+    // DOM already loaded, but wait a tiny bit for parent-cms.js
+    setTimeout(initializeSafetyTips, 50);
 }
 
 console.log('📄 App.js loaded successfully');
