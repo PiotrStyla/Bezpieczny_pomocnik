@@ -2589,10 +2589,20 @@ function renderSafetyTips(tips) {
     }
     
     console.log('✅ Safety tips container found:', safetyTipsContainer);
+    console.log(`📄 Container currently has ${safetyTipsContainer.children.length} children (before clear)`);
     
-    // Clear existing tips
-    safetyTipsContainer.innerHTML = '';
-    console.log('🧽 Cleared existing tips');
+    // Remove ONLY default-tip elements (keeps custom tips if any)
+    const defaultTips = safetyTipsContainer.querySelectorAll('.default-tip');
+    console.log(`🧽 Found ${defaultTips.length} default tips to remove`);
+    defaultTips.forEach(tip => tip.remove());
+    
+    console.log('🧽 Removed all default tips (hardcoded fallbacks)');
+    console.log(`📄 Container now has ${safetyTipsContainer.children.length} children (after removing defaults)`);
+    
+    if (tips.length === 0) {
+        console.warn('⚠️ No custom tips to render - leaving defaults!');
+        return;
+    }
     
     // Render each tip
     let renderedCount = 0;
