@@ -446,18 +446,42 @@ async function loadFromMinaZK(key) {
  * 🔐 ENCRYPT FOR MINA ZK
  */
 async function encryptForMinaZK(data) {
-    // Simple encryption for now - later integrate with Mina ZK
-    const jsonString = JSON.stringify(data);
-    return btoa(unescape(encodeURIComponent(jsonString)));
+    try {
+        // Simple encryption for now - later integrate with Mina ZK
+        const jsonString = JSON.stringify(data);
+        // Use TextEncoder for modern UTF-8 encoding
+        const encoder = new TextEncoder();
+        const utf8Bytes = encoder.encode(jsonString);
+        // Convert to base64
+        const base64 = btoa(String.fromCharCode(...utf8Bytes));
+        return base64;
+    } catch (error) {
+        console.error('❌ Encryption error:', error);
+        throw error;
+    }
 }
 
 /**
  * 🔓 DECRYPT FROM MINA ZK  
  */
 async function decryptFromMinaZK(encryptedData) {
-    // Simple decryption for now - later integrate with Mina ZK
-    const jsonString = decodeURIComponent(escape(atob(encryptedData)));
-    return JSON.parse(jsonString);
+    try {
+        // Simple decryption for now - later integrate with Mina ZK
+        // Decode from base64
+        const binaryString = atob(encryptedData);
+        // Convert to Uint8Array
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        // Use TextDecoder for modern UTF-8 decoding
+        const decoder = new TextDecoder();
+        const jsonString = decoder.decode(bytes);
+        return JSON.parse(jsonString);
+    } catch (error) {
+        console.error('❌ Decryption error:', error);
+        throw error;
+    }
 }
 
 /**
