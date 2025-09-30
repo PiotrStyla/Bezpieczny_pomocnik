@@ -522,6 +522,9 @@ async function loadAllMessages() {
             clearLocationFields(); // Clear if no messages found for this child
         }
         
+        // Load safety tips
+        await loadSafetyTips();
+        
         const childName = currentSelectedChild === 'general' ? 'general messages' : 
                          (childProfiles.find(c => c.id === currentSelectedChild)?.name || 'selected child');
         console.log(`✅ All messages loaded for: ${childName}`);
@@ -714,6 +717,10 @@ function showNotification(message, type = 'info') {
  * Function that main app can use to get parent-created messages
  * Now supports child-specific messages for multi-child families
  */
+
+// Export loadFromMinaZK for main app to load safety tips
+window.loadFromMinaZK = loadFromMinaZK;
+
 window.getParentMessage = async function(category, type, childId = null) {
     try {
         // If childId provided, use child-specific storage
@@ -1056,6 +1063,136 @@ function clearLocationFields() {
     fields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) field.value = '';
+    });
+}
+
+function clearSafetyTipsFields() {
+    for (let i = 1; i <= 5; i++) {
+        const titleField = document.getElementById(`safety-tip-${i}-title`);
+        const contentField = document.getElementById(`safety-tip-${i}-content`);
+        if (titleField) titleField.value = '';
+        if (contentField) contentField.value = '';
+    }
+}
+
+/**
+ * 💾 SAVE SAFETY TIPS
+ */
+async function saveSafetyTips() {
+    try {
+        console.log('💾 Saving safety tips...');
+        
+        // Collect all safety tips from form
+        const safetyTips = [];
+        
+        for (let i = 1; i <= 5; i++) {
+            const titleField = document.getElementById(`safety-tip-${i}-title`);
+            const contentField = document.getElementById(`safety-tip-${i}-content`);
+            
+            if (titleField && contentField) {
+                const title = titleField.value.trim();
+                const content = contentField.value.trim();
+                
+                // Only save if there's content
+                if (title || content) {
+                    safetyTips.push({
+                        id: i,
+                        title: title,
+                        content: content,
+                        icon: getSafetyTipIcon(i) // Get default icon for position
+                    });
+                }
+            }
+        }
+        
+        console.log('📍 Safety tips collected:', safetyTips);
+        
+        // 🔒 DETERMINE STORAGE KEY BASED ON SELECTED CHILD
+        let storageKey;
+        if (currentSelectedChild && currentSelectedChild !== 'general') {
+            storageKey = `zk_parent_safety_tips_child_${currentSelectedChild}`;
+            console.log(`🧒 Saving child-specific safety tips for: ${currentSelectedChild}`);
+        } else {
+            storageKey = 'zk_parent_safety_tips';
+            console.log('📊 Saving general safety tips');
+        }
+        
+        // Save to Mina ZK storage
+        await saveToMinaZK(storageKey, safetyTips);
+        
+        const childName = currentSelectedChild === 'general' ? 'ogólne' : 
+                         (childProfiles.find(c => c.id === currentSelectedChild)?.name || 'wybrane dziecko');
+        showNotification(`✅ Złote zasady zapisane dla: ${childName}`, 'success');
+        
+    } catch (error) {
+        console.error('❌ Failed to save safety tips:', error);
+        showNotification('❌ Błąd zapisu złotych zasad', 'error');
+    }
+}
+
+/**
+ * 🎯 GET SAFETY TIP ICON BY POSITION
+ */
+function getSafetyTipIcon(position) {
+    const icons = {
+        1: '😸',  // Bezpieczeństwo na drodze
+        2: '🏠',  // W domu
+        3: '👥',  // Z nieznajomymi
+        4: '🌦️', // Zła pogoda
+        5: '🛴'   // Hulajnogi elektryczne
+    };
+    return icons[position] || '💡';
+}
+
+/**
+ * 📚 LOAD SAFETY TIPS
+ */
+async function loadSafetyTips() {
+    try {
+        // 🔍 DETERMINE STORAGE KEY BASED ON SELECTED CHILD
+        let storageKey;
+        if (currentSelectedChild && currentSelectedChild !== 'general') {
+            storageKey = `zk_parent_safety_tips_child_${currentSelectedChild}`;
+            console.log(`📚 Loading child-specific safety tips for: ${currentSelectedChild}`);
+        } else {
+            storageKey = 'zk_parent_safety_tips';
+            console.log('📚 Loading general safety tips');
+        }
+        
+        const safetyTips = await loadFromMinaZK(storageKey);
+        
+        if (safetyTips && Array.isArray(safetyTips)) {
+            console.log('✅ Safety tips loaded:', safetyTips);
+            populateSafetyTipsFields(safetyTips);
+        } else {
+            console.log('ℹ️ No safety tips found - using empty fields');
+            clearSafetyTipsFields();
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to load safety tips:', error);
+        clearSafetyTipsFields();
+    }
+}
+
+/**
+ * 📝 POPULATE SAFETY TIPS FIELDS
+ */
+function populateSafetyTipsFields(safetyTips) {
+    // Clear all fields first
+    clearSafetyTipsFields();
+    
+    // Populate with loaded data
+    safetyTips.forEach(tip => {
+        const titleField = document.getElementById(`safety-tip-${tip.id}-title`);
+        const contentField = document.getElementById(`safety-tip-${tip.id}-content`);
+        
+        if (titleField && tip.title) {
+            titleField.value = tip.title;
+        }
+        if (contentField && tip.content) {
+            contentField.value = tip.content;
+        }
     });
 }
 

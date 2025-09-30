@@ -2517,5 +2517,88 @@ function showDetailedAlertStatus() {
     };
 }
 
+/**
+ * 💡 LOAD SAFETY TIPS FROM PARENT CMS
+ * Dynamically loads and displays golden safety rules
+ */
+async function loadSafetyTipsFromCMS() {
+    try {
+        console.log('💡 Loading safety tips from Parent CMS...');
+        
+        // Get safety tips from ZK storage
+        const storageKey = 'zk_parent_safety_tips';
+        
+        // Try to load from MinaZK (reuse parent-cms.js function if available)
+        let safetyTips = null;
+        
+        // Check if parent-cms functions are available
+        if (window.loadFromMinaZK) {
+            safetyTips = await window.loadFromMinaZK(storageKey);
+        } else {
+            // Fallback: Direct localStorage access
+            const zkKey = `${storageKey}_parent_${localStorage.getItem('zk_parent_identifier') || 'default'}`;
+            const stored = localStorage.getItem(zkKey);
+            if (stored) {
+                const zkData = JSON.parse(stored);
+                // Simple decrypt (matching parent-cms.js)
+                const jsonString = decodeURIComponent(escape(atob(zkData.encrypted)));
+                safetyTips = JSON.parse(jsonString);
+            }
+        }
+        
+        if (safetyTips && Array.isArray(safetyTips) && safetyTips.length > 0) {
+            console.log('✅ Safety tips loaded from CMS:', safetyTips);
+            renderSafetyTips(safetyTips);
+        } else {
+            console.log('ℹ️ No custom safety tips found - using defaults');
+            // Keep hardcoded defaults in HTML
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to load safety tips from CMS:', error);
+        // Keep hardcoded defaults in HTML on error
+    }
+}
+
+/**
+ * 🎨 RENDER SAFETY TIPS TO DOM
+ */
+function renderSafetyTips(tips) {
+    const safetyTipsContainer = document.querySelector('.safety-tips');
+    
+    if (!safetyTipsContainer) {
+        console.warn('⚠️ Safety tips container not found in DOM');
+        return;
+    }
+    
+    // Clear existing tips
+    safetyTipsContainer.innerHTML = '';
+    
+    // Render each tip
+    tips.forEach(tip => {
+        if (tip.title || tip.content) {
+            const tipCard = document.createElement('div');
+            tipCard.className = 'tip-card';
+            
+            tipCard.innerHTML = `
+                <div class="tip-icon">${tip.icon || '💡'}</div>
+                <h4>${tip.title || 'Zasada bezpieczeństwa'}</h4>
+                <p>${tip.content || ''}</p>
+            `;
+            
+            safetyTipsContainer.appendChild(tipCard);
+        }
+    });
+    
+    console.log(`✅ Rendered ${tips.length} custom safety tips`);
+}
+
+// 🚀 LOAD SAFETY TIPS ON PAGE LOAD
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadSafetyTipsFromCMS);
+} else {
+    loadSafetyTipsFromCMS();
+}
+
 console.log('📄 App.js loaded successfully');
 
