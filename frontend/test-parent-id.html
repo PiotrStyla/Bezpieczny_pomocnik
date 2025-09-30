@@ -108,15 +108,25 @@
                 }
             }
             
-            // 5. Raw dump
+            // 5. Raw dump - SHOW ALL KEYS
             const dump = {};
+            console.log(`\n📊 Total localStorage keys: ${allKeys.length}`);
             allKeys.forEach(key => {
                 const value = localStorage.getItem(key);
-                if (key.includes('safety') || key.includes('parent') || key.includes('zk_')) {
-                    dump[key] = value.substring(0, 200) + '...';
-                }
+                const shortValue = value.substring(0, 200);
+                dump[key] = shortValue + (value.length > 200 ? '...' : '');
+                
+                // Log each key for debugging
+                console.log(`Key: ${key} | Length: ${value.length}`);
             });
             document.getElementById('raw-storage').textContent = JSON.stringify(dump, null, 2);
+            
+            // Show statistics
+            console.log('\n📈 Key Statistics:');
+            console.log(`Total keys: ${allKeys.length}`);
+            console.log(`Safety tips keys: ${safetyKeys.length}`);
+            console.log(`Keys with 'zk_': ${allKeys.filter(k => k.includes('zk_')).length}`);
+            console.log(`Keys with 'parent': ${allKeys.filter(k => k.includes('parent')).length}`);
             
             // 6. Test actual loading
             console.log('\n🧪 Testing actual loadFromMinaZK...');

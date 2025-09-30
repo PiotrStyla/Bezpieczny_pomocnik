@@ -2552,6 +2552,29 @@ async function loadSafetyTipsFromCMS() {
 }
 
 /**
+ * 🎵 READ SAFETY TIP ALOUD
+ * Reads safety tip using Czubówna-inspired voice with parental consent check
+ */
+async function readSafetyTipAloud(tip) {
+    try {
+        console.log('🎵 Reading safety tip aloud:', tip.title);
+        
+        // Build speech text
+        const speechText = `${tip.icon || ''} ${tip.title}. ${tip.content}`;
+        
+        console.log('📝 Speech text:', speechText);
+        
+        // Use existing speakText function (has parental consent check built-in)
+        await speakText(speechText);
+        
+        console.log('✅ Safety tip read successfully');
+        
+    } catch (error) {
+        console.error('❌ Error reading safety tip:', error);
+    }
+}
+
+/**
  * 🎨 RENDER SAFETY TIPS TO DOM
  */
 function renderSafetyTips(tips) {
@@ -2579,6 +2602,7 @@ function renderSafetyTips(tips) {
         if (tip.title || tip.content) {
             const tipCard = document.createElement('div');
             tipCard.className = 'tip-card';
+            tipCard.style.cursor = 'pointer'; // Show it's clickable
             
             tipCard.innerHTML = `
                 <div class="tip-icon">${tip.icon || '💡'}</div>
@@ -2586,9 +2610,24 @@ function renderSafetyTips(tips) {
                 <p>${tip.content || ''}</p>
             `;
             
+            // Add click event to read aloud
+            tipCard.addEventListener('click', () => {
+                console.log(`🎵 Safety tip clicked: ${tip.title}`);
+                readSafetyTipAloud(tip);
+            });
+            
+            // Add hover effect
+            tipCard.addEventListener('mouseenter', () => {
+                tipCard.style.transform = 'scale(1.02)';
+                tipCard.style.transition = 'transform 0.2s ease';
+            });
+            tipCard.addEventListener('mouseleave', () => {
+                tipCard.style.transform = 'scale(1)';
+            });
+            
             safetyTipsContainer.appendChild(tipCard);
             renderedCount++;
-            console.log(`✅ Tip ${index + 1} rendered successfully`);
+            console.log(`✅ Tip ${index + 1} rendered successfully with click handler`);
         } else {
             console.log(`⚠️ Tip ${index + 1} skipped - no title or content`);
         }
