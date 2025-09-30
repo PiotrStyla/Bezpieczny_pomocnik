@@ -802,8 +802,8 @@ function getUserLocation(userRequested = false) {
             
             // Only show success message if user explicitly requested location
             if (userRequested) {
-                // Show success message with location details
-                showLocationMessage('success', { lat, lon });
+                // Show success message with location details and full position for geocoding
+                showLocationMessage('success', { lat, lon, position });
             }
             
             // Update map
@@ -1909,27 +1909,18 @@ END OF DISABLED FUNCTION */
 async function handleWhereAmI() {
     console.log('🧭 Where Am I clicked');
 
-    // 🎯 Get CMS message immediately - NO default text
-    const smartMessage = await generateSmartSpeech('where_am_i');
-
-    // 🔇 SILENT MODE: If no parent message, stay silent and don't get location
-    if (!smartMessage) {
-        console.log('🔇 No parent message for where_am_i - staying silent');
-        return;
+    // 📍 STEP 1: Show "checking" message from parent CMS
+    if (window.showLocationMessage) {
+        await showLocationMessage('checking');
     }
+    
+    // Wait a bit for the checking message to be displayed
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
-    const mascotText = document.getElementById('mascot-text');
-    setTimeout(() => {
-        if (mascotText) {
-            mascotText.textContent = smartMessage;
-        }
-        // Remove emoji for speech synthesis (voice can't read emoji properly)
-        const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
-        speakText(speechMessage);
-    }, 1000);
-
-    // 🎯 Get location WITHOUT messages (silent) since parent message already provided
-    getUserLocation(false);
+    // 📍 STEP 2: Get location and show "found" message with location details
+    // The getUserLocation with userRequested=true will trigger showLocationMessage('success')
+    // which will use parent CMS message with location variables replaced
+    getUserLocation(true);
 }
 
 async function handleFindSafety() {

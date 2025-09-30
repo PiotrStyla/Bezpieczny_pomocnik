@@ -235,10 +235,17 @@
                 <p>Co dziecko słyszy gdy aplikacja sprawdza lokalizację</p>
                 
                 <label>🔍 Sprawdzanie lokalizacji:</label>
-                <textarea class="message-editor" id="location-checking" placeholder="Np: Sprawdzam gdzie jesteś, żeby móc ci pomóc. To jest bezpieczne."></textarea>
+                <textarea class="message-editor" id="location-checking" placeholder="Np: Szukam, gdzie jesteś, czekaj cierpliwie. To jest bezpieczne i mama/tata pomagają mi cię znaleźć."></textarea>
                 
                 <label>✅ Lokalizacja znaleziona:</label>
-                <textarea class="message-editor" id="location-found" placeholder="Np: Znalazłem cię! Teraz mogę pokazać ci bezpieczne miejsca w okolicy."></textarea>
+                <textarea class="message-editor" id="location-found" placeholder="Np: Super, znalazłem cię! Jesteś w okolicy {NEIGHBORHOOD}, {CITY}. Teraz mogę pokazać ci bezpieczne miejsca w pobliżu.
+
+💡 Zmienne dostępne:
+• {NEIGHBORHOOD} - osiedle/dzielnica (np. Nowa Huta, Śródmieście)
+• {CITY} - miasto/miejscowość (np. Kraków, Warszawa)
+• {REGION} - województwo (np. małopolskie, mazowieckie)
+
+🛡️ BEZPIECZEŃSTWO: NIE używamy dokładnego adresu (ulica/numer) dla ochrony prywatności dziecka."></textarea>
                 
                 <button class="save-btn" onclick="saveLocationMessages()">🔒 Zaszyfruj i zapisz</button>
             </div>

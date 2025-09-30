@@ -1,4 +1,81 @@
 /**
+ * 🌍 REVERSE GEOCODING - Get location details from coordinates
+ * Returns neighborhood, city, and region for privacy-safe location messaging
+ */
+async function getLocationDetails(position) {
+    if (!position || !position.coords) {
+        throw new Error('Invalid position data');
+    }
+    
+    const lat = position.coords.latitude;
+    const lon = position.coords.longitude;
+    
+    console.log(`📍 Reverse geocoding: ${lat}, ${lon}`);
+    
+    try {
+        // Use Nominatim (OpenStreetMap) for reverse geocoding
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?` +
+            `format=json&lat=${lat}&lon=${lon}&` +
+            `addressdetails=1&accept-language=pl&zoom=14`,
+            {
+                headers: {
+                    'User-Agent': 'BezpiecznyPomocnik/1.0'
+                }
+            }
+        );
+        
+        if (!response.ok) {
+            throw new Error('Geocoding API error');
+        }
+        
+        const data = await response.json();
+        const address = data.address || {};
+        
+        // Extract privacy-safe location components
+        const locationData = {
+            // Neighborhood/suburb/district (osiedle)
+            neighborhood: address.suburb || 
+                         address.neighbourhood || 
+                         address.quarter || 
+                         address.district ||
+                         address.residential ||
+                         null,
+            
+            // City/town/village (miejscowość)
+            city: address.city || 
+                  address.town || 
+                  address.village || 
+                  address.municipality ||
+                  null,
+            
+            // Region/state (województwo)
+            region: address.state ||
+                   address.region ||
+                   null,
+            
+            // Country (for completeness)
+            country: address.country || 'Polska'
+        };
+        
+        console.log('✅ Location details extracted:', locationData);
+        
+        return locationData;
+        
+    } catch (error) {
+        console.error('❌ Reverse geocoding failed:', error);
+        
+        // Fallback: Return generic Polish location data
+        return {
+            neighborhood: null,
+            city: null,
+            region: null,
+            country: 'Polska'
+        };
+    }
+}
+
+/**
  * 📍 SHOW LOCATION MESSAGE - Enhanced with Parent CMS support
  */
 async function showLocationMessage(stage, data = {}) {
@@ -17,8 +94,40 @@ async function showLocationMessage(stage, data = {}) {
             const parentMessage = await window.getParentMessage('location', stage === 'checking' ? 'checking' : 'found', childId);
             if (parentMessage && parentMessage.trim()) {
                 console.log('✅ Using parent-created location message from ZKP system');
-                message = parentMessage;
-                speech = parentMessage; // Parent message should be speech-ready
+                
+                // 📍 REPLACE LOCATION VARIABLES with actual data
+                let processedMessage = parentMessage;
+                
+                // If this is the 'found' stage and we have location data, replace variables
+                if (stage === 'success' || stage === 'found' || stage === 'address') {
+                    if (data.position || userLocation) {
+                        try {
+                            const locationData = await getLocationDetails(data.position || userLocation);
+                            
+                            // Replace variables with actual location data
+                            processedMessage = processedMessage
+                                .replace(/\{NEIGHBORHOOD\}/g, locationData.neighborhood || 'tej okolicy')
+                                .replace(/\{CITY\}/g, locationData.city || 'Twojego miasta')
+                                .replace(/\{REGION\}/g, locationData.region || 'Twojego regionu');
+                            
+                            console.log('📍 Location variables replaced:', {
+                                neighborhood: locationData.neighborhood,
+                                city: locationData.city,
+                                region: locationData.region
+                            });
+                        } catch (error) {
+                            console.warn('⚠️ Failed to replace location variables:', error);
+                            // Remove unfilled variables for cleaner output
+                            processedMessage = processedMessage
+                                .replace(/\{NEIGHBORHOOD\}/g, 'tej okolicy')
+                                .replace(/\{CITY\}/g, 'Twojego miasta')
+                                .replace(/\{REGION\}/g, 'Twojego regionu');
+                        }
+                    }
+                }
+                
+                message = processedMessage;
+                speech = processedMessage; // Parent message should be speech-ready
                 
                 // Show message and speak
                 const mascotText = document.getElementById('mascot-text');
