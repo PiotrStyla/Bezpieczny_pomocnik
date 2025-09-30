@@ -238,14 +238,15 @@
                 <textarea class="message-editor" id="location-checking" placeholder="Np: Szukam, gdzie jesteś, czekaj cierpliwie. To jest bezpieczne i mama/tata pomagają mi cię znaleźć."></textarea>
                 
                 <label>✅ Lokalizacja znaleziona:</label>
-                <textarea class="message-editor" id="location-found" placeholder="Np: Super, znalazłem cię! Jesteś w okolicy {NEIGHBORHOOD}, {CITY}. Teraz mogę pokazać ci bezpieczne miejsca w pobliżu.
-
-💡 Zmienne dostępne:
-• {NEIGHBORHOOD} - osiedle/dzielnica (np. Nowa Huta, Śródmieście)
-• {CITY} - miasto/miejscowość (np. Kraków, Warszawa)
-• {REGION} - województwo (np. małopolskie, mazowieckie)
-
-🛡️ BEZPIECZEŃSTWO: NIE używamy dokładnego adresu (ulica/numer) dla ochrony prywatności dziecka."></textarea>
+                <textarea class="message-editor" id="location-found" placeholder="Np: Super, znalazłem cię! Jesteś w okolicy {NEIGHBORHOOD}, {CITY}. Teraz mogę pokazać ci bezpieczne miejsca w pobliżu."></textarea>
+                
+                <div style="background: rgba(33, 150, 243, 0.1); border-left: 3px solid #2196F3; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 13px;">
+                    <strong>💡 Zmienne dostępne:</strong><br>
+                    • <code>{NEIGHBORHOOD}</code> - osiedle/dzielnica (np. Nowa Huta, Śródmieście)<br>
+                    • <code>{CITY}</code> - miasto/miejscowość (np. Kraków, Warszawa)<br>
+                    • <code>{REGION}</code> - województwo (np. małopolskie, mazowieckie)<br>
+                    <small style="color: #666; margin-top: 5px; display: block;">🛡️ BEZPIECZEŃSTWO: NIE używamy dokładnego adresu (ulica/numer) dla ochrony prywatności dziecka.</small>
+                </div>
                 
                 <button class="save-btn" onclick="saveLocationMessages()">🔒 Zaszyfruj i zapisz</button>
             </div>
