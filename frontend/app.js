@@ -866,74 +866,9 @@ function getChildAgeForAI() {
         return 8;
     }
 }
-/**
- * 📍 SHOW LOCATION MESSAGE - Complete communication system
- */
-function showLocationMessage(stage, data = {}) {
-    const childAge = getChildAgeForAI();
-    let message, speech;
-    
-    switch (stage) {
-        case 'checking':
-            if (childAge <= 6) {
-                message = '🔍 Szukam gdzie jesteś! To pomoże mi znaleźć odpowiedzi dla Ciebie.';
-                speech = 'Szukam... gdzie... jesteś... To... pomoże... mi... znaleźć... odpowiedzi... dla... Ciebie';
-            } else if (childAge <= 9) {
-                message = '🧭 Sprawdzam gdzie jesteś, żeby dać ci najlepsze rady bezpieczeństwa!';
-                speech = 'Sprawdzam... gdzie... jesteś... żeby... dać... ci... najlepsze... rady... bezpieczeństwa';
-            } else if (childAge <= 12) {
-                message = '📍 Określam twoją lokalizację, żeby pokazać ci bezpieczne miejsca w okolicy!';
-                speech = 'Określam... twoją... lokalizację... żeby... pokazać... ci... bezpieczne... miejsca... w... okolicy';
-            } else {
-                message = '🌍 Analizuję twoją pozycję GPS, żeby przygotować mape bezpieczeństwa!';
-                speech = 'Analizuję... twoją... pozycję... GPS... żeby... przygotować... mape... bezpieczeństwa';
-            }
-            break;
-            
-        case 'success':
-            const lat = data.lat.toFixed(4);
-            const lon = data.lon.toFixed(4);
-            
-            if (childAge <= 6) {
-                message = `✅ Znalazłem Cię! Jesteś bezpieczny i mogę Ci teraz pomóc!`;
-                speech = 'Znalazłem... Cię... Jesteś... bezpieczny... i... mogę... Ci... teraz... pomóc';
-            } else if (childAge <= 9) {
-                message = `🎯 Mam Twoją lokalizację! Teraz mogę pokazać Ci co dzieje się w okolicy i jak być bezpiecznym!`;
-                speech = 'Mam... Twoją... lokalizację... Teraz... mogę... pokazać... Ci... co... dzieje... się... w... okolicy';
-            } else if (childAge <= 12) {
-                message = `📍 Lokalizacja znaleziona! Współrzędne: ${lat}, ${lon}. Przygotowuję informacje o bezpieczeństwie w Twojej okolicy!`;
-                speech = 'Lokalizacja... znaleziona... Przygotowuję... informacje... o... bezpieczeństwie... w... Twojej... okolicy';
-            } else {
-                message = `🌍 GPS aktywny! Pozycja: ${lat}°N, ${lon}°E. System bezpieczeństwa skanuje okoliczne zagrożenia...`;
-                speech = 'GPS... aktywny... System... bezpieczeństwa... skanuje... okoliczne... zagrożenia';
-            }
-            break;
-            
-        case 'address':
-            const address = data.address;
-            if (childAge <= 9) {
-                message = `🏠 Widzę że jesteś w: ${address}. Sprawdzam czy wszystko jest bezpieczne!`;
-                speech = `Widzę... że... jesteś... w... ${address}... Sprawdzam... czy... wszystko... jest... bezpieczne`;
-            } else {
-                message = `📍 Lokalizacja: ${address}. Analizuję sytuację bezpieczeństwa w tej okolicy...`;
-                speech = `Lokalizacja... ${address}... Analizuję... sytuację... bezpieczeństwa... w... tej... okolicy`;
-            }
-            break;
-    }
-    
-    // Update UI
-    const mascotText = document.getElementById('mascot-text');
-    if (mascotText) {
-        mascotText.textContent = message;
-    }
-    
-    // Speak the message
-    if (speech) {
-        speakText(speech);
-    }
-    
-    console.log(`📍 Location message (age ${childAge}): ${message}`);
-}
+// 📍 showLocationMessage() is now defined in location-message-fix.js
+// That version has Parent CMS support and replaces location variables
+// DO NOT define it here to avoid conflicts
 
 /**
  * ❌ HANDLE LOCATION ERROR - Supportive error messages
@@ -2559,8 +2494,8 @@ async function readSafetyTipAloud(tip) {
     try {
         console.log('🎵 Reading safety tip aloud:', tip.title);
         
-        // Build speech text
-        const speechText = `${tip.icon || ''} ${tip.title}. ${tip.content}`;
+        // Build speech text - DON'T include emoji icon (not readable)
+        const speechText = `${tip.title}. ${tip.content}`;
         
         console.log('📝 Speech text:', speechText);
         

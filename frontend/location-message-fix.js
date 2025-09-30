@@ -151,32 +151,32 @@ async function showLocationMessage(stage, data = {}) {
         case 'checking':
             if (childAge <= 6) {
                 message = '🔍 Szukam gdzie jesteś! To pomoże mi znaleźć odpowiedzi dla Ciebie.';
-                speech = 'Szukam... gdzie... jesteś... To... pomoże... mi... znaleźć... odpowiedzi... dla... Ciebie';
+                speech = 'Szukam gdzie jesteś. To pomoże mi znaleźć odpowiedzi dla Ciebie.';
             } else if (childAge <= 9) {
-                message = '🧭 Sprawdzam gdzie jesteś, żeby dać ci najlepsze rady bezpieczeństwa!';
-                speech = 'Sprawdzam... gdzie... jesteś... żeby... dać... ci... najlepsze... rady... bezpieczeństwa';
+                message = '🦭 Sprawdzam gdzie jesteś, żeby dać ci najlepsze rady bezpieczeństwa!';
+                speech = 'Sprawdzam gdzie jesteś, żeby dać ci najlepsze rady bezpieczeństwa.';
             } else if (childAge <= 12) {
                 message = '📍 Określam twoją lokalizację, żeby pokazać ci bezpieczne miejsca w okolicy!';
-                speech = 'Określam... twoją... lokalizację... żeby... pokazać... ci... bezpieczne... miejsca... w... okolicy';
+                speech = 'Określam twoją lokalizację, żeby pokazać ci bezpieczne miejsca w okolicy.';
             } else {
                 message = '🌍 Analizuję twoją pozycję GPS, żeby przygotować mape bezpieczeństwa!';
-                speech = 'Analizuję... twoją... pozycję... GPS... żeby... przygotować... mape... bezpieczeństwa';
+                speech = 'Analizuję twoją pozycję GPS, żeby przygotować mape bezpieczeństwa.';
             }
             break;
             
         case 'success':
             if (childAge <= 6) {
                 message = '✅ Znalazłem Cię! Jesteś bezpieczny i mogę Ci teraz pomóc!';
-                speech = 'Znalazłem... Cię... Jesteś... bezpieczny... i... mogę... Ci... teraz... pomóc';
+                speech = 'Znalazłem Cię! Jesteś bezpieczny i mogę Ci teraz pomóc!';
             } else if (childAge <= 9) {
                 message = '🎯 Mam Twoją lokalizację! Teraz mogę pokazać Ci co dzieje się w okolicy i jak być bezpiecznym!';
-                speech = 'Mam... Twoją... lokalizację... Teraz... mogę... pokazać... Ci... co... dzieje... się... w... okolicy';
+                speech = 'Mam Twoją lokalizację. Teraz mogę pokazać Ci co dzieje się w okolicy i jak być bezpiecznym.';
             } else if (childAge <= 12) {
                 message = '📊 Lokalizacja otrzymana! Przygotowuję informacje o bezpieczeństwie w Twojej okolicy.';
-                speech = 'Lokalizacja... otrzymana... Przygotowuję... informacje... o... bezpieczeństwie... w... Twojej... okolicy';
+                speech = 'Lokalizacja otrzymana. Przygotowuję informacje o bezpieczeństwie w Twojej okolicy.';
             } else {
                 message = '💡 GPS aktywny! Ładuję dane o zagrożeniach i bezpiecznych miejscach w okolicy.';
-                speech = 'GPS... aktywny... Ładuję... dane... o... zagrożeniach... i... bezpiecznych... miejscach';
+                speech = 'GPS aktywny. Ładuję dane o zagrożeniach i bezpiecznych miejscach w okolicy.';
             }
             break;
             
@@ -184,22 +184,22 @@ async function showLocationMessage(stage, data = {}) {
             const address = data.address || 'okolicy';
             if (childAge <= 6) {
                 message = `🏠 Widzę że jesteś w: ${address}. Sprawdzam czy wszystko jest bezpieczne!`;
-                speech = `Widzę... że... jesteś... w... ${address}... Sprawdzam... czy... wszystko... jest... bezpieczne`;
+                speech = `Widzę że jesteś w ${address}. Sprawdzam czy wszystko jest bezpieczne.`;
             } else if (childAge <= 9) {
                 message = `🗺️ Twoja lokalizacja: ${address}. Analizuję sytuację bezpieczeństwa w okolicy!`;
-                speech = `Twoja... lokalizacja... ${address}... Analizuję... sytuację... bezpieczeństwa... w... okolicy`;
+                speech = `Twoja lokalizacja: ${address}. Analizuję sytuację bezpieczeństwa w okolicy.`;
             } else if (childAge <= 12) {
                 message = `📌 Jesteś w: ${address}. Sprawdzam aktualne ostrzeżenia i bezpieczne trasy.`;
-                speech = `Jesteś... w... ${address}... Sprawdzam... aktualne... ostrzeżenia... i... bezpieczne... trasy`;
+                speech = `Jesteś w ${address}. Sprawdzam aktualne ostrzeżenia i bezpieczne trasy.`;
             } else {
                 message = `🎯 Lokalizacja zidentyfikowana: ${address}. Przygotowuję raport bezpieczeństwa.`;
-                speech = `Lokalizacja... zidentyfikowana... ${address}... Przygotowuję... raport... bezpieczeństwa`;
+                speech = `Lokalizacja zidentyfikowana: ${address}. Przygotowuję raport bezpieczeństwa.`;
             }
             break;
             
         default:
             message = '📍 Sprawdzam Twoją lokalizację...';
-            speech = 'Sprawdzam... Twoją... lokalizację';
+            speech = 'Sprawdzam Twoją lokalizację.';
     }
     
     // Show message and speak (fallback behavior)
