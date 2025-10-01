@@ -181,6 +181,18 @@
                 </div>
             </div>
 
+            <!-- Safe Places Section (Real Data from OpenStreetMap) -->
+            <div class="safe-places-section" style="margin: 20px 0; display: none;" id="safe-places-section">
+                <h3 class="section-title">🏥 Bezpieczne miejsca w pobliżu</h3>
+                <div id="safe-places-list" class="safe-places-list">
+                    <!-- Real places will be loaded here by emergency-real-places.js -->
+                    <div class="loading-message">
+                        <div class="spinner">🔄</div>
+                        <p>Szukam najbliższych bezpiecznych miejsc...</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Emergency Contact -->
             <div class="emergency-section">
                 <h3 class="section-title">🚨 W nagłych wypadkach</h3>
@@ -245,6 +257,7 @@
     <script src="adaptive-learning.js"></script> <!-- AI Learning System -->
     <script src="polish-ai-client.js"></script> <!-- Client-side Polish AI -->
     <script src="alert-classifier.js"></script> <!-- Enhanced Alert Classification -->
+    <script src="emergency-real-places.js"></script> <!-- Real Safe Places from OpenStreetMap -->
     <script src="app.js"></script>
     <script src="location-message-fix.js"></script> <!-- Enhanced Location Messages with Parent CMS -->
     <!-- 🚨 MINA EMERGENCY INTEGRATION - CRITICAL! -->

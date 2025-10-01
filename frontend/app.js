@@ -1863,7 +1863,7 @@ async function handleFindSafety() {
     
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = '🏃 Szukam bezpiecznych miejsc...';
+        mascotText.textContent = '🏃 Szukam bezpiecznych miejsc w pobliżu...';
     }
     
     // 🔒 FIRST: Try to get parent-created safety message
@@ -1888,6 +1888,40 @@ async function handleFindSafety() {
     // 🤖 FALLBACK: Use AI/rule-based if no parent message
     if (!smartMessage) {
         smartMessage = await generateSmartSpeech('find_safety');
+    }
+    
+    // 📍 GET USER LOCATION AND FETCH REAL PLACES
+    if (navigator.geolocation) {
+        try {
+            console.log('📍 Getting user location for real safe places...');
+            
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                });
+            });
+            
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+            
+            console.log(`📍 User location: ${userLat}, ${userLon}`);
+            
+            // 🗺️ FETCH REAL SAFE PLACES from OpenStreetMap
+            if (typeof window.displayRealSafePlaces === 'function') {
+                await window.displayRealSafePlaces({ lat: userLat, lon: userLon });
+                console.log('✅ Real safe places displayed');
+            } else {
+                console.warn('⚠️ displayRealSafePlaces not loaded - make sure emergency-real-places.js is included');
+            }
+            
+        } catch (error) {
+            console.error('❌ Failed to get location or fetch places:', error);
+            if (mascotText) {
+                mascotText.textContent = '⚠️ Nie udało się określić lokalizacji. Sprawdź uprawnienia GPS.';
+            }
+        }
     }
     
     setTimeout(() => {
