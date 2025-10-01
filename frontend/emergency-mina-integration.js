@@ -801,6 +801,14 @@ class EmergencyMinaManager {
     }
 
     /**
+     * 🏠 FIND SHELTER (ALIAS)
+     * Alias for findNearbyShelters() for button compatibility
+     */
+    async findShelter() {
+        return await this.findNearbyShelters();
+    }
+
+    /**
      * 👨‍👩‍👧‍👦 FAMILY CONTACT SYSTEM
      */
     async contactFamily() {

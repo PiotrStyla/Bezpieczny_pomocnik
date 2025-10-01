@@ -1966,16 +1966,16 @@ async function handleSafeRoute() {
         smartMessage = await generateSmartSpeech('safe_route');
     }
     
-    // 👨‍👩‍👧 NAVIGATE TO PARENT (REAL FUNCTIONALITY)
-    if (typeof window.navigateToParent === 'function') {
-        console.log('🧭 Attempting to navigate to parent...');
+    // 👨‍👩‍👧 SHOW PARENT ON MAP (REAL FUNCTIONALITY)
+    if (typeof window.showParentMapFromButton === 'function') {
+        console.log('🗺️ Showing parent on map...');
         try {
-            await window.navigateToParent();
+            await window.showParentMapFromButton();
         } catch (error) {
-            console.error('❌ Navigation error:', error);
+            console.error('❌ Map display error:', error);
         }
     } else {
-        console.warn('⚠️ navigateToParent not loaded - make sure parent-location-sharing.js is included');
+        console.warn('⚠️ showParentMapFromButton not loaded - make sure parent-map-display.js is included');
     }
     
     setTimeout(() => {
