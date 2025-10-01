@@ -83,7 +83,25 @@ function startLocationSharing() {
     // Stop any existing watch
     stopLocationSharing();
     
-    // Start watching position
+    // 🚀 IMMEDIATELY GET CURRENT POSITION (don't wait for watchPosition)
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            console.log('📍 Initial parent location obtained immediately');
+            await saveParentLocation(position);
+            updateLocationSharingUI(position);
+        },
+        (error) => {
+            console.error('❌ Initial location error:', error);
+            handleLocationSharingError(error);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+        }
+    );
+    
+    // Start watching position for continuous updates
     locationWatchId = navigator.geolocation.watchPosition(
         async (position) => {
             console.log('📍 Parent location updated');
@@ -413,5 +431,14 @@ async function tryHomeNavigation() {
         alert('Adres domowy nie został zapisany. Poproś rodzica o dodanie go w Parent CMS.');
     }
 }
+
+// Export functions to window for global access
+window.startLocationSharing = startLocationSharing;
+window.stopLocationSharing = stopLocationSharing;
+window.saveHomeLocation = saveHomeLocation;
+window.getParentLocation = getParentLocation;
+window.getHomeLocation = getHomeLocation;
+window.navigateToParent = navigateToParent;
+window.tryHomeNavigation = tryHomeNavigation;
 
 console.log('✅ Parent Location Sharing module loaded');

@@ -1,7 +1,8 @@
-// 🚨 EMERGENCY OFFLINE CACHE - Critical for when internet is down during disasters
-const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1.2.0';
-const STATIC_CACHE = 'static-resources-v1.2.0';
-const DYNAMIC_CACHE = 'dynamic-content-v1.2.0';
+// 🚨 EMERGENCY OFFLINE CACHE - Critical for emergency operation
+// Cache version - increment to force update
+const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1.4.1';
+const STATIC_CACHE = 'static-resources-v1.4.1';
+const DYNAMIC_CACHE = 'dynamic-content-v1.4.1';
 
 const EMERGENCY_ESSENTIALS = [
     // Core App Files
@@ -14,6 +15,7 @@ const EMERGENCY_ESSENTIALS = [
     './persistent-settings-zk.js',
     './pwa-installer.js',
     './enhanced-security-zk.js',
+    './emergency-survival-mode.js',
     './manifest.json',
     
     // Images & Icons
@@ -60,7 +62,7 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Fetch - Cache-first strategy for emergency content
+// Fetch - Network-first with cache fallback (for fresh content)
 self.addEventListener('fetch', event => {
     // Only handle GET requests
     if (event.request.method !== 'GET') return;
@@ -69,34 +71,36 @@ self.addEventListener('fetch', event => {
     if (!event.request.url.startsWith('http')) return;
     
     event.respondWith(
-        caches.match(event.request)
+        // Try network first
+        fetch(event.request)
             .then(response => {
-                if (response) {
-                    console.log('📦 Serving from cache:', event.request.url);
-                    return response;
-                }
-                
-                // Try network, fallback to offline emergency page
-                return fetch(event.request)
-                    .then(response => {
-                        // Cache successful responses
-                        if (response.status === 200) {
-                            const responseClone = response.clone();
-                            caches.open(CACHE_NAME)
-                                .then(cache => cache.put(event.request, responseClone));
-                        }
-                        return response;
-                    })
-                    .catch(() => {
-                        // Network failed - serve offline emergency content
-                        if (event.request.destination === 'document') {
-                            return caches.match('/') || createOfflineEmergencyPage();
-                        }
-                        return new Response('🚨 Emergency Mode: No Internet', {
-                            status: 503,
-                            statusText: 'Service Unavailable - Emergency Mode Active'
-                        });
+                // Cache successful responses
+                if (response.status === 200) {
+                    const responseClone = response.clone();
+                    caches.open(DYNAMIC_CACHE).then(cache => {
+                        cache.put(event.request, responseClone);
                     });
+                }
+                return response;
+            })
+            .catch(() => {
+                // Network failed, try cache
+                return caches.match(event.request).then(response => {
+                    if (response) {
+                        console.log('📦 Serving from cache (offline):', event.request.url);
+                        return response;
+                    }
+                    
+                    // No cache, return offline message
+                    if (event.request.destination === 'document') {
+                        return createOfflineEmergencyPage();
+                    }
+                    
+                    return new Response('🚨 Emergency Mode: No Internet', {
+                        status: 503,
+                        statusText: 'Service Unavailable - Emergency Mode Active'
+                    });
+                });
             })
     );
 });

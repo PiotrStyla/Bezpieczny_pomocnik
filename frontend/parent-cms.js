@@ -1261,4 +1261,62 @@ if (document.readyState === 'loading') {
     loadLocationSettingsUI();
 }
 
+/**
+ * 🚨 ENABLE CHILD SURVIVAL MODE (REMOTE)
+ * Parent can remotely activate survival mode on child's device
+ */
+async function enableChildSurvivalMode() {
+    console.log('🚨 Parent triggering child survival mode...');
+    
+    try {
+        const survivalTrigger = {
+            enabled: true,
+            triggeredBy: 'parent',
+            timestamp: new Date().toISOString(),
+            reason: 'Parent activated emergency mode remotely'
+        };
+        
+        // Save to Mina ZK (child will read this)
+        await saveToMinaZK('zk_survival_mode_trigger', survivalTrigger);
+        
+        console.log('✅ Survival mode trigger sent to child');
+        alert('✅ Tryb awaryjny został włączony na urządzeniu dziecka.\n\nDziecko zobaczy ekran oszczędzania energii z ostatnimi znanymi lokalizacjami.');
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to trigger survival mode:', error);
+        alert('❌ Nie udało się włączyć trybu awaryjnego. Spróbuj ponownie.');
+        return false;
+    }
+}
+
+/**
+ * 🔄 DISABLE CHILD SURVIVAL MODE (REMOTE)
+ */
+async function disableChildSurvivalMode() {
+    console.log('🔄 Parent disabling child survival mode...');
+    
+    try {
+        const survivalTrigger = {
+            enabled: false,
+            triggeredBy: 'parent',
+            timestamp: new Date().toISOString()
+        };
+        
+        await saveToMinaZK('zk_survival_mode_trigger', survivalTrigger);
+        
+        console.log('✅ Survival mode disabled');
+        alert('✅ Tryb awaryjny został wyłączony.');
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to disable survival mode:', error);
+        return false;
+    }
+}
+
+// Export functions
+window.enableChildSurvivalMode = enableChildSurvivalMode;
+window.disableChildSurvivalMode = disableChildSurvivalMode;
+
 console.log('🔒 Parent CMS module loaded');

@@ -443,4 +443,8 @@ function showErrorMessage() {
     }
 }
 
+// Export to window for global access
+window.displayRealSafePlaces = displayRealSafePlaces;
+window.navigateToPlace = navigateToPlace;
+
 console.log('✅ Emergency Real Places module loaded');

@@ -429,12 +429,29 @@
             
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
             
+            <h4 style="margin-bottom: 10px;">🚨 Zdalne włączenie trybu awaryjnego</h4>
+            <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                Możesz zdalnie włączyć tryb oszczędzania energii na urządzeniu dziecka (72+ godzin baterii)
+            </p>
+            
+            <button onclick="enableChildSurvivalMode()" 
+                style="width: 100%; padding: 12px; background: linear-gradient(135deg, #ff5252, #d32f2f); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+                🚨 Włącz tryb awaryjny dziecku
+            </button>
+            
+            <button onclick="disableChildSurvivalMode()" 
+                style="width: 100%; padding: 12px; background: #666; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                Wyłącz tryb awaryjny
+            </button>
+            
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+            
             <h4 style="margin-bottom: 10px;">🏠 Adres domowy (fallback)</h4>
             <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
                 Zapisz adres domowy na wypadek gdy Twoja lokalizacja będzie niedostępna
             </p>
             
-            <input type="text" id="home-address" placeholder="ul. Przykładowa 123, Kraków" 
+            <input type="text" id="home-address" placeholder="Halszki 1/51, Kraków" 
                 style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; font-size: 14px;">
             
             <button onclick="saveHomeAddress()" 
@@ -572,37 +589,101 @@
                 return;
             }
             
+            // Check if saveHomeLocation is available
+            if (typeof window.saveHomeLocation !== 'function') {
+                console.error('❌ saveHomeLocation not available');
+                alert('❌ Funkcja zapisu nie jest dostępna. Odśwież stronę i spróbuj ponownie.');
+                return;
+            }
+            
             console.log('🏠 Saving home address:', address);
+            
+            // Format address for better geocoding
+            let formattedAddress = address.trim();
+            
+            // Remove "ul", "ul.", "ul ", "ul. " at start
+            formattedAddress = formattedAddress.replace(/^ul\.?\s*/gi, '');
+            
+            console.log('🔍 Step 1 - After removing "ul":', formattedAddress);
+            
+            // Add city if missing
+            const hasCityName = /kraków|warszawa|poznań|wrocław|gdańsk|łódź|katowice/i.test(formattedAddress);
+            if (!hasCityName) {
+                formattedAddress = formattedAddress + ', Kraków';
+            }
+            
+            console.log('🔍 Step 2 - After city check:', formattedAddress);
+            
+            // Add Poland if not specified
+            const hasCountry = /polska|poland/i.test(formattedAddress);
+            if (!hasCountry) {
+                formattedAddress = formattedAddress + ', Polska';
+            }
+            
+            console.log('🔍 Step 3 - Final formatted:', formattedAddress);
+            console.log('🔍 Original:', address);
             
             // Geocode address to get coordinates
             try {
-                const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+                // Build Nominatim URL with all parameters
+                const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formattedAddress)}&limit=5&countrycodes=pl&addressdetails=1`;
+                
                 const response = await fetch(geocodeUrl, {
                     headers: {
                         'User-Agent': 'BezpiecznyPomocnik/1.0'
                     }
                 });
                 
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
                 
+                console.log('📍 Geocoding results:', data);
+                
                 if (data && data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lon = parseFloat(data[0].lon);
+                    // Show results if multiple found
+                    let selectedResult = data[0];
                     
-                    const success = await saveHomeLocation(address, lat, lon);
+                    if (data.length > 1) {
+                        const options = data.map((item, index) => 
+                            `${index + 1}. ${item.display_name}`
+                        ).join('\n\n');
+                        
+                        const choice = prompt(
+                            `Znaleziono ${data.length} wyników. Wybierz numer (1-${data.length}):\n\n${options}`,
+                            '1'
+                        );
+                        
+                        if (choice && !isNaN(choice)) {
+                            const index = parseInt(choice) - 1;
+                            if (index >= 0 && index < data.length) {
+                                selectedResult = data[index];
+                            }
+                        }
+                    }
+                    
+                    const lat = parseFloat(selectedResult.lat);
+                    const lon = parseFloat(selectedResult.lon);
+                    const displayName = selectedResult.display_name;
+                    
+                    console.log(`✅ Selected: ${displayName} (${lat}, ${lon})`);
+                    
+                    const success = await saveHomeLocation(displayName, lat, lon);
                     
                     if (success) {
-                        alert('✅ Adres domowy zapisany!\n\n' + address);
+                        alert('✅ Adres domowy zapisany!\n\n' + displayName);
                         addressInput.value = '';
                     } else {
                         alert('❌ Błąd zapisu. Spróbuj ponownie.');
                     }
                 } else {
-                    alert('❌ Nie znaleziono adresu. Sprawdź poprawność.');
+                    alert(`❌ Nie znaleziono adresu: "${address}"\n\nSpróbuj:\n• Pełny adres z miastem\n• Bez "ul" na początku\n• Uproszczoną wersję (np. "Hańcki 1, Kraków")`);
                 }
             } catch (error) {
                 console.error('❌ Geocoding error:', error);
-                alert('❌ Błąd podczas weryfikacji adresu');
+                alert(`❌ Błąd podczas weryfikacji adresu:\n\n${error.message}\n\nSprawdź połączenie internetowe.`);
             }
         }
     </script>

@@ -287,4 +287,10 @@ async function showParentMapFromButton() {
     }
 }
 
+// Export functions to window for global access
+window.showParentOnMap = showParentOnMap;
+window.showParentMapFromButton = showParentMapFromButton;
+window.closeParentMap = closeParentMap;
+window.refreshParentLocation = refreshParentLocation;
+
 console.log('✅ Parent Map Display module loaded');

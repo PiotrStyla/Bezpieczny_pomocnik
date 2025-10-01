@@ -2211,6 +2211,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
+    // Parent location button handler
+    const parentLocationBtn = document.getElementById('parent-location-btn');
+    if (parentLocationBtn) {
+        parentLocationBtn.addEventListener('click', async () => {
+            console.log('👨‍👩‍👧 Parent location button clicked');
+            await showParentLocationWithFallback();
+            trackFeatureUsage('parent_location');
+        });
+    }
+
     // Show call popup function
     function showCallPopup(phoneNumber, targetElement) {
         console.log('📞 Showing call popup for:', phoneNumber);
@@ -2354,20 +2364,101 @@ function setupManualBackgroundSync(registration) {
 }
 
 /**
+ * 👨‍👩‍👧 SHOW PARENT LOCATION WITH FALLBACK
+ * Shows parent location, home address, or reassuring message
+ */
+async function showParentLocationWithFallback() {
+    try {
+        console.log('👨‍👩‍👧 Attempting to show parent location...');
+        
+        // Try to get parent location
+        if (window.getParentLocation) {
+            const parentLocation = await window.getParentLocation();
+            
+            if (parentLocation && parentLocation.lat && parentLocation.lon) {
+                console.log('✅ Parent location found');
+                
+                // Show on map
+                if (window.showParentOnMap) {
+                    await window.showParentOnMap(parentLocation.lat, parentLocation.lon);
+                }
+                
+                // Show success message
+                const mascotText = document.getElementById('mascot-text');
+                if (mascotText) {
+                    mascotText.textContent = '✅ Znalazłem rodziców! Zobacz ich lokalizację na mapie.';
+                }
+                
+                speakText('Znalazłem rodziców! Zobacz ich lokalizację na mapie.');
+                return;
+            }
+        }
+        
+        // Fallback 1: Try home address
+        if (window.getHomeLocation) {
+            const homeLocation = await window.getHomeLocation();
+            
+            if (homeLocation && homeLocation.lat && homeLocation.lon) {
+                console.log('✅ Home address found as fallback');
+                
+                // Show home on map
+                if (window.showParentOnMap) {
+                    await window.showParentOnMap(homeLocation.lat, homeLocation.lon);
+                }
+                
+                // Reassuring message
+                const mascotText = document.getElementById('mascot-text');
+                if (mascotText) {
+                    mascotText.textContent = '🏠 Nie znalazłem aktualnej lokalizacji rodziców, ale pokazuję Wam adres domowy. Rodzice na pewno są w pobliżu i wszystko jest w porządku!';
+                }
+                
+                speakText('Nie znalazłem aktualnej lokalizacji rodziców, ale pokazuję wam adres domowy. Rodzice na pewno są w pobliżu i wszystko jest w porządku!');
+                return;
+            }
+        }
+        
+        // Fallback 2: Reassuring message (no location data)
+        console.log('⚠️ No location data available');
+        
+        const mascotText = document.getElementById('mascot-text');
+        if (mascotText) {
+            mascotText.textContent = '💙 Nie mogę teraz pokazać lokalizacji rodziców, ale to nie znaczy, że coś złego się dzieje! Rodzice często nie udostępniają lokalizacji, gdy są w bezpiecznym miejscu. Jeśli martwisz się, możesz do nich zadzwonić - na pewno odpowiedzą! ☺️';
+        }
+        
+        speakText('Nie mogę teraz pokazać lokalizacji rodziców, ale to nie znaczy, że coś złego się dzieje! Rodzice często nie udostępniają lokalizacji, gdy są w bezpiecznym miejscu. Jeśli martwisz się, możesz do nich zadzwonić - na pewno odpowiedzą!');
+        
+    } catch (error) {
+        console.error('❌ Error showing parent location:', error);
+        
+        // Error message - still reassuring
+        const mascotText = document.getElementById('mascot-text');
+        if (mascotText) {
+            mascotText.textContent = '😊 Nie mogę teraz sprawdzić lokalizacji rodziców, ale to nic złego! Jeśli chcesz z nimi porozmawiać, możesz do nich zadzwonić. Na pewno wszystko jest w porządku!';
+        }
+        
+        speakText('Nie mogę teraz sprawdzić lokalizacji rodziców, ale to nic złego! Jeśli chcesz z nimi porozmawiać, możesz do nich zadzwonić. Na pewno wszystko jest w porządku!');
+    }
+}
+
+/**
  * 🗃️ CACHE USER LOCATION FOR BACKGROUND ALERTS
  */
 async function cacheLocationForBackground(lat, lon) {
     try {
+        const locationData = { lat, lon, timestamp: new Date().toISOString() };
+        
+        // Cache in Cache API (for background alerts)
         if ('caches' in window) {
             const cache = await caches.open('emergency-data');
-            const locationData = { lat, lon, timestamp: Date.now() };
-            
             await cache.put('/cache/user-location', 
                 new Response(JSON.stringify(locationData))
             );
-            
-            console.log('📍 Location cached for background alerts');
         }
+        
+        // ALSO cache in localStorage (for survival mode)
+        localStorage.setItem('emergency_last_child_location', JSON.stringify(locationData));
+        
+        console.log('📍 Location cached for emergency mode:', locationData);
     } catch (error) {
         console.warn('Failed to cache location:', error);
     }

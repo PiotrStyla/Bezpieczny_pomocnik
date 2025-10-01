@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🛡️ Bezpieczny Pomocnik dla Dzieci</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="parental-consent.css">
     <link rel="manifest" href="manifest.json">
@@ -74,6 +74,14 @@
                     <button id="location-btn" class="kids-button location-btn">
                         <span class="btn-icon">📍</span>
                         <span class="btn-text">Znajdź mnie</span>
+                    </button>
+                </div>
+
+                <div class="control-card">
+                    <h3>👨‍👩‍👧 Gdzie są rodzice?</h3>
+                    <button id="parent-location-btn" class="kids-button parent-location-btn">
+                        <span class="btn-icon">🏠</span>
+                        <span class="btn-text">Pokaż rodziców</span>
                     </button>
                 </div>
 
@@ -247,7 +255,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="parental-consent.js"></script>
     <script src="mina-parental-zk.js"></script>
     <script src="enhanced-security-zk.js"></script> <!-- Enhanced Security Storage -->
@@ -261,6 +269,7 @@
     <script src="parent-location-sharing.js"></script> <!-- Parent Location Tracking -->
     <script src="parent-map-display.js"></script> <!-- Parent Map Display -->
     <script src="real-sync-system.js"></script> <!-- Real Synchronization System -->
+    <script src="emergency-survival-mode.js"></script> <!-- TRUE Emergency Survival Mode (72+ hours) -->
     <script src="app.js"></script>
     <script src="location-message-fix.js"></script> <!-- Enhanced Location Messages with Parent CMS -->
     <!-- 🚨 MINA EMERGENCY INTEGRATION - CRITICAL! -->

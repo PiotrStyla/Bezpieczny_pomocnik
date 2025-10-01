@@ -112,7 +112,7 @@ class ParentalConsentManager {
                 ],
                 legalBasis: '📜 <strong>Podstawa prawna:</strong> RODO Art. 8 - zgoda rodzica/opiekuna dla dzieci poniżej 16 lat.',
                 dataMinimization: '🔒 <strong>Minimalizacja danych:</strong> Aplikacja zbiera tylko niezbędne dane - preferencje językowe, ustawienia dźwięku i opcjonalnie lokalizację.',
-                contact: '📞 <strong>Kontakt w sprawie zgody:</strong><br>E-mail: kontakt@fundacja-hospicjum.org<br>Telefon: +48 735 749 618',
+                contact: '📞 <strong>Kontakt w sprawie zgody:</strong><br>E-mail: kontakt@fundacja-hospicjum.org',
                 buttons: {
                     grantConsent: 'Jako rodzic/opiekun wyrażam zgodę',
                     denyAccess: 'Nie wyrażam zgody',
@@ -142,7 +142,7 @@ class ParentalConsentManager {
                 ],
                 legalBasis: '📜 <strong>Legal basis:</strong> GDPR Art. 8 - parental/guardian consent for children under 16.',
                 dataMinimization: '🔒 <strong>Data minimization:</strong> The application collects only necessary data - language preferences, audio settings and optionally location.',
-                contact: '📞 <strong>Contact regarding consent:</strong><br>E-mail: kontakt@fundacja-hospicjum.org<br>Phone: +48 735 749 618',
+                contact: '📞 <strong>Contact regarding consent:</strong><br>E-mail: kontakt@fundacja-hospicjum.org',
                 buttons: {
                     grantConsent: 'As parent/guardian I give consent',
                     denyAccess: 'I do not give consent',
@@ -172,7 +172,7 @@ class ParentalConsentManager {
                 ],
                 legalBasis: '📜 <strong>Правова основа:</strong> GDPR Ст. 8 - згода батьків/опікуна для дітей до 16 років.',
                 dataMinimization: '🔒 <strong>Мінімізація даних:</strong> Додаток збирає лише необхідні дані - мовні налаштування, налаштування звуку та за бажанням місцезнаходження.',
-                contact: '📞 <strong>Контакт щодо згоди:</strong><br>E-mail: kontakt@fundacja-hospicjum.org<br>Телефон: +48 735 749 618',
+                contact: '📞 <strong>Контакт щодо згоди:</strong><br>E-mail: kontakt@fundacja-hospicjum.org',
                 buttons: {
                     grantConsent: 'Як батько/опікун я даю згоду',
                     denyAccess: 'Я не даю згоди',
@@ -927,7 +927,6 @@ Podstawa prawna: RODO Art. 8 - zgoda rodzica/opiekuna dla dzieci poniżej 16 lat
 
 Kontakt w sprawie zgody:
 E-mail: kontakt@fundacja-hospicjum.org
-Tel: +48 735 749 618
 
 _________________________ 
 (podpis rodzica/opiekuna)
