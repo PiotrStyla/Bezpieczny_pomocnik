@@ -762,38 +762,42 @@ class EmergencyMinaManager {
     }
 
     /**
-     * 🏠 EMERGENCY SHELTER LOCATOR
+     * 🏠 FIND NEARBY SHELTERS (REAL IMPLEMENTATION)
      */
-    async findShelter() {
-        console.log('🏠 Locating emergency shelters...');
+    async findNearbyShelters() {
+        console.log('🏠 Finding REAL nearby safe places...');
         
-        // In real implementation:
-        // 1. Get encrypted location
-        // 2. Query Mina network for nearby shelters
-        // 3. Verify shelter status via mesh network
-        // 4. Provide directions without revealing exact location
-        
-        const shelters = [
-            {
-                id: 'shelter_001',
-                distance: '0.5km',
-                capacity: 'available',
-                supplies: ['food', 'water', 'medical'],
-                accessibility: true,
-                lastVerified: Date.now() - 300000 // 5 minutes ago
-            },
-            {
-                id: 'shelter_002', 
-                distance: '1.2km',
-                capacity: 'limited',
-                supplies: ['water', 'basic_medical'],
-                accessibility: false,
-                lastVerified: Date.now() - 900000 // 15 minutes ago
+        try {
+            // Get user location
+            const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                });
+            });
+            
+            const userLat = position.coords.latitude;
+            const userLon = position.coords.longitude;
+            
+            console.log(`📍 User location: ${userLat}, ${userLon}`);
+            
+            // Use real safe places system
+            if (typeof window.displayRealSafePlaces === 'function') {
+                await window.displayRealSafePlaces({ lat: userLat, lon: userLon });
+                console.log('✅ Real safe places displayed via emergency-real-places.js');
+                return { success: true, source: 'OpenStreetMap' };
+            } else {
+                console.error('❌ displayRealSafePlaces not available');
+                alert('Funkcja wyszukiwania miejsc nie jest dostępna. Sprawdź czy emergency-real-places.js jest załadowany.');
+                return { success: false, error: 'Module not loaded' };
             }
-        ];
-        
-        this.displayShelterResults(shelters);
-        return shelters;
+            
+        } catch (error) {
+            console.error('❌ Failed to find safe places:', error);
+            alert('Nie udało się pobrać lokalizacji. Sprawdź uprawnienia GPS.');
+            return { success: false, error: error.message };
+        }
     }
 
     /**

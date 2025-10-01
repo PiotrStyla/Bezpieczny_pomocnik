@@ -504,6 +504,33 @@
         // Location sharing toggle
         let sharingActive = false;
         
+        // Check if sharing was active on page load
+        async function checkLocationSharingStatus() {
+            try {
+                const parentLocation = await window.loadFromMinaZK('zk_parent_emergency_location');
+                if (parentLocation && parentLocation.sharingEnabled) {
+                    // Restore sharing state
+                    sharingActive = true;
+                    const startBtn = document.getElementById('start-sharing-btn');
+                    const stopBtn = document.getElementById('stop-sharing-btn');
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'block';
+                    
+                    // Restart location watching
+                    startLocationSharing();
+                    
+                    console.log('✅ Location sharing restored from previous session');
+                }
+            } catch (error) {
+                console.error('❌ Failed to check location sharing status:', error);
+            }
+        }
+        
+        // Run on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkLocationSharingStatus, 1000);
+        });
+        
         async function toggleLocationSharing() {
             const startBtn = document.getElementById('start-sharing-btn');
             const stopBtn = document.getElementById('stop-sharing-btn');

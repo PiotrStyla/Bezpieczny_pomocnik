@@ -232,14 +232,14 @@ function showInAppNotification(updatedItems) {
     const notification = document.createElement('div');
     notification.style.cssText = `
         position: fixed;
-        top: 20px;
+        top: 80px;
         right: 20px;
         background: linear-gradient(135deg, #4CAF50, #45a049);
         color: white;
         padding: 20px 25px;
         border-radius: 10px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        z-index: 10000;
+        z-index: 100001;
         animation: slideIn 0.5s ease;
         max-width: 350px;
     `;
