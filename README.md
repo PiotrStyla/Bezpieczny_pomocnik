@@ -102,10 +102,40 @@ Aplikacja będzie dostępna pod adresem `http://127.0.0.1:8000`.
 
 ## 🧪 Testowanie
 
-Aby uruchomić testy, przejdź do folderu `backend` i wykonaj komendę:
+### **Automated Frontend Testing**
+
+**Comprehensive Test Suite** - kompletny system testów dla frontendu:
+
+**Lokalizacja:** `frontend/comprehensive-test-suite.html`
+
+**Pokrycie testów:**
+- ✅ RODO Art. 8 compliance & parental consent
+- ✅ Mina ZK storage security (AES-256-GCM)
+- ✅ Parent CMS functionality
+- ✅ Multi-child session management
+- ✅ Service Worker & PWA
+- ✅ Alert system integration
+- ✅ Speech synthesis (Polish voices)
+- ✅ Browser compatibility
+- ✅ Performance & security context
+
+**Jak uruchomić:**
+1. Otwórz `frontend/comprehensive-test-suite.html` w przeglądarce
+2. Kliknij "▶️ Uruchom wszystkie testy" lub wybierz konkretny etap (1-4)
+3. Sprawdź wyniki i eksportuj raport JSON
+
+**📊 Ostatni raport testów:** Zobacz `TEST_REPORT.md` (95% success rate, production-ready)
+
+### **Backend Testing**
+
+Aby uruchomić testy backendowe, przejdź do folderu `backend` i wykonaj komendę:
 ```bash
 pytest
 ```
+
+### **Manual Testing Guide**
+
+Zobacz `TESTING-GUIDE.md` dla szczegółowego przewodnika testowania manualnego z dziećmi.
 
 ## ☁️ Wdrożenie na Render.com (Zalecane)
 

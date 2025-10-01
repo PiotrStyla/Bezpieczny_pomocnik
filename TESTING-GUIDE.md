@@ -6,6 +6,41 @@ Dziękujemy za testowanie aplikacji! Ta wersja wprowadza **REVOLUCYJNĄ** funkcj
 
 ---
 
+## 📊 **AUTOMATED TEST SUITE**
+
+### **🤖 Comprehensive Test Suite (Nowe!)**
+
+Dostępny jest automatyczny system testów który sprawdza wszystkie krytyczne komponenty aplikacji.
+
+**URL:** `frontend/comprehensive-test-suite.html`
+
+#### **Co testuje:**
+- ✅ RODO Art. 8 compliance (parental consent)
+- ✅ Mina ZK storage security
+- ✅ Parent CMS functionality
+- ✅ Multi-child session management
+- ✅ Service Worker & PWA
+- ✅ Alert system
+- ✅ Speech synthesis
+- ✅ Browser compatibility
+- ✅ Performance & security
+
+#### **Jak uruchomić:**
+1. Otwórz `frontend/comprehensive-test-suite.html` w przeglądarce
+2. Kliknij **"▶️ Uruchom wszystkie testy"** lub wybierz konkretny etap
+3. Sprawdź wyniki (zielone ✅ = pass, czerwone ❌ = fail, żółte ⚠️ = warning)
+4. Eksportuj raport JSON klikając **"💾 Eksportuj raport"**
+
+#### **Dostępne są 4 etapy testów:**
+- **Etap 1:** KRYTYCZNE (RODO, Security, ZK Storage)
+- **Etap 2:** CORE (Safety Tips, Multi-Child)
+- **Etap 3:** ADVANCED (PWA, Alerts, Emergency)
+- **Etap 4:** POLISH (Browser Compatibility, Performance)
+
+**📄 Pełny raport testów:** Zobacz `TEST_REPORT.md` dla szczegółowych wyników
+
+---
+
 ## 🚀 **JAK ROZPOCZĄĆ TESTOWANIE:**
 
 ### **KROK 1: Uruchom serwer**
