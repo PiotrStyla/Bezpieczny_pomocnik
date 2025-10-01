@@ -396,6 +396,53 @@
             <p><small>Wszystkie Twoje komunikaty są szyfrowane i przechowywane prywatnie w systemie ZKP. Nikt oprócz Ciebie nie może ich przeczytać.</small></p>
         </div>
 
+        <!-- 📍 LOCATION SHARING FOR EMERGENCY -->
+        <div class="cms-card" style="border-left-color: #f39c12; margin-top: 30px;">
+            <h3>📍 Udostępnianie lokalizacji (Tryb awaryjny)</h3>
+            <p style="color: #666; margin-bottom: 15px;">
+                Włącz udostępnianie lokalizacji, aby dziecko mogło Cię znaleźć w nagłej sytuacji. 
+                Twoja lokalizacja będzie bezpiecznie zaszyfrowana w systemie ZKP.
+            </p>
+            
+            <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 15px; margin-bottom: 15px;">
+                <strong>⚠️ Ważne:</strong> Lokalizacja jest aktualizowana automatycznie co 30 sekund gdy udostępnianie jest włączone.
+                Dziecko zobaczy Twoją ostatnią lokalizację i odległość do Ciebie.
+            </div>
+            
+            <div id="location-sharing-status" style="background: #f8f9fa; border-radius: 10px; padding: 20px; margin-bottom: 15px;">
+                <div class="status-text">
+                    <strong>⏸️ Udostępnianie wyłączone</strong>
+                    <p style="margin: 10px 0 0 0; color: #666;">Kliknij przycisk poniżej aby włączyć</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button id="start-sharing-btn" onclick="toggleLocationSharing()" 
+                    style="flex: 1; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                    ✅ Włącz udostępnianie
+                </button>
+                <button id="stop-sharing-btn" onclick="toggleLocationSharing()" 
+                    style="flex: 1; padding: 12px; background: #f44336; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; display: none;">
+                    ⏹️ Wyłącz udostępnianie
+                </button>
+            </div>
+            
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #e0e0e0;">
+            
+            <h4 style="margin-bottom: 10px;">🏠 Adres domowy (fallback)</h4>
+            <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                Zapisz adres domowy na wypadek gdy Twoja lokalizacja będzie niedostępna
+            </p>
+            
+            <input type="text" id="home-address" placeholder="ul. Przykładowa 123, Kraków" 
+                style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 10px; font-size: 14px;">
+            
+            <button onclick="saveHomeAddress()" 
+                style="width: 100%; padding: 12px; background: #2196F3; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                💾 Zapisz adres domowy
+            </button>
+        </div>
+
         <!-- 🔄 QUICK BACK BUTTON -->
         <div style="text-align: center; margin: 30px 0; padding: 20px; background: rgba(52, 152, 219, 0.1); border-radius: 10px; border: 2px solid #3498db;">
             <p style="margin: 0 0 15px 0; color: #2c3e50; font-size: 16px;">
@@ -450,6 +497,87 @@
 
     <script src="enhanced-security-zk.js"></script>
     <script src="child-session-manager.js"></script>
+    <script src="parent-location-sharing.js"></script>
     <script src="parent-cms.js"></script>
+    
+    <script>
+        // Location sharing toggle
+        let sharingActive = false;
+        
+        async function toggleLocationSharing() {
+            const startBtn = document.getElementById('start-sharing-btn');
+            const stopBtn = document.getElementById('stop-sharing-btn');
+            
+            if (!sharingActive) {
+                // Start sharing
+                const success = startLocationSharing();
+                if (success !== false) {
+                    sharingActive = true;
+                    startBtn.style.display = 'none';
+                    stopBtn.style.display = 'block';
+                }
+            } else {
+                // Stop sharing
+                stopLocationSharing();
+                sharingActive = false;
+                startBtn.style.display = 'block';
+                stopBtn.style.display = 'none';
+                
+                // Update UI
+                const statusElement = document.getElementById('location-sharing-status');
+                if (statusElement) {
+                    statusElement.innerHTML = `
+                        <div class="status-text">
+                            <strong>⏸️ Udostępnianie wyłączone</strong>
+                            <p style="margin: 10px 0 0 0; color: #666;">Kliknij przycisk aby włączyć</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        async function saveHomeAddress() {
+            const addressInput = document.getElementById('home-address');
+            const address = addressInput.value.trim();
+            
+            if (!address) {
+                alert('Proszę wprowadzić adres domowy');
+                return;
+            }
+            
+            console.log('🏠 Saving home address:', address);
+            
+            // Geocode address to get coordinates
+            try {
+                const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`;
+                const response = await fetch(geocodeUrl, {
+                    headers: {
+                        'User-Agent': 'BezpiecznyPomocnik/1.0'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    
+                    const success = await saveHomeLocation(address, lat, lon);
+                    
+                    if (success) {
+                        alert('✅ Adres domowy zapisany!\n\n' + address);
+                        addressInput.value = '';
+                    } else {
+                        alert('❌ Błąd zapisu. Spróbuj ponownie.');
+                    }
+                } else {
+                    alert('❌ Nie znaleziono adresu. Sprawdź poprawność.');
+                }
+            } catch (error) {
+                console.error('❌ Geocoding error:', error);
+                alert('❌ Błąd podczas weryfikacji adresu');
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1935,11 +1935,11 @@ async function handleFindSafety() {
 }
 
 async function handleSafeRoute() {
-    console.log('🚶 Safe Route clicked');
+    console.log('🚶 Safe Route clicked - Find Parent/Home');
     
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = '🚶 Planuję bezpieczną trasę...';
+        mascotText.textContent = '🚶 Szukam drogi do rodzica lub domu...';
     }
     
     // 🔒 FIRST: Try to get parent-created route message
@@ -1964,6 +1964,18 @@ async function handleSafeRoute() {
     // 🤖 FALLBACK: Use AI/rule-based if no parent message
     if (!smartMessage) {
         smartMessage = await generateSmartSpeech('safe_route');
+    }
+    
+    // 👨‍👩‍👧 NAVIGATE TO PARENT (REAL FUNCTIONALITY)
+    if (typeof window.navigateToParent === 'function') {
+        console.log('🧭 Attempting to navigate to parent...');
+        try {
+            await window.navigateToParent();
+        } catch (error) {
+            console.error('❌ Navigation error:', error);
+        }
+    } else {
+        console.warn('⚠️ navigateToParent not loaded - make sure parent-location-sharing.js is included');
     }
     
     setTimeout(() => {
