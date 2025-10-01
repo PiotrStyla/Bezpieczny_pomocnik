@@ -486,6 +486,214 @@
         }
         
         // ========================================
+        // ETAP 3: ADVANCED (PWA, Alerts, Emergency)
+        // ========================================
+        
+        async function runStage3() {
+            console.log('🧪 Starting STAGE 3: ADVANCED TESTS');
+            
+            // Test 3.1: Service Worker & PWA
+            const section1 = createTestSection('Test 3.1: Service Worker & PWA', '💾');
+            
+            if ('serviceWorker' in navigator) {
+                addTestCase(section1, 'Service Worker API available', 'pass', 
+                    'Browser supports Service Workers');
+                    
+                try {
+                    const registration = await navigator.serviceWorker.getRegistration();
+                    if (registration) {
+                        addTestCase(section1, 'Service Worker registered', 'pass', 
+                            `SW active: ${registration.active ? 'Yes' : 'No'}, Scope: ${registration.scope}`);
+                    } else {
+                        addTestCase(section1, 'Service Worker registered', 'warning', 
+                            'No Service Worker registered yet');
+                    }
+                } catch (e) {
+                    addTestCase(section1, 'Service Worker registered', 'fail', 
+                        `Error checking SW: ${e.message}`);
+                }
+            } else {
+                addTestCase(section1, 'Service Worker API available', 'fail', 
+                    'Browser does not support Service Workers');
+            }
+            
+            // Check Cache API
+            if ('caches' in window) {
+                addTestCase(section1, 'Cache API available', 'pass', 
+                    'Browser supports Cache API');
+                    
+                try {
+                    const cacheNames = await caches.keys();
+                    if (cacheNames.length > 0) {
+                        addTestCase(section1, 'Emergency cache exists', 'pass', 
+                            `Found ${cacheNames.length} cache(s): ${cacheNames.join(', ')}`);
+                    } else {
+                        addTestCase(section1, 'Emergency cache exists', 'warning', 
+                            'No caches found - may not be initialized yet');
+                    }
+                } catch (e) {
+                    addTestCase(section1, 'Emergency cache exists', 'fail', 
+                        `Error checking caches: ${e.message}`);
+                }
+            } else {
+                addTestCase(section1, 'Cache API available', 'fail', 
+                    'Browser does not support Cache API');
+            }
+            
+            // Test 3.2: Alert System Components
+            const section2 = createTestSection('Test 3.2: Alert System', '🚨');
+            
+            // Check for alert-related functions
+            const alertFunctions = [
+                'checkForAlerts',
+                'startAlertMonitoring',
+                'handleLocationError'
+            ];
+            
+            alertFunctions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    addTestCase(section2, `${funcName} function exists`, 'pass', 
+                        `Alert function available: ${funcName}()`);
+                } else {
+                    addTestCase(section2, `${funcName} function exists`, 'warning', 
+                        `Function not found in global scope (may be in app.js context)`);
+                }
+            });
+            
+            // Test 3.3: Emergency Mode
+            const section3 = createTestSection('Test 3.3: Emergency Mode Configuration', '⚡');
+            
+            // Check for emergency-related localStorage
+            const emergencyKeys = Object.keys(localStorage).filter(k => 
+                k.includes('emergency') || k.includes('crisis'));
+            
+            if (emergencyKeys.length > 0) {
+                addTestCase(section3, 'Emergency data stored', 'pass', 
+                    `Found ${emergencyKeys.length} emergency key(s): ${emergencyKeys.join(', ')}`);
+            } else {
+                addTestCase(section3, 'Emergency data stored', 'info', 
+                    'No emergency-specific data (normal for non-crisis mode)');
+            }
+            
+            // Check battery API (for emergency optimization)
+            if ('getBattery' in navigator) {
+                addTestCase(section3, 'Battery API available', 'pass', 
+                    'Can monitor battery for emergency optimization');
+                    
+                try {
+                    const battery = await navigator.getBattery();
+                    const batteryInfo = `Level: ${(battery.level * 100).toFixed(0)}%, Charging: ${battery.charging}`;
+                    addTestCase(section3, 'Battery status', 'info', batteryInfo);
+                } catch (e) {
+                    addTestCase(section3, 'Battery status', 'warning', 
+                        `Could not get battery status: ${e.message}`);
+                }
+            } else {
+                addTestCase(section3, 'Battery API available', 'warning', 
+                    'Battery API not supported (emergency optimization limited)');
+            }
+            
+            console.log('✅ STAGE 3 completed');
+        }
+        
+        // ========================================
+        // ETAP 4: POLISH (UX, Accessibility)
+        // ========================================
+        
+        async function runStage4() {
+            console.log('🧪 Starting STAGE 4: POLISH TESTS');
+            
+            // Test 4.1: Browser Capabilities
+            const section1 = createTestSection('Test 4.1: Browser Compatibility', '🌐');
+            
+            // Check Speech Synthesis
+            if ('speechSynthesis' in window) {
+                addTestCase(section1, 'Speech Synthesis API', 'pass', 
+                    'Text-to-speech available');
+                    
+                const voices = speechSynthesis.getVoices();
+                const polishVoices = voices.filter(v => v.lang.includes('pl'));
+                
+                if (polishVoices.length > 0) {
+                    addTestCase(section1, 'Polish voices available', 'pass', 
+                        `Found ${polishVoices.length} Polish voice(s): ${polishVoices.map(v => v.name).slice(0, 3).join(', ')}`);
+                } else {
+                    addTestCase(section1, 'Polish voices available', 'warning', 
+                        'No Polish voices found - may load after page load');
+                }
+            } else {
+                addTestCase(section1, 'Speech Synthesis API', 'fail', 
+                    'Speech synthesis not supported');
+            }
+            
+            // Check Geolocation
+            if ('geolocation' in navigator) {
+                addTestCase(section1, 'Geolocation API', 'pass', 
+                    'Location services available');
+            } else {
+                addTestCase(section1, 'Geolocation API', 'fail', 
+                    'Geolocation not supported');
+            }
+            
+            // Check Notification API
+            if ('Notification' in window) {
+                addTestCase(section1, 'Notification API', 'pass', 
+                    `Notifications available (Permission: ${Notification.permission})`);
+            } else {
+                addTestCase(section1, 'Notification API', 'warning', 
+                    'Notifications not supported');
+            }
+            
+            // Test 4.2: Performance & Storage
+            const section2 = createTestSection('Test 4.2: Performance & Storage', '⚡');
+            
+            // Check localStorage usage
+            let localStorageSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    localStorageSize += localStorage[key].length + key.length;
+                }
+            }
+            const sizeMB = (localStorageSize / 1024 / 1024).toFixed(2);
+            
+            if (localStorageSize < 5 * 1024 * 1024) { // < 5MB
+                addTestCase(section2, 'localStorage usage', 'pass', 
+                    `Using ${sizeMB} MB of localStorage (efficient)`);
+            } else {
+                addTestCase(section2, 'localStorage usage', 'warning', 
+                    `Using ${sizeMB} MB of localStorage (consider cleanup)`);
+            }
+            
+            // Check IndexedDB support
+            if ('indexedDB' in window) {
+                addTestCase(section2, 'IndexedDB available', 'pass', 
+                    'IndexedDB for advanced storage available');
+            } else {
+                addTestCase(section2, 'IndexedDB available', 'warning', 
+                    'IndexedDB not supported');
+            }
+            
+            // Test 4.3: Security Headers & Context
+            const section3 = createTestSection('Test 4.3: Security Context', '🔐');
+            
+            // Check HTTPS
+            if (location.protocol === 'https:' || location.hostname === 'localhost') {
+                addTestCase(section3, 'Secure context', 'pass', 
+                    `Running in secure context: ${location.protocol}`);
+            } else {
+                addTestCase(section3, 'Secure context', 'fail', 
+                    'Not running in secure context (HTTPS required for production)');
+            }
+            
+            // Check console for errors
+            const hasConsoleErrors = false; // We can't programmatically check this easily
+            addTestCase(section3, 'Console error check', 'info', 
+                'Check browser console manually for any errors');
+            
+            console.log('✅ STAGE 4 completed');
+        }
+        
+        // ========================================
         // RUN ALL TESTS
         // ========================================
         
@@ -495,6 +703,8 @@
             
             await runStage1();
             await runStage2();
+            await runStage3();
+            await runStage4();
             
             document.getElementById('runBtn').disabled = false;
             console.log('🎉 All tests completed!');
