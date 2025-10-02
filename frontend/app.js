@@ -167,7 +167,6 @@ function saveUserMemory() {
 // Update visit count and show smart welcome message
 function updateVisitCount() {
     userMemory.visitCount++;
-    console.log(`📊 Visit count updated: ${userMemory.visitCount}`);
     saveUserMemory();
     
     // Check if we have parental consent for smart welcome
@@ -175,8 +174,8 @@ function updateVisitCount() {
     
     if (consentData.granted) {
         // Use smart AI welcome based on age and context
-        setTimeout(() => {
-            const smartWelcome = generateSmartSpeech('welcome');
+        setTimeout(async () => {
+            const smartWelcome = await generateSmartSpeech('welcome');
             const mascotText = document.getElementById('mascot-text');
             if (mascotText) {
                 mascotText.textContent = smartWelcome;
@@ -186,9 +185,6 @@ function updateVisitCount() {
             }
         }, 3000);
     }
-    
-    // REMOVED: Annoying visit count welcome messages
-    // Users don't want to hear about visit numbers
 }
 
 // Add learned tip to memory
