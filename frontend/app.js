@@ -35,7 +35,7 @@ let map = null;
 let markersLayer = null;
 let userLocation = null;
 let userLocationMarker = null;
-let speechEnabled = localStorage.getItem('speech_enabled') === 'true' || true;
+let speechEnabled = localStorage.getItem('speech_enabled') !== 'false'; // Default: true
 
 // ?? LOADING STATES - Child-friendly visual feedback
 function showLoader(targetElement, message = '�aduj�...') {
@@ -2786,6 +2786,7 @@ if (document.readyState === 'loading') {
 }
 
 console.log('?? App.js loaded successfully');
+
 
 
 
