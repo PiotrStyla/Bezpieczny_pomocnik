@@ -1,4 +1,4 @@
-/*
+﻿/*
  * 🛡️ PARENT ROUTING SAFETY
  * Critical safety checks before showing route to parent
  * Prevents showing route when child is already near parent
@@ -170,18 +170,13 @@ async function safeShowParentOnMap(childLat, childLon) {
     // Decide action based on validation
     switch (validation.action) {
         case 'already_there':
-            // Just show markers, no route
-            if (window.showParentOnMap) {
-                await window.showParentOnMap(childLat, childLon);
-            }
-            // Prevent routing
+            // DON'T show map - just message
+            // Parent is right here!
             return 'already_there';
             
         case 'very_close':
-            // Show markers, no route needed
-            if (window.showParentOnMap) {
-                await window.showParentOnMap(childLat, childLon);
-            }
+            // DON'T show map - just message  
+            // Parent is very close
             return 'very_close';
             
         case 'old_location':
@@ -216,3 +211,4 @@ window.calculateDistance = calculateDistance;
 window.isLocationRecent = isLocationRecent;
 
 console.log('✅ Parent routing safety module loaded');
+
