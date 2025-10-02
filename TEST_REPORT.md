@@ -182,7 +182,7 @@
 | Notification API | ✅ PASS | Notifications available (Permission: default) |
 
 **Analysis:**  
-- **Speech Synthesis:** ✅ 3 Polish voices (Czubówna-ready!)
+- **Speech Synthesis:** ✅ 3 Polish voices (professional quality!)
 - **Geolocation:** ✅ Ready for "Gdzie jestem?" feature
 - **Notifications:** ✅ Can request permission from user
 - **Browser support:** ✅ EXCELLENT
@@ -227,7 +227,7 @@
 4. **Performance:** Ultra-efficient storage usage (0.00 MB)
 5. **Compatibility:** All major browser APIs supported
 6. **Multi-child:** Session management fully operational
-7. **Speech:** 3 Polish voices available (Microsoft Paulina perfect for Czubówna!)
+7. **Speech:** 3 Polish voices available (Microsoft Paulina perfect for educational content!)
 
 ### ⚠️ Warnings (All Expected/Explained)
 

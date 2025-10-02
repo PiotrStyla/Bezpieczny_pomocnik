@@ -287,7 +287,7 @@ function initMap() {
     }
 }
 
-// Speech functions with Krystyna Czubówna-inspired voice
+// Speech functions with professional educational voice
 async function speakText(text, lang = 'pl') {
     // Handle async text (Promises)
     if (text instanceof Promise) {
@@ -321,35 +321,35 @@ async function speakText(text, lang = 'pl') {
     }
 
     setTimeout(() => {
-        // Format text with Krystyna Czubówna-style pauses
+        // Format text with educational voice-style pauses
         const czubownaText = formatTextForCzubowna(text);
         const utterance = new SpeechSynthesisUtterance(czubownaText);
         
-        // Select voice most similar to Krystyna Czubówna
+        // Select most suitable professional Polish voice
         const selectedVoice = selectCzubownaLikeVoice(lang);
         if (selectedVoice) {
             utterance.voice = selectedVoice;
-            console.log(`🎭 Using Krystyna Czubówna-inspired voice: ${selectedVoice.name}`);
+            console.log(`🎭 Using professional educational voice: ${selectedVoice.name}`);
         }
         
         utterance.lang = lang === 'pl' ? 'pl-PL' : lang === 'en' ? 'en-US' : 'uk-UA';
         
-        // KRYSTYNA CZUBÓWNA SIGNATURE PARAMETERS:
-        utterance.rate = 0.55;   // Very slow, contemplative like Czubówna
+        // PROFESSIONAL EDUCATIONAL VOICE PARAMETERS:
+        utterance.rate = 0.55;   // Very slow, contemplative for child comprehension
         utterance.pitch = 1.15;  // Gentle, warm feminine tone
         utterance.volume = 0.9;  // Clear, confident but not aggressive
         
-        // Add Czubówna-style emotional expression
+        // Add professional educational emotional expression
         utterance.onstart = () => {
-            console.log('🚀 Krystyna Czubówna-inspired speech started (parental consent verified)');
+            console.log('🚀 Professional educational speech started (parental consent verified).');
         };
         
         utterance.onend = () => {
-            console.log('✅ Krystyna Czubówna-style speech completed');
+            console.log('✅ Professional educational speech completed');
         };
 
         window.speechSynthesis.speak(utterance);
-    }, 400); // Slightly longer pause before speaking (Czubówna style)
+    }, 400); // Slightly longer pause before speaking (professional style)
 }
 
 /**
@@ -417,7 +417,7 @@ function formatTextForCzubowna(text) {
     // 🔢 FORMAT NUMBERS FOR CHILDREN - pojedyncze cyfry
     formatted = formatNumbersForChildren(formatted);
     
-    // Add characteristic Czubówna pauses:
+    // Add characteristic educational pauses:
     
     // After important words (bezpieczeństwo, lokalizacja, etc.)
     formatted = formatted.replace(/\b(bezpieczeństwo|lokalizacja|dziecko|rodzic|pomoc|zagrożenie)\b/gi, '$1...');
@@ -428,7 +428,7 @@ function formatTextForCzubowna(text) {
     // Before important information
     formatted = formatted.replace(/\b(uwaga|pamiętaj|ważne|ostrzeżenie)\b/gi, '...$1');
     
-    // Add pauses after punctuation (Czubówna's signature dramatic timing)
+    // Add pauses after punctuation (professional dramatic timing for clarity)
     formatted = formatted.replace(/([.!?])\s+/g, '$1... ');
     
     // Add gentle pauses in longer sentences (every 4-5 words)
@@ -448,7 +448,7 @@ function formatTextForCzubowna(text) {
     // Clean up multiple consecutive pauses
     formatted = formatted.replace(/\.{6,}/g, '...');
     
-    console.log(`🎭 Formatted for Czubówna style: "${formatted}"`);
+    console.log(`🎭 Formatted for educational style: "${formatted}"`);
     return formatted;
 }
 
@@ -464,15 +464,15 @@ function selectCzubownaLikeVoice(lang = 'pl') {
         return null;
     }
     
-    // Krystyna Czubówna voice characteristics priority:
+    // Professional Polish voice characteristics priority:
     const czubownaPreferences = [
-        // Polish voices that sound mature and warm (like Czubówna)
+        // Polish voices that sound mature and warm for children
         'Microsoft Paulina - Polish (Poland)',  // Usually the best for Polish
         'Paulina',
         'Microsoft Zofia - Polish (Poland)', 
         'Zofia',
         'Agnieszka',  // Often has mature, warm tone
-        'Ewa',        // Sometimes sounds similar to Czubówna
+        'Ewa',        // Professional, warm tone
         'Anna',
         'Kasia',
         'Google polski',
@@ -485,14 +485,14 @@ function selectCzubownaLikeVoice(lang = 'pl') {
     );
     console.log('🇵🇱 Available Polish voices:', polishVoices.map(v => v.name));
     
-    // Try to find the best Czubówna-like voice
+    // Try to find the best professional educational voice
     for (const preference of czubownaPreferences) {
         const voice = voices.find(v => 
             v.name.includes(preference) && 
             (v.lang.includes('pl') || v.lang.includes('PL'))
         );
         if (voice) {
-            console.log(`✅ Found Czubówna-like voice: ${voice.name}`);
+            console.log(`✅ Found professional educational voice: ${voice.name}`);
             return voice;
         }
     }
@@ -656,7 +656,7 @@ function initializeVoices() {
             // Pre-select the best voice for children
             const childVoice = selectCzubownaLikeVoice('pl');
             if (childVoice) {
-                console.log(`👶 Pre-selected Czubówna-like voice: ${childVoice.name}`);
+                console.log(`👶 Pre-selected professional voice for children: ${childVoice.name}`);
             }
         };
     }
@@ -1573,7 +1573,7 @@ function showChildAlert(alert, childMessage) {
         mascotText.style.animation = 'pulse 2s infinite';
     }
     
-    // Speak the alert using Czubówna-inspired voice synthesis
+    // Speak the alert using professional educational voice synthesis
     // Remove emoji for speech synthesis (voice can't read emoji properly)
     const speechMessage = childMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
     speakText(speechMessage);
@@ -2661,7 +2661,7 @@ async function loadSafetyTipsFromCMS() {
 
 /**
  * 🎵 READ SAFETY TIP ALOUD
- * Reads safety tip using Czubówna-inspired voice with parental consent check
+ * Reads safety tip using professional educational voice with parental consent check
  */
 async function readSafetyTipAloud(tip) {
     try {
