@@ -722,9 +722,7 @@ function toggleSpeech() {
     
     const btn = document.getElementById('speech-toggle-btn');
     if (btn) {
-        btn.innerHTML = speechEnabled ? 
-            '<span class="btn-icon">??</span><span class="btn-text">Czytanie w��czone</span>' :
-            '<span class="btn-icon">??</span><span class="btn-text">Czytanie wy��czone</span>';
+        btn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie wyłączone</span>';
         btn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
     }
 }
@@ -2120,9 +2118,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (speechBtn) {
         speechBtn.addEventListener('click', toggleSpeech);
         // Initialize button state
-        speechBtn.innerHTML = speechEnabled ? 
-            '<span class="btn-icon">??</span><span class="btn-text">Czytanie w��czone</span>' :
-            '<span class="btn-icon">??</span><span class="btn-text">Czytanie wy��czone</span>';
+        speechbtn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie wyłączone</span>';
         speechBtn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
     }
     
