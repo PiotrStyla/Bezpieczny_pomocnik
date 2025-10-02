@@ -2218,27 +2218,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // Location button handler
-    const locationBtn = document.getElementById('location-btn');
-    if (locationBtn) {
-        locationBtn.addEventListener('click', () => {
-            console.log('📍 Location button clicked');
-            getUserLocation(true);
-            
-            // Generate age-appropriate location message
-            const locationMessage = generateLocationMessage();
-            
-            const mascotText = document.getElementById('mascot-text');
-            if (mascotText) {
-                mascotText.textContent = locationMessage.text;
-            }
-            
-            speakText(locationMessage.speech);
-            
-            // Track location usage
-            trackFeatureUsage('location');
-        });
-    }
+    // Location button handler - REMOVED (button was deleted from UI)
 
     // Parent location button handler
     const parentLocationBtn = document.getElementById('parent-location-btn');
