@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Force Cache Clear - Bezpieczny Pomocnik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .critical {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        
+        .critical strong {
+            color: #856404;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: scale(1.02);
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .danger {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        }
+        
+        .log {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 3px 0;
+        }
+        
+        .success {
+            color: #4caf50;
+        }
+        
+        .error {
+            color: #f44336;
+        }
+        
+        .info {
+            color: #2196f3;
+        }
+        
+        .warning {
+            color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 Force Cache Clear</h1>
+        <p class="subtitle">Natychmiastowe czyszczenie cache aplikacji</p>
+        
+        <div class="critical">
+            <strong>⚠️ KRYTYCZNE:</strong> Użyj tego narzędzia gdy aplikacja nie aktualizuje się po deployment.
+        </div>
+        
+        <button onclick="softClear()">🔄 Miękkie czyszczenie (zalecane)</button>
+        <button onclick="hardClear()" class="danger">💣 Twarde czyszczenie (usuń wszystko)</button>
+        <button onclick="reloadApp()">🚀 Przeładuj aplikację</button>
+        
+        <div class="log" id="log"></div>
+    </div>
+    
+    <script>
+        const log = document.getElementById('log');
+        
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        async function softClear() {
+            addLog('🔄 Rozpoczynam miękkie czyszczenie...', 'info');
+            
+            try {
+                // 1. Unregister Service Worker
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                        addLog('✅ Service Worker odrejestrowany', 'success');
+                    }
+                }
+                
+                // 2. Clear all caches
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    addLog(`📦 Znaleziono ${cacheNames.length} cache'y`, 'info');
+                    
+                    for (let cacheName of cacheNames) {
+                        await caches.delete(cacheName);
+                        addLog(`🗑️ Usunięto cache: ${cacheName}`, 'success');
+                    }
+                }
+                
+                // 3. Clear localStorage (preserve ZK data)
+                const keysToPreserve = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('zk_') || key.startsWith('mina_')) {
+                        keysToPreserve.push({key, value: localStorage.getItem(key)});
+                    }
+                }
+                
+                localStorage.clear();
+                addLog('🧹 localStorage wyczyszczony', 'success');
+                
+                // Restore ZK data
+                for (let item of keysToPreserve) {
+                    localStorage.setItem(item.key, item.value);
+                }
+                addLog(`🔒 Przywrócono ${keysToPreserve.length} ZK kluczy`, 'success');
+                
+                addLog('✅ MIĘKKIE CZYSZCZENIE ZAKOŃCZONE!', 'success');
+                addLog('👉 Kliknij "Przeładuj aplikację"', 'warning');
+                
+            } catch (error) {
+                addLog(`❌ Błąd: ${error.message}`, 'error');
+            }
+        }
+        
+        async function hardClear() {
+            if (!confirm('⚠️ TO USUNIE WSZYSTKIE DANE WŁĄCZNIE Z USTAWIENIAMI RODZICA!\n\nCzy na pewno?')) {
+                return;
+            }
+            
+            addLog('💣 Rozpoczynam TWARDE czyszczenie...', 'warning');
+            
+            try {
+                // 1. Unregister Service Worker
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                        addLog('✅ Service Worker odrejestrowany', 'success');
+                    }
+                }
+                
+                // 2. Clear all caches
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    for (let cacheName of cacheNames) {
+                        await caches.delete(cacheName);
+                        addLog(`🗑️ Usunięto cache: ${cacheName}`, 'success');
+                    }
+                }
+                
+                // 3. Clear ALL localStorage
+                localStorage.clear();
+                addLog('🧹 localStorage całkowicie wyczyszczony', 'success');
+                
+                // 4. Clear sessionStorage
+                sessionStorage.clear();
+                addLog('🧹 sessionStorage wyczyszczony', 'success');
+                
+                // 5. Clear IndexedDB
+                if ('indexedDB' in window) {
+                    const databases = await indexedDB.databases();
+                    for (let db of databases) {
+                        indexedDB.deleteDatabase(db.name);
+                        addLog(`🗑️ Usunięto IndexedDB: ${db.name}`, 'success');
+                    }
+                }
+                
+                addLog('✅ TWARDE CZYSZCZENIE ZAKOŃCZONE!', 'success');
+                addLog('👉 Kliknij "Przeładuj aplikację"', 'warning');
+                
+            } catch (error) {
+                addLog(`❌ Błąd: ${error.message}`, 'error');
+            }
+        }
+        
+        function reloadApp() {
+            addLog('🚀 Przeładowuję aplikację...', 'info');
+            setTimeout(() => {
+                window.location.href = './index.html?nocache=' + Date.now();
+            }, 500);
+        }
+        
+        // Auto-check cache status on load
+        window.addEventListener('load', async () => {
+            addLog('🔍 Sprawdzam aktualny status cache...', 'info');
+            
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                addLog(`📦 Znaleziono ${cacheNames.length} cache'y: ${cacheNames.join(', ')}`, 'info');
+            }
+            
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                addLog(`🔧 Aktywnych Service Workers: ${registrations.length}`, 'info');
+            }
+            
+            const zkKeys = Object.keys(localStorage).filter(k => k.startsWith('zk_') || k.startsWith('mina_'));
+            addLog(`🔒 Kluczy ZK w localStorage: ${zkKeys.length}`, 'info');
+        });
+    </script>
+</body>
+</html>
