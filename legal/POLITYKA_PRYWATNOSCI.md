@@ -1,4 +1,4 @@
-# POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
+﻿# POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Zgodna z RODO | Obowiązuje od: 21 września 2025 r.**
 **Aktualizacja 02.10.2025: Multi-source alert fetching (RSS2JSON API, AllOrigins Proxy), real-time source monitoring**
@@ -269,3 +269,64 @@ W przypadku podejrzenia naruszenia danych osobowych prosimy o natychmiastowy kon
 **Wersja:** 1.3 (Multi-source alerts, honest status monitoring)
 
 *Ta polityka została opracowana zgodnie z RODO oraz uwzględnia szczególne wymogi ochrony danych dzieci poniżej 16. roku życia.*
+
+
+
+## 🔐 ŚRODKI BEZPIECZEŃSTWA TECHNICZNE (Art. 32 RODO)
+
+### Szyfrowanie danych (zaktualizowane 2025-10-02)
+
+**Wszystkie dane osobowe dziecka są chronione szyfrowaniem:**
+
+#### **Standard szyfrowania:**
+- **Algorytm:** AES-256-GCM (Advanced Encryption Standard, 256-bit)
+- **Tryb:** Galois/Counter Mode (uwierzytelnione szyfrowanie)
+- **Key Derivation:** PBKDF2 z 100,000 iteracjami
+- **Integralność:** HMAC-SHA256
+
+#### **Dane podlegające szyfrowaniu:**
+1. Lokalizacja GPS dziecka (współrzędne geograficzne)
+2. Lokalizacja GPS rodzica (współrzędne geograficzne)  
+3. Adres domowy rodziny
+4. Wiadomości rodzica do dziecka
+5. Ustawienia prywatności
+6. Historia lokalizacji
+
+#### **Techniczne środki ochrony:**
+- ✅ 256-bitowy klucz szyfrowania (praktycznie niemożliwy do złamania)
+- ✅ Unikalny IV (Initialization Vector) dla każdego rekordu
+- ✅ Unikalny salt dla każdego zaszyfrowanego elementu
+- ✅ Weryfikacja integralności danych (HMAC)
+- ✅ Ochrona przed modyfikacją danych
+- ✅ Client-side encryption (dane nie opuszczają urządzenia w formie niezaszyfrowanej)
+
+#### **Zgodność z przepisami:**
+- ✅ RODO Art. 32(1)(a) - pseudonimizacja i szyfrowanie danych osobowych
+- ✅ RODO Art. 25 - privacy by design i privacy by default
+- ✅ COPPA - ochrona danych dzieci poniżej 13 lat
+- ✅ FIPS 197 - Federal Information Processing Standards
+- ✅ NIST SP 800-38D - rekomendacje dla trybu GCM
+
+#### **Dostęp do danych:**
+Dostęp do zaszyfrowanych danych dziecka:
+- ❌ Niemożliwy bez hasła rodzinnego
+- ❌ Niemożliwy przez osoby trzecie
+- ❌ Niemożliwy przez administratora (nie ma dostępu do hasła)
+- ✅ Możliwy tylko przez rodzica z prawidłowym hasłem rodzinnym
+
+#### **Przechowywanie:**
+- Dane przechowywane w localStorage przeglądarki
+- Wszystkie dane w formie zaszyfrowanej
+- Brak przesyłania do serwera (100% client-side)
+- Automatyczne usuwanie przy wyczyszczeniu danych przeglądarki
+
+### Audyt bezpieczeństwa
+
+Administrator przeprowadza regularne audyty bezpieczeństwa:
+- Przegląd kodu źródłowego
+- Testy penetracyjne
+- Weryfikacja szyfrowania
+- Aktualizacje zabezpieczeń
+
+Dokumentacja audytu dostępna w: \SECURITY_AUDIT.md\
+

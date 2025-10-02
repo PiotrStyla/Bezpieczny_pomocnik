@@ -1,4 +1,4 @@
-# 🛡️ Bezpieczny Pomocnik - Opis Technologiczny
+﻿# 🛡️ Bezpieczny Pomocnik - Opis Technologiczny
 
 **Zaawansowana aplikacja bezpieczeństwa dla dzieci z systemem Zero-Knowledge Privacy**
 
@@ -33,7 +33,7 @@
 │• Voice Synthesis │    │• Emergency Ctrl  │    │• IMGW Weather   │
 │• Safety Education│    │• Child Age Mgmt  │    │• Local Gov APIs │
 │• Emergency Btns  │    │• ZKP Encryption  │    │• OpenStreetMap  │
-│• Real-time Alert │    │• Parental Consent│    │• Polish AI (LLM)│
+│• Real-time Alert │    │• Parental Consent│    │• Bielik AI      │
 └──────────────────┘    └──────────────────┘    └─────────────────┘
            │                       │                       │
            └───────────────────────┼───────────────────────┘
@@ -115,19 +115,28 @@
 ### **🚨 SYSTEM ALERTÓW (30s vs 3-4h przewaga)**
 
 ```
-📡 SOURCES → ⚡ PROCESSING → 👶 CHILD OUTPUT
+📡 MULTI-SOURCE FETCHING → ⚡ PROCESSING → 👶 CHILD OUTPUT
 
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ RCB Alerts  │    │   AI Alert  │    │ Educational │
-│IMGW Weather │───►│ Classifier  │───►│    Voice    │
-│Local Gov    │    │             │    │  Synthesis  │
-│             │    │• Age-adapt  │    │             │
-└─────────────┘    │• Geo-filter │    └─────────────┘
-                   │• Severity   │           │
-┌─────────────┐    │• Parent CMS │    ┌─────────────┐
-│ Parent CMS  │───►│  Override   │───►│   Visual    │
-│ Override    │    └─────────────┘    │ Interface   │
-└─────────────┘                       └─────────────┘
+┌─────────────────┐    ┌─────────────┐    ┌─────────────┐
+│ RCB RSS Feed   │    │   AI Alert  │    │ Educational │
+│ ├─RSS2JSON API │───►│ Classifier  │───►│    Voice    │
+│ └─AllOrigins   │    │             │    │  Synthesis  │
+│   Proxy        │    │• Age-adapt  │    │             │
+│                │    │• Geo-filter │    └─────────────┘
+│IMGW Weather    │    │• Severity   │           │
+│Local Gov APIs  │    │• Parent CMS │    ┌─────────────┐
+└─────────────────┘    │  Override   │───►│   Visual    │
+         │             └─────────────┘    │ Interface   │
+┌─────────────────┐           │           │ + Honest    │
+│ Parent CMS      │───────────┘           │ Status      │
+│ Override        │                       │ Indicator   │
+└─────────────────┘                       └─────────────┘
+
+🎯 MULTI-SOURCE STRATEGY:
+1. Try RSS2JSON API (api.rss2json.com)
+2. Fallback: AllOrigins Proxy (api.allorigins.win)  
+3. Real-time status monitoring
+4. Honest ACTIVE/OFFLINE/DISABLED indicator
 ```
 
 ### **🎭 SYNTEZA MOWY**
@@ -185,16 +194,18 @@ Volume: 0.9   (Wyraźny, pewny głos)
 - **Features:** PWA, Offline, Responsive, A11y
 
 ### **Backend/AI:**
-- **AI:** Polish LLM (OpenAI/PLLuM), custom NLP
+- **AI:** Bielik (Polish LLM), custom NLP
 - **Data:** RCB, IMGW, Local Gov APIs
 - **Privacy:** Mina Protocol ZKP
-- **Security:** Client-side encryption, no server storage
+- **Security:** AES-256-GCM encryption (Web Crypto API), PBKDF2 key derivation, HMAC integrity, client-side only
 
 ### **Deployment:**
 - **Primary:** GitHub Pages (CDN, HTTPS, Auto-deploy)
-- **Backup:** Render/Netlify
+- **Frontend-only:** Static files, no backend required
+- **Alert Sources:** RSS2JSON API + AllOrigins Proxy
+- **Cache:** Service Worker v1.4.2-real-alerts
 - **Testing:** Automated testing pipeline
-- **Monitoring:** Performance + security metrics
+- **Monitoring:** Real-time source status tracking
 
 ---
 
@@ -301,8 +312,7 @@ Production Settings:
 ## 📞 **CONTACT & SUPPORT**
 
 **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**
-- **Address:** 30-404 Kraków, ul. Czajniarska 68/45
-- **Phone:** +48 735 749 618
+- **Address:** 30-404 Kraków, ul. Cegielniana 6B/45
 - **Email:** kontakt@fundacja-hospicjum.org
 - **Website:** https://fundacja-hospicjum.org/
 
@@ -311,5 +321,127 @@ Production Settings:
 ---
 
 *Dokument utworzony: 2025-01-27*  
-*Wersja: 2.0 Production*  
+*Ostatnia aktualizacja: 2025-10-02*  
+*Wersja: 2.1 Production - Real Alerts*  
 *Status: Active Deployment*
+
+---
+
+## 📝 **CHANGELOG v2.1 (2025-10-02)**
+
+### ✅ **Nowe funkcje:**
+1. **Multi-source Alert Fetching**
+   - RSS2JSON API (primary)
+   - AllOrigins Proxy (fallback)
+   - Automatyczne przełączanie przy awarii
+
+2. **Alert Source Monitoring**
+   - Real-time status tracking (alertSourceWorking)
+   - Last successful fetch timestamp
+   - Honest status communication
+
+3. **Improved Status Indicator**
+   - ✅ AKTYWNE (zielony) - źródło działa
+   - ⚠️ OFFLINE (pomarańczowy) - próbuje połączyć
+   - ❌ WYŁĄCZONE (czerwony) - wyłączone przez użytkownika
+
+4. **Force Cache Clear Utility**
+   - Dedykowane narzędzie do czyszczenia cache
+   - Soft clear (zachowuje dane ZK)
+   - Hard clear (usuwa wszystko)
+
+5. **Frontend-only Architecture**
+   - Zero dependency na backend
+   - Direct RSS fetching z RCB
+   - GitHub Pages deployment
+
+
+
+## 🔐 **BEZPIECZEŃSTWO I SZYFROWANIE**
+
+### **Web Crypto API - Military-Grade Encryption**
+
+**Wdrożono:** 2025-10-02  
+**Standard:** AES-256-GCM (Advanced Encryption Standard, 256-bit, Galois/Counter Mode)
+
+#### **Chronione dane:**
+- 📍 Lokalizacja GPS dziecka (współrzędne)
+- 👨‍👩‍👧 Lokalizacja GPS rodzica (współrzędne)
+- 🏠 Adres domowy (pełny adres)
+- 💬 Wiadomości rodzica do dziecka
+- ⚙️ Ustawienia prywatności i bezpieczeństwa
+- 🔑 Wszystkie dane w systemie ZK
+
+#### **Techniczne szczegóły szyfrowania:**
+
+1. **AES-256-GCM:**
+   - Symetryczne szyfrowanie z uwierzytelnianiem
+   - 256-bitowy klucz (praktycznie niemożliwy do złamania)
+   - Galois/Counter Mode dla integralności i poufności
+   - Zgodne z FIPS 197 i NIST SP 800-38D
+
+2. **PBKDF2 (Key Derivation):**
+   - 100,000 iteracji (ochrona przed brute-force)
+   - SHA-256 hash function
+   - Unikalny salt dla każdego rekordu (16 bajtów)
+   - Zgodne z NIST SP 800-132
+
+3. **HMAC-SHA256 (Data Integrity):**
+   - Weryfikacja integralności danych
+   - Wykrywa manipulacje/modyfikacje
+   - Authenticated encryption
+
+4. **Random Generation:**
+   - Crypto-secure random dla IV (12 bajtów)
+   - Crypto-secure random dla salt (16 bajtów)
+   - Używa crypto.getRandomValues()
+
+#### **Architektura bezpieczeństwa:**
+
+\\\
+Dane dziecka
+    ↓
+[Hasło rodzinne] → PBKDF2 (100k iter) → Klucz AES-256
+    ↓
+[Klucz + Random IV] → AES-256-GCM → Zaszyfrowane dane
+    ↓
+[Zaszyfrowane] → HMAC-SHA256 → Podpis integralności
+    ↓
+localStorage (zaszyfrowane + HMAC)
+\\\
+
+#### **Compliance:**
+- ✅ **RODO Art. 32(1)(a):** "Pseudonimizacja i szyfrowanie danych osobowych"
+- ✅ **RODO Art. 25:** "Privacy by design and by default"
+- ✅ **COPPA:** Ochrona danych dzieci poniżej 13 roku życia
+- ✅ **Dyrektywa NIS2:** Wymagania cyberbezpieczeństwa
+
+#### **Migracja ze starego formatu:**
+- Automatyczna detekcja starych danych (base64)
+- Konwersja do AES-256-GCM przy pierwszym odczycie
+- Zachowanie zgodności wstecznej
+- Bezpieczne usuwanie starych danych
+
+#### **Dostęp do danych:**
+❌ **Niemożliwe bez hasła rodzinnego:**
+- Włamanie do localStorage
+- Przechwycenie danych przez inne skrypty
+- Fizyczny dostęp do urządzenia
+- Man-in-the-middle attack (dane już zaszyfrowane)
+
+✅ **Możliwe tylko z hasłem:**
+- Poprawne hasło rodzinne
+- Prawidłowy klucz szyfrujący
+
+#### **Plany rozwoju:**
+1. **Krótkoterminowe:**
+   - UI dla rodzica do ustawiania hasła rodzinnego
+   - Rate limiting na próby deszyfrowania
+   - Audit log dostępu do wrażliwych danych
+
+2. **Długoterminowe:**
+   - Integracja z prawdziwym Mina Protocol ZKP
+   - Public/private key infrastructure
+   - Digital signatures dla wiadomości rodzica
+   - Hardware security module (HSM) support
+
