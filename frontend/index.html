@@ -23,11 +23,7 @@
                     <p class="kids-subtitle">Twój przyjaciel bezpieczeństwa!</p>
                 </div>
                 
-                <nav class="kids-nav">
-                    <button id="lang-pl" class="lang-btn active">🇵🇱 Polski</button>
-                    <button id="lang-en" class="lang-btn">🇺🇸 English</button>
-                    <button id="lang-ua" class="lang-btn">🇺🇦 Українська</button>
-                </nav>
+                <!-- Language selection simplified - Polski is default -->
             </div>
         </header>
 
@@ -54,7 +50,7 @@
                 </div>
 
                 <div class="control-card">
-                    <h3>🔔 Powiadomienia</h3>
+                    <h3>🔔 Powiadomienia o zagrożeniach</h3>
                     <button id="notifications-btn" class="kids-button notifications-btn">
                         <span class="btn-icon">📱</span>
                         <span class="btn-text">Włącz powiadomienia</span>
@@ -62,20 +58,14 @@
                 </div>
 
                 <div class="control-card">
-                    <h3>🔊 Czytanie na głos</h3>
+                    <h3>🔊 Głos pomocnika</h3>
                     <button id="speech-toggle-btn" class="kids-button speech-btn">
                         <span class="btn-icon">🔊</span>
-                        <span class="btn-text">Czytanie włączone</span>
+                        <span class="btn-text">Głos włączony</span>
                     </button>
                 </div>
 
-                <div class="control-card">
-                    <h3>📍 Twoja lokalizacja</h3>
-                    <button id="location-btn" class="kids-button location-btn">
-                        <span class="btn-icon">📍</span>
-                        <span class="btn-text">Znajdź mnie</span>
-                    </button>
-                </div>
+                <!-- Location button removed - duplicates 'Gdzie jestem?' functionality -->
 
                 <div class="control-card">
                     <h3>👨‍👩‍👧 Gdzie są rodzice?</h3>
@@ -259,7 +249,7 @@
     <script src="parental-consent.js"></script>
     <script src="mina-parental-zk.js"></script>
     <script src="enhanced-security-zk.js"></script> <!-- Enhanced Security Storage -->
-    <script src="test-enhanced-security.js"></script> <!-- Temporary Security Test -->
+    <!-- test-enhanced-security.js removed - test scripts should not run in production -->
     <script src="child-session-manager.js"></script> <!-- Multi-Child Support - RODO Art. 8 -->
     <script src="parent-cms.js"></script> <!-- Parent CMS functions for main app --> <!-- ZK Privacy for RODO Art. 8 -->
     <script src="adaptive-learning.js"></script> <!-- AI Learning System -->
@@ -278,7 +268,7 @@
     <script type="module" src="emergency-mina-integration.js"></script>
     
     <!-- 🔒 PERSISTENT SETTINGS & PWA SYSTEM -->
-    <script src="enhanced-security-zk.js"></script>
+    <!-- enhanced-security-zk.js already loaded above to avoid duplication -->
     <script src="persistent-settings-zk.js"></script>
     <script src="pwa-installer.js"></script>
     
@@ -293,15 +283,6 @@
                 if (window.PersistentSettings) {
                     const settings = await window.PersistentSettings.loadSettings();
                     console.log('✅ Settings restored:', settings);
-                    
-                    // Apply restored settings to UI
-                    if (settings.language && settings.language !== 'pl') {
-                        const langBtn = document.getElementById(`lang-${settings.language}`);
-                        if (langBtn) {
-                            langBtn.click();
-                            console.log(`🌐 Language restored: ${settings.language}`);
-                        }
-                    }
                     
                     // Apply sound settings
                     if (typeof settings.soundEnabled === 'boolean') {
