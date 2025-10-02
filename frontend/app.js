@@ -1,6 +1,6 @@
-/*
+ï»¿/*
  * Bezpieczny Pomocnik - Child Safety Application
- * Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Królowej Aposto³ów w Krakowie
+ * Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Krï¿½lowej Apostoï¿½ï¿½w w Krakowie
  */
 
 console.log('?? APP.JS LOADING...');
@@ -8,8 +8,8 @@ console.log('? Timestamp:', new Date().toISOString());
 
 // IMMEDIATELY define critical functions
 window.testSpeech = function() {
-    console.log('?? TEST: Klikniêto przycisk test mowy');
-    const testMessage = "Witaj! To jest test mowy. Jeœli mnie s³yszysz, znaczy ¿e wszystko dzia³a!";
+    console.log('?? TEST: Klikniï¿½to przycisk test mowy');
+    const testMessage = "Witaj! To jest test mowy. Jeï¿½li mnie sï¿½yszysz, znaczy ï¿½e wszystko dziaï¿½a!";
     
     if (window.speechSynthesis) {
         const utterance = new SpeechSynthesisUtterance(testMessage);
@@ -18,15 +18,15 @@ window.testSpeech = function() {
         utterance.pitch = 1.1;
         utterance.volume = 1.0;
         
-        utterance.onstart = () => console.log('?? Test mowy rozpoczêty');
-        utterance.onend = () => console.log('? Test mowy zakoñczony');
-        utterance.onerror = (e) => console.log('? B³¹d test mowy:', e.error);
+        utterance.onstart = () => console.log('?? Test mowy rozpoczï¿½ty');
+        utterance.onend = () => console.log('? Test mowy zakoï¿½czony');
+        utterance.onerror = (e) => console.log('? Bï¿½ï¿½d test mowy:', e.error);
         
         window.speechSynthesis.speak(utterance);
-        console.log('?? Test speak() wys³any');
+        console.log('?? Test speak() wysï¿½any');
     } else {
-        console.log('? Brak TTS w przegl¹darce');
-        alert('Twoja przegl¹darka nie obs³uguje mowy!');
+        console.log('? Brak TTS w przeglï¿½darce');
+        alert('Twoja przeglï¿½darka nie obsï¿½uguje mowy!');
     }
 };
 
@@ -38,7 +38,7 @@ let userLocationMarker = null;
 let speechEnabled = localStorage.getItem('speech_enabled') === 'true' || true;
 
 // ?? LOADING STATES - Child-friendly visual feedback
-function showLoader(targetElement, message = '£adujê...') {
+function showLoader(targetElement, message = 'ï¿½adujï¿½...') {
     if (!targetElement) return null;
     
     const loader = document.createElement('div');
@@ -60,7 +60,7 @@ function hideLoader(targetElement) {
     loaders.forEach(loader => loader.remove());
 }
 
-function showMascotLoader(message = '?? Chwileczkê...') {
+function showMascotLoader(message = '?? Chwileczkï¿½...') {
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
         mascotText.innerHTML = `
@@ -230,7 +230,7 @@ function addLearnedTip(tipTitle) {
         // Check for achievement
         if (userMemory.learnedTips.length === 5 && !userMemory.achievements.includes('safety_expert')) {
             userMemory.achievements.push('safety_expert');
-            showAchievement('?? Ekspert Bezpieczeñstwa!', 'Pozna³eœ wszystkie 5 porad bezpieczeñstwa!');
+            showAchievement('?? Ekspert Bezpieczeï¿½stwa!', 'Poznaï¿½eï¿½ wszystkie 5 porad bezpieczeï¿½stwa!');
         }
         
         saveUserMemory();
@@ -256,7 +256,7 @@ function showAchievement(title, description) {
     }, 5000);
     
     if (speechEnabled) {
-        speakText(`Osi¹gniêcie odblokowane! ${title}. ${description}`);
+        speakText(`Osiï¿½gniï¿½cie odblokowane! ${title}. ${description}`);
     }
 }
 
@@ -295,7 +295,7 @@ function initMap() {
     }
 
     // Show loading indicator
-    const mapLoader = showLoader(mapElement, '??? £adujê mapê Polski...');
+    const mapLoader = showLoader(mapElement, '??? ï¿½adujï¿½ mapï¿½ Polski...');
 
     try {
         console.log('??? Creating Leaflet map...');
@@ -308,7 +308,7 @@ function initMap() {
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap contributors'
+            attribution: 'ï¿½ OpenStreetMap contributors'
         }).addTo(map);
 
         markersLayer = L.layerGroup().addTo(map);
@@ -336,7 +336,7 @@ async function speakText(text, lang = 'pl') {
             text = 'Error loading message';
         }
     }
-    console.log('?? CZUBÓWNA-INSPIRED VOICE SYNTHESIS:', text);
+    console.log('?? CZUBï¿½WNA-INSPIRED VOICE SYNTHESIS:', text);
     
     // RODO Art. 8 COMPLIANCE - Smart consent checking
     // If child age is available, it means parent has already verified via RODO process
@@ -393,7 +393,7 @@ async function speakText(text, lang = 'pl') {
 /**
  * ?? FORMAT NUMBERS FOR CHILDREN
  * Converts phone numbers and emergency numbers to individual digits
- * 112 › "jeden jeden dwa", 997 › "dziewiêæ dziewiêæ siedem"
+ * 112 ï¿½ "jeden jeden dwa", 997 ï¿½ "dziewiï¿½ï¿½ dziewiï¿½ï¿½ siedem"
  */
 function formatNumbersForChildren(text) {
     const digitMap = {
@@ -402,11 +402,11 @@ function formatNumbersForChildren(text) {
         '2': 'dwa',
         '3': 'trzy',
         '4': 'cztery',
-        '5': 'piêæ',
-        '6': 'szeœæ',
+        '5': 'piï¿½ï¿½',
+        '6': 'szeï¿½ï¿½',
         '7': 'siedem',
         '8': 'osiem',
-        '9': 'dziewiêæ'
+        '9': 'dziewiï¿½ï¿½'
     };
     
     // Function to convert number to individual digits
@@ -429,8 +429,8 @@ function formatNumbersForChildren(text) {
         return `numer ${numberToDigits(match, number)}`;
     });
     
-    // Standalone numbers after "dzwoñ" or "wybierz"
-    text = text.replace(/\b(dzwoñ|wybierz|naciœnij)\s+(\d{3,})\b/gi, (match, action, number) => {
+    // Standalone numbers after "dzwoï¿½" or "wybierz"
+    text = text.replace(/\b(dzwoï¿½|wybierz|naciï¿½nij)\s+(\d{3,})\b/gi, (match, action, number) => {
         return `${action} ${numberToDigits(match, number)}`;
     });
     
@@ -439,7 +439,7 @@ function formatNumbersForChildren(text) {
 }
 
 /**
- * ?? FORMAT TEXT FOR KRYSTYNA CZUBÓWNA STYLE
+ * ?? FORMAT TEXT FOR KRYSTYNA CZUBï¿½WNA STYLE
  * Adds characteristic pauses and rhythm like the legendary Polish narrator
  */
 function formatTextForCzubowna(text) {
@@ -457,14 +457,14 @@ function formatTextForCzubowna(text) {
     
     // Add characteristic educational pauses:
     
-    // After important words (bezpieczeñstwo, lokalizacja, etc.)
-    formatted = formatted.replace(/\b(bezpieczeñstwo|lokalizacja|dziecko|rodzic|pomoc|zagro¿enie)\b/gi, '$1...');
+    // After important words (bezpieczeï¿½stwo, lokalizacja, etc.)
+    formatted = formatted.replace(/\b(bezpieczeï¿½stwo|lokalizacja|dziecko|rodzic|pomoc|zagroï¿½enie)\b/gi, '$1...');
     
     // After conjunctions (natural speech breaks)
-    formatted = formatted.replace(/\b(ale|wiêc|czyli|oraz|a tak¿e|i)\b/gi, '$1...');
+    formatted = formatted.replace(/\b(ale|wiï¿½c|czyli|oraz|a takï¿½e|i)\b/gi, '$1...');
     
     // Before important information
-    formatted = formatted.replace(/\b(uwaga|pamiêtaj|wa¿ne|ostrze¿enie)\b/gi, '...$1');
+    formatted = formatted.replace(/\b(uwaga|pamiï¿½taj|waï¿½ne|ostrzeï¿½enie)\b/gi, '...$1');
     
     // Add pauses after punctuation (professional dramatic timing for clarity)
     formatted = formatted.replace(/([.!?])\s+/g, '$1... ');
@@ -491,7 +491,7 @@ function formatTextForCzubowna(text) {
 }
 
 /**
- * ?? SELECT VOICE MOST SIMILAR TO KRYSTYNA CZUBÓWNA
+ * ?? SELECT VOICE MOST SIMILAR TO KRYSTYNA CZUBï¿½WNA
  * Prioritizes warm, mature feminine Polish voices
  */
 function selectCzubownaLikeVoice(lang = 'pl') {
@@ -540,7 +540,7 @@ function selectCzubownaLikeVoice(lang = 'pl') {
         (v.lang.includes('pl') || v.lang.includes('PL')) &&
         !v.name.toLowerCase().includes('male') &&
         !v.name.toLowerCase().includes('man') &&
-        !v.name.toLowerCase().includes('mê¿czyzna')
+        !v.name.toLowerCase().includes('mï¿½czyzna')
     );
     
     if (polishFemale) {
@@ -723,8 +723,8 @@ function toggleSpeech() {
     const btn = document.getElementById('speech-toggle-btn');
     if (btn) {
         btn.innerHTML = speechEnabled ? 
-            '<span class="btn-icon">??</span><span class="btn-text">Czytanie w³¹czone</span>' :
-            '<span class="btn-icon">??</span><span class="btn-text">Czytanie wy³¹czone</span>';
+            '<span class="btn-icon">??</span><span class="btn-text">Czytanie wï¿½ï¿½czone</span>' :
+            '<span class="btn-icon">??</span><span class="btn-text">Czytanie wyï¿½ï¿½czone</span>';
         btn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
     }
 }
@@ -746,8 +746,8 @@ function generateLocationMessage() {
     if (!hasLLM) {
         // Fallback to simple message
         return {
-            text: '?? Sprawdzam twoj¹ lokalizacjê...',
-            speech: 'Sprawdzam twoj¹ lokalizacjê'
+            text: '?? Sprawdzam twojï¿½ lokalizacjï¿½...',
+            speech: 'Sprawdzam twojï¿½ lokalizacjï¿½'
         };
     }
     
@@ -756,20 +756,20 @@ function generateLocationMessage() {
     
     if (childAge <= 6) {
         // Very young children (4-6)
-        baseMessage = '?? Szukam gdzie jesteœ, ¿eby ci pomóc!';
-        speechMessage = 'Szukam... gdzie... jesteœ... ¿eby... ci... pomóc';
+        baseMessage = '?? Szukam gdzie jesteï¿½, ï¿½eby ci pomï¿½c!';
+        speechMessage = 'Szukam... gdzie... jesteï¿½... ï¿½eby... ci... pomï¿½c';
     } else if (childAge <= 9) {
         // Young children (7-9) 
-        baseMessage = '?? Sprawdzam twoj¹ lokalizacjê, ¿ebyœ by³ bezpieczny!';
-        speechMessage = 'Sprawdzam... twoj¹... lokalizacjê... ¿ebyœ... by³... bezpieczny';
+        baseMessage = '?? Sprawdzam twojï¿½ lokalizacjï¿½, ï¿½ebyï¿½ byï¿½ bezpieczny!';
+        speechMessage = 'Sprawdzam... twojï¿½... lokalizacjï¿½... ï¿½ebyï¿½... byï¿½... bezpieczny';
     } else if (childAge <= 12) {
         // Pre-teens (10-12)
-        baseMessage = '?? Okreœlam twoj¹ pozycjê dla twojego bezpieczeñstwa!';
-        speechMessage = 'Okreœlam... twoj¹... pozycjê... dla... twojego... bezpieczeñstwa';
+        baseMessage = '?? Okreï¿½lam twojï¿½ pozycjï¿½ dla twojego bezpieczeï¿½stwa!';
+        speechMessage = 'Okreï¿½lam... twojï¿½... pozycjï¿½... dla... twojego... bezpieczeï¿½stwa';
     } else {
         // Teenagers (13-16)
-        baseMessage = '?? Analizujê twoj¹ lokalizacjê w systemie bezpieczeñstwa!';
-        speechMessage = 'Analizujê... twoj¹... lokalizacjê... w... systemie... bezpieczeñstwa';
+        baseMessage = '?? Analizujï¿½ twojï¿½ lokalizacjï¿½ w systemie bezpieczeï¿½stwa!';
+        speechMessage = 'Analizujï¿½... twojï¿½... lokalizacjï¿½... w... systemie... bezpieczeï¿½stwa';
     }
     
     // Try to enhance with LLM (async, but return immediately)
@@ -789,7 +789,7 @@ function generateLocationMessage() {
  */
 async function enhanceLocationMessageWithAI(childAge, fallbackMessage) {
     try {
-        const prompt = `Jako przyjazny asystent dla ${childAge}-letniego dziecka, napisz krótk¹ (max 50 znaków), pozytywn¹ wiadomoœæ o sprawdzaniu lokalizacji dziecka dla bezpieczeñstwa. U¿yj prostego jêzyka i emotikonki. Przyk³ad: "?? Szukam gdzie jesteœ!"`;
+        const prompt = `Jako przyjazny asystent dla ${childAge}-letniego dziecka, napisz krï¿½tkï¿½ (max 50 znakï¿½w), pozytywnï¿½ wiadomoï¿½ï¿½ o sprawdzaniu lokalizacji dziecka dla bezpieczeï¿½stwa. Uï¿½yj prostego jï¿½zyka i emotikonki. Przykï¿½ad: "?? Szukam gdzie jesteï¿½!"`;
         
         const bielikClient = window.BielikClient;
         const enhancedMessage = await bielikClient.generateText(prompt, {
@@ -821,7 +821,7 @@ function getUserLocation(userRequested = false) {
     
     if (!navigator.geolocation) {
         console.error('? Geolocation not supported');
-        handleLocationError('Twoja przegl¹darka nie obs³uguje lokalizacji.');
+        handleLocationError('Twoja przeglï¿½darka nie obsï¿½uguje lokalizacji.');
         return;
     }
 
@@ -917,24 +917,24 @@ function handleLocationError(error) {
     const childAge = getChildAgeForAI();
     let message, speech, advice;
     
-    const errorType = typeof error === 'string' ? error : error.message || 'Nieznany b³¹d';
+    const errorType = typeof error === 'string' ? error : error.message || 'Nieznany bï¿½ï¿½d';
     
     if (childAge <= 6) {
-        message = '?? Nie mogê znaleŸæ gdzie jesteœ, ale nie martw siê! Zapytaj doros³ego o pomoc.';
-        speech = 'Nie... mogê... znaleŸæ... gdzie... jesteœ... ale... nie... martw... siê... Zapytaj... doros³ego... o... pomoc';
-        advice = 'Poproœ mamê lub tatê ¿eby w³¹czyli lokalizacjê w telefonie.';
+        message = '?? Nie mogï¿½ znaleï¿½ï¿½ gdzie jesteï¿½, ale nie martw siï¿½! Zapytaj dorosï¿½ego o pomoc.';
+        speech = 'Nie... mogï¿½... znaleï¿½ï¿½... gdzie... jesteï¿½... ale... nie... martw... siï¿½... Zapytaj... dorosï¿½ego... o... pomoc';
+        advice = 'Poproï¿½ mamï¿½ lub tatï¿½ ï¿½eby wï¿½ï¿½czyli lokalizacjï¿½ w telefonie.';
     } else if (childAge <= 9) {
-        message = '?? Mam problem ze znalezieniem Twojej lokalizacji. To mo¿e byæ przez ustawienia telefonu.';
-        speech = 'Mam... problem... ze... znalezieniem... Twojej... lokalizacji... To... mo¿e... byæ... przez... ustawienia... telefonu';
-        advice = 'SprawdŸ czy w³¹czy³eœ lokalizacjê w ustawieniach lub zapytaj doros³ego.';
+        message = '?? Mam problem ze znalezieniem Twojej lokalizacji. To moï¿½e byï¿½ przez ustawienia telefonu.';
+        speech = 'Mam... problem... ze... znalezieniem... Twojej... lokalizacji... To... moï¿½e... byï¿½... przez... ustawienia... telefonu';
+        advice = 'Sprawdï¿½ czy wï¿½ï¿½czyï¿½eï¿½ lokalizacjï¿½ w ustawieniach lub zapytaj dorosï¿½ego.';
     } else if (childAge <= 12) {
-        message = '?? Nie uda³o siê ustaliæ lokalizacji. Mo¿esz u¿yæ aplikacji bez tego, ale niektóre funkcje bêd¹ ograniczone.';
-        speech = 'Nie... uda³o... siê... ustaliæ... lokalizacji... Mo¿esz... u¿yæ... aplikacji... bez... tego';
-        advice = 'SprawdŸ ustawienia lokalizacji w przegl¹darce lub spróbuj ponownie.';
+        message = '?? Nie udaï¿½o siï¿½ ustaliï¿½ lokalizacji. Moï¿½esz uï¿½yï¿½ aplikacji bez tego, ale niektï¿½re funkcje bï¿½dï¿½ ograniczone.';
+        speech = 'Nie... udaï¿½o... siï¿½... ustaliï¿½... lokalizacji... Moï¿½esz... uï¿½yï¿½... aplikacji... bez... tego';
+        advice = 'Sprawdï¿½ ustawienia lokalizacji w przeglï¿½darce lub sprï¿½buj ponownie.';
     } else {
-        message = '?? B³¹d geolokalizacji: Brak dostêpu do GPS. Aplikacja bêdzie dzia³aæ w trybie podstawowym.';
-        speech = 'B³¹d... geolokalizacji... Brak... dostêpu... do... GPS... Aplikacja... bêdzie... dzia³aæ... w... trybie... podstawowym';
-        advice = 'W³¹cz lokalizacjê w ustawieniach przegl¹darki lub urz¹dzenia.';
+        message = '?? Bï¿½ï¿½d geolokalizacji: Brak dostï¿½pu do GPS. Aplikacja bï¿½dzie dziaï¿½aï¿½ w trybie podstawowym.';
+        speech = 'Bï¿½ï¿½d... geolokalizacji... Brak... dostï¿½pu... do... GPS... Aplikacja... bï¿½dzie... dziaï¿½aï¿½... w... trybie... podstawowym';
+        advice = 'Wï¿½ï¿½cz lokalizacjï¿½ w ustawieniach przeglï¿½darki lub urzï¿½dzenia.';
     }
     
     // Update UI with error message
@@ -974,9 +974,9 @@ function makeAddressChildFriendly(fullAddress) {
         if (/^\d+/.test(part) || /\d{2}-\d{3}/.test(part)) continue;
         
         // Look for districts (common Polish district patterns)
-        if (part.toLowerCase().includes('podgórze') || 
+        if (part.toLowerCase().includes('podgï¿½rze') || 
             part.toLowerCase().includes('krowodrza') ||
-            part.toLowerCase().includes('œródmieœcie') ||
+            part.toLowerCase().includes('ï¿½rï¿½dmieï¿½cie') ||
             part.toLowerCase().includes('nowa huta') ||
             part.toLowerCase().includes('district') ||
             part.toLowerCase().includes('dzielnica')) {
@@ -985,18 +985,18 @@ function makeAddressChildFriendly(fullAddress) {
         
         // Look for neighborhoods (osiedle, etc.)
         if (part.toLowerCase().includes('osiedle') || 
-            part.toLowerCase().includes('kurdwanów') ||
-            part.toLowerCase().includes('pr¹dnik') ||
+            part.toLowerCase().includes('kurdwanï¿½w') ||
+            part.toLowerCase().includes('prï¿½dnik') ||
             part.toLowerCase().includes('bronowice')) {
             neighborhood = part;
         }
         
         // Look for city
-        if (part.toLowerCase().includes('kraków') ||
+        if (part.toLowerCase().includes('krakï¿½w') ||
             part.toLowerCase().includes('warszawa') ||
-            part.toLowerCase().includes('gdañsk') ||
-            part.toLowerCase().includes('wroc³aw') ||
-            part.toLowerCase().includes('poznañ')) {
+            part.toLowerCase().includes('gdaï¿½sk') ||
+            part.toLowerCase().includes('wrocï¿½aw') ||
+            part.toLowerCase().includes('poznaï¿½')) {
             city = part;
         }
     }
@@ -1016,7 +1016,7 @@ function makeAddressChildFriendly(fullAddress) {
         friendlyAddress.push(`dzielnicy ${district}`);
     } else if (city) {
         // Fallback: just city
-        friendlyAddress.push(`mieœcie ${city}`);
+        friendlyAddress.push(`mieï¿½cie ${city}`);
     }
     
     if (friendlyAddress.length === 0) {
@@ -1066,7 +1066,10 @@ let lastAlertCheck = null;
  * Connects to backend system with 260 Polish alert sources
  */
 function startAlertMonitoring() {
-    console.log('?? Starting alert monitoring system...');
+    console.log('ğŸš¨ Starting alert monitoring system...');
+    
+    // Show alert monitoring starting
+    showMascotLoader('ğŸ“¡ ÅÄ…czÄ™ siÄ™ z systemem alertÃ³w...');
     
     // Activate monitoring
     alertMonitoringActive = true;
@@ -1091,7 +1094,7 @@ function startAlertMonitoring() {
 
 /**
  * ?? FETCH DIRECT RCB ALERTS
- * Bezpoœrednie pobieranie z RSS RCB gdy backend niedostêpny
+ * Bezpoï¿½rednie pobieranie z RSS RCB gdy backend niedostï¿½pny
  */
 async function fetchDirectRCBAlerts() {
     // ?? TRY MULTIPLE SOURCES IN ORDER
@@ -1123,7 +1126,7 @@ async function fetchDirectRCBAlerts() {
                         alerts.push({
                             id: `rcb-${pubDate.getTime()}-${item.title.substring(0, 10)}`,
                             title: item.title || 'Alert RCB',
-                            content: item.description || item.content || 'SprawdŸ szczegó³y na stronie RCB',
+                            content: item.description || item.content || 'Sprawdï¿½ szczegï¿½y na stronie RCB',
                             severity: 'high',
                             timestamp: pubDate.toISOString(),
                             location: 'Polska',
@@ -1155,7 +1158,7 @@ async function fetchDirectRCBAlerts() {
                 
                 for (let item of items) {
                     const title = item.querySelector('title')?.textContent || 'Alert RCB';
-                    const description = item.querySelector('description')?.textContent || 'SprawdŸ szczegó³y';
+                    const description = item.querySelector('description')?.textContent || 'Sprawdï¿½ szczegï¿½y';
                     const pubDate = item.querySelector('pubDate')?.textContent || new Date().toISOString();
                     
                     const alertDate = new Date(pubDate);
@@ -1231,7 +1234,7 @@ async function getParentLocationSettings() {
 
 /**
  * ?? CHECK FOR ALERTS - HIERARCHICAL SYSTEM
- * Priority: GPS+ParentRegion › GPS › National › Always Critical
+ * Priority: GPS+ParentRegion ï¿½ GPS ï¿½ National ï¿½ Always Critical
  */
 async function checkForAlerts() {
     if (!alertMonitoringActive) {
@@ -1327,8 +1330,8 @@ async function generateEmergencyFallbackMessage(alert, childAge) {
         const isYoung = childAge <= 6;
         
         const safeDefaults = {
-            young: `?? Uwaga, kochanie! Jest wa¿ne ostrze¿enie w okolicy. ZnajdŸ mamê, tatê lub innego doros³ego i zostañ przy nim. Doroœli wiedz¹ co robiæ i zadbaj¹ o Twoje bezpieczeñstwo.`,
-            older: `?? Uwaga! Otrzymano wa¿ne ostrze¿enie bezpieczeñstwa. Skontaktuj siê z rodzicami lub znajdŸ doros³ego. S³uchaj instrukcji doros³ych i s³u¿b ratunkowych.`
+            young: `?? Uwaga, kochanie! Jest waï¿½ne ostrzeï¿½enie w okolicy. Znajdï¿½ mamï¿½, tatï¿½ lub innego dorosï¿½ego i zostaï¿½ przy nim. Doroï¿½li wiedzï¿½ co robiï¿½ i zadbajï¿½ o Twoje bezpieczeï¿½stwo.`,
+            older: `?? Uwaga! Otrzymano waï¿½ne ostrzeï¿½enie bezpieczeï¿½stwa. Skontaktuj siï¿½ z rodzicami lub znajdï¿½ dorosï¿½ego. Sï¿½uchaj instrukcji dorosï¿½ych i sï¿½uï¿½b ratunkowych.`
         };
         
         return isYoung ? safeDefaults.young : safeDefaults.older;
@@ -1336,7 +1339,7 @@ async function generateEmergencyFallbackMessage(alert, childAge) {
     } catch (error) {
         console.error('? Emergency fallback generation failed:', error);
         // Ultra-safe fallback
-        return `?? Wa¿ne ostrze¿enie! ZnajdŸ doros³ego i zostañ przy nim. Doroœli zadbaj¹ o Twoje bezpieczeñstwo.`;
+        return `?? Waï¿½ne ostrzeï¿½enie! Znajdï¿½ dorosï¿½ego i zostaï¿½ przy nim. Doroï¿½li zadbajï¿½ o Twoje bezpieczeï¿½stwo.`;
     }
 }
 
@@ -1450,15 +1453,15 @@ async function getParentCustomMessage(alert, childAge) {
         
         let alertType = null;
         
-        if (title.includes('woda niezdatna') || content.includes('nie nadaje siê do spo¿ycia')) {
+        if (title.includes('woda niezdatna') || content.includes('nie nadaje siï¿½ do spoï¿½ycia')) {
             alertType = 'water';
         } else if (title.includes('burza') || title.includes('wiatr') || title.includes('grad')) {
             alertType = 'storm';
-        } else if (title.includes('powódŸ') || content.includes('podtopienia')) {
+        } else if (title.includes('powï¿½dï¿½') || content.includes('podtopienia')) {
             alertType = 'flood';
         } else if (title.includes('dron') || title.includes('obiekt')) {
             alertType = 'drones';
-        } else if (title.includes('æwiczenia')) {
+        } else if (title.includes('ï¿½wiczenia')) {
             alertType = 'exercises';
         }
         
@@ -1493,7 +1496,7 @@ async function generateAlertMessage(alert, childAge) {
     const severity = alert.severity || 'medium';
     const location = alert.location || 'twoja okolica';
     
-    const prompt = `Jako asystent bezpieczeñstwa dla ${childAge}-letniego dziecka, przet³umacz ten oficjalny alert na prosty, uspokajaj¹cy jêzyk:
+    const prompt = `Jako asystent bezpieczeï¿½stwa dla ${childAge}-letniego dziecka, przetï¿½umacz ten oficjalny alert na prosty, uspokajajï¿½cy jï¿½zyk:
 
 ALERT: "${alert.title}"
 OPIS: "${alert.content}"
@@ -1501,14 +1504,14 @@ LOKALIZACJA: ${location}
 POZIOM: ${severity}
 
 Wytyczne:
-- U¿yj prostego jêzyka dla ${childAge}-latka
+- Uï¿½yj prostego jï¿½zyka dla ${childAge}-latka
 - Zacznij od odpowiedniego emoji
 - Maksymalnie 2-3 zdania
-- Podaj konkretne, bezpieczne dzia³ania
-- Nie strasŸ, ale ostrzegaj
-- Podkreœl "poproœ doros³ego o pomoc"
+- Podaj konkretne, bezpieczne dziaï¿½ania
+- Nie strasï¿½, ale ostrzegaj
+- Podkreï¿½l "poproï¿½ dorosï¿½ego o pomoc"
 
-OdpowiedŸ:`;
+Odpowiedï¿½:`;
 
     try {
         const response = await window.polishAI.generateResponse('alert_translation', childAge, {
@@ -1537,60 +1540,60 @@ function generateRuleBasedAlert(alert, childAge) {
     if (title.includes('burza') || title.includes('wiatr') || title.includes('grad') || content.includes('burze')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Nadchodzi burza z gradem! IdŸ szybko do domu. Nie baw siê na dworze. Schowaj zabawki do œrodka.';
+            message = 'Nadchodzi burza z gradem! Idï¿½ szybko do domu. Nie baw siï¿½ na dworze. Schowaj zabawki do ï¿½rodka.';
         } else if (childAge <= 9) {
-            message = 'Alert burzowy! Wróæ natychmiast do domu. Unikaj drzew i wysokich budynków. Zamknij okna.';
+            message = 'Alert burzowy! Wrï¿½ï¿½ natychmiast do domu. Unikaj drzew i wysokich budynkï¿½w. Zamknij okna.';
         } else {
-            message = 'Ostrze¿enie przed burzami i gradem. Szukaj natychmiastowego schronienia. Zabezpiecz rzeczy na balkonie.';
+            message = 'Ostrzeï¿½enie przed burzami i gradem. Szukaj natychmiastowego schronienia. Zabezpiecz rzeczy na balkonie.';
         }
-    } else if (title.includes('woda niezdatna') || content.includes('nie nadaje siê do spo¿ycia') || content.includes('nie nadaje siê do u¿ytku')) {
+    } else if (title.includes('woda niezdatna') || content.includes('nie nadaje siï¿½ do spoï¿½ycia') || content.includes('nie nadaje siï¿½ do uï¿½ytku')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Nie pij wody z kranu! Woda jest brudna i mo¿e ciê rozchorowaæ. Pij tylko wodê z butelek.';
+            message = 'Nie pij wody z kranu! Woda jest brudna i moï¿½e ciï¿½ rozchorowaï¿½. Pij tylko wodï¿½ z butelek.';
         } else if (childAge <= 9) {
-            message = 'Woda z kranu jest ska¿ona! U¿ywaj tylko wody butelkowanej do picia, mycia zêbów i gotowania.';
+            message = 'Woda z kranu jest skaï¿½ona! Uï¿½ywaj tylko wody butelkowanej do picia, mycia zï¿½bï¿½w i gotowania.';
         } else {
-            message = 'Ska¿enie wody pitnej! Nie u¿ywaj wody z kranu do picia ani przygotowania jedzenia. Tylko woda butelkowana!';
+            message = 'Skaï¿½enie wody pitnej! Nie uï¿½ywaj wody z kranu do picia ani przygotowania jedzenia. Tylko woda butelkowana!';
         }
-    } else if (title.includes('powódŸ') || content.includes('podtopienia') || content.includes('wezbranych') || content.includes('opady deszczu')) {
+    } else if (title.includes('powï¿½dï¿½') || content.includes('podtopienia') || content.includes('wezbranych') || content.includes('opady deszczu')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Za du¿o wody wszêdzie! Nie chodŸ blisko rzek ani potoczków. Trzymaj siê z dala od ka³u¿.';
+            message = 'Za duï¿½o wody wszï¿½dzie! Nie chodï¿½ blisko rzek ani potoczkï¿½w. Trzymaj siï¿½ z dala od kaï¿½uï¿½.';
         } else if (childAge <= 9) {
-            message = 'Niebezpieczne podtopienia! Unikaj rzek, mostów i niskich terenów. IdŸ na wy¿sze miejsce.';
+            message = 'Niebezpieczne podtopienia! Unikaj rzek, mostï¿½w i niskich terenï¿½w. Idï¿½ na wyï¿½sze miejsce.';
         } else {
-            message = 'Alert powodziowy! Natychmiast oddal siê od rzek i potoków. Udaj siê na wy¿szy teren.';
+            message = 'Alert powodziowy! Natychmiast oddal siï¿½ od rzek i potokï¿½w. Udaj siï¿½ na wyï¿½szy teren.';
         }
-    } else if (title.includes('dron') || title.includes('obiekt') || content.includes('naruszy³y granice')) {
+    } else if (title.includes('dron') || title.includes('obiekt') || content.includes('naruszyï¿½y granice')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Niebezpieczne lataj¹ce rzeczy! IdŸ szybko do domu. Nie dotykaj niczego co spad³o z nieba.';
+            message = 'Niebezpieczne latajï¿½ce rzeczy! Idï¿½ szybko do domu. Nie dotykaj niczego co spadï¿½o z nieba.';
         } else if (childAge <= 9) {
-            message = 'Niebezpieczne drony w okolicy! Wróæ do domu. Jeœli widzisz coœ spadaj¹cego - nie zbli¿aj siê!';
+            message = 'Niebezpieczne drony w okolicy! Wrï¿½ï¿½ do domu. Jeï¿½li widzisz coï¿½ spadajï¿½cego - nie zbliï¿½aj siï¿½!';
         } else {
-            message = 'Alert wojskowy - drony! Natychmiastowe schronienie. Nie dotykaj podejrzanych obiektów!';
+            message = 'Alert wojskowy - drony! Natychmiastowe schronienie. Nie dotykaj podejrzanych obiektï¿½w!';
         }
-    } else if (title.includes('æwiczenia') || content.includes('strza³ów') || content.includes('helikopterów')) {
+    } else if (title.includes('ï¿½wiczenia') || content.includes('strzaï¿½ï¿½w') || content.includes('helikopterï¿½w')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Wojsko æwiczy dzisiaj. Bêdzie g³oœno ale to nie prawdziwa wojna. Zostañ blisko doros³ych.';
+            message = 'Wojsko ï¿½wiczy dzisiaj. Bï¿½dzie gï¿½oï¿½no ale to nie prawdziwa wojna. Zostaï¿½ blisko dorosï¿½ych.';
         } else if (childAge <= 9) {
-            message = 'Æwiczenia wojskowe w okolicy. Odg³osy strza³ów i helikopterów to tylko trening. Wszystko w porz¹dku.';
+            message = 'ï¿½wiczenia wojskowe w okolicy. Odgï¿½osy strzaï¿½ï¿½w i helikopterï¿½w to tylko trening. Wszystko w porzï¿½dku.';
         } else {
-            message = 'Æwiczenia s³u¿b mundurowych. Ha³as strza³ów i loty helikopterów to czêœæ treningu, zachowaj spokój.';
+            message = 'ï¿½wiczenia sï¿½uï¿½b mundurowych. Haï¿½as strzaï¿½ï¿½w i loty helikopterï¿½w to czï¿½ï¿½ treningu, zachowaj spokï¿½j.';
         }
     } else {
         // Generic alert with concrete actions
         if (childAge <= 6) {
-            message = 'Wa¿ne ostrze¿enie! ZnajdŸ szybko doros³ego i powiedz mu o tej wiadomoœci.';
+            message = 'Waï¿½ne ostrzeï¿½enie! Znajdï¿½ szybko dorosï¿½ego i powiedz mu o tej wiadomoï¿½ci.';
         } else if (childAge <= 9) {
-            message = 'Alert bezpieczeñstwa! Poinformuj rodziców i trzymaj siê blisko domu.';
+            message = 'Alert bezpieczeï¿½stwa! Poinformuj rodzicï¿½w i trzymaj siï¿½ blisko domu.';
         } else {
-            message = 'Ostrze¿enie w twojej okolicy. SprawdŸ z rodzicami co robiæ dalej.';
+            message = 'Ostrzeï¿½enie w twojej okolicy. Sprawdï¿½ z rodzicami co robiï¿½ dalej.';
         }
     }
     
-    return `${emoji} ${message} Zawsze poproœ doros³ego o pomoc!`;
+    return `${emoji} ${message} Zawsze poproï¿½ dorosï¿½ego o pomoc!`;
 }
 
 /**
@@ -1686,7 +1689,7 @@ function testAlert(alertType = 'weather') {
         water: {
             id: 'rcb_water_real',
             title: 'Alert RCB - woda niezdatna do picia w gminie',
-            content: 'UWAGA! Woda z wodoci¹gu w gminie nie nadaje siê do spo¿ycia. Gmina zapewnia wodê pitn¹ w butelkach i z beczkowozu. ŒledŸ lokalne komunikaty.',
+            content: 'UWAGA! Woda z wodociï¿½gu w gminie nie nadaje siï¿½ do spoï¿½ycia. Gmina zapewnia wodï¿½ pitnï¿½ w butelkach i z beczkowozu. ï¿½ledï¿½ lokalne komunikaty.',
             severity: 'critical',
             location: 'Gmina lokalna',
             timestamp: new Date().toISOString()
@@ -1694,33 +1697,33 @@ function testAlert(alertType = 'weather') {
         storm: {
             id: 'rcb_storm_real',
             title: 'Alert RCB - burze, silny wiatr i lokalnie grad',
-            content: 'Uwaga! Dziœ mo¿liwe burze, silny wiatr i lokalnie grad. Zachowaj ostro¿noœæ i zabezpiecz rzeczy, które mo¿e porwaæ wiatr.',
+            content: 'Uwaga! Dziï¿½ moï¿½liwe burze, silny wiatr i lokalnie grad. Zachowaj ostroï¿½noï¿½ï¿½ i zabezpiecz rzeczy, ktï¿½re moï¿½e porwaï¿½ wiatr.',
             severity: 'warning',
-            location: 'Województwo Ma³opolskie',
+            location: 'Wojewï¿½dztwo Maï¿½opolskie',
             timestamp: new Date().toISOString()
         },
         flood: {
             id: 'rcb_flood_real',
             title: 'Alert RCB - intensywne opady deszczu i burze',
-            content: 'Uwaga! Dziœ prognozowane intensywne opady deszczu i burze. Mo¿liwe podtopienia. Nie zbli¿aj siê do wezbranych rzek. S³uchaj poleceñ s³u¿b.',
+            content: 'Uwaga! Dziï¿½ prognozowane intensywne opady deszczu i burze. Moï¿½liwe podtopienia. Nie zbliï¿½aj siï¿½ do wezbranych rzek. Sï¿½uchaj poleceï¿½ sï¿½uï¿½b.',
             severity: 'warning',
-            location: 'Dolina Wis³y',
+            location: 'Dolina Wisï¿½y',
             timestamp: new Date().toISOString()
         },
         drones: {
             id: 'rcb_drones_real',
-            title: 'Alert RCB - neutralizacja obiektów',
-            content: 'Uwaga! W zwi¹zku z operacj¹ neutralizacji obiektów, które naruszy³y granice RP, informuj s³u¿by o dronach lub miejscach ich upadku. Nie zbli¿aj siê do nich.',
+            title: 'Alert RCB - neutralizacja obiektï¿½w',
+            content: 'Uwaga! W zwiï¿½zku z operacjï¿½ neutralizacji obiektï¿½w, ktï¿½re naruszyï¿½y granice RP, informuj sï¿½uï¿½by o dronach lub miejscach ich upadku. Nie zbliï¿½aj siï¿½ do nich.',
             severity: 'critical',
-            location: 'Województwa wschodnie',
+            location: 'Wojewï¿½dztwa wschodnie',
             timestamp: new Date().toISOString()
         },
         exercises: {
             id: 'rcb_exercises_real', 
-            title: 'Alert RCB - æwiczenia s³u¿b mundurowych',
-            content: 'Uwaga! Æwiczenia s³u¿b mundurowych. Mo¿liwe odg³osy strza³ów i loty helikopterów. Zachowaj spokój i ostro¿noœæ.',
+            title: 'Alert RCB - ï¿½wiczenia sï¿½uï¿½b mundurowych',
+            content: 'Uwaga! ï¿½wiczenia sï¿½uï¿½b mundurowych. Moï¿½liwe odgï¿½osy strzaï¿½ï¿½w i loty helikopterï¿½w. Zachowaj spokï¿½j i ostroï¿½noï¿½ï¿½.',
             severity: 'info',
-            location: 'Teren æwiczeñ',
+            location: 'Teren ï¿½wiczeï¿½',
             timestamp: new Date().toISOString()
         }
     };
@@ -1751,12 +1754,12 @@ function addTestButtons() {
     `;
     
     testContainer.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 10px;">?? Test Rzeczywistych Alertów RCB</div>
+        <div style="font-weight: bold; margin-bottom: 10px;">?? Test Rzeczywistych Alertï¿½w RCB</div>
         <button onclick="testAlert('water')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #f44336; color: white; cursor: pointer;">?? Woda Niezdatna</button>
         <button onclick="testAlert('storm')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #ff9800; color: white; cursor: pointer;">?? Burze+Grad</button>
-        <button onclick="testAlert('flood')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #2196F3; color: white; cursor: pointer;">?? PowódŸ</button>
+        <button onclick="testAlert('flood')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #2196F3; color: white; cursor: pointer;">?? Powï¿½dï¿½</button>
         <button onclick="testAlert('drones')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #9c27b0; color: white; cursor: pointer;">?? Drony</button>
-        <button onclick="testAlert('exercises')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #607d8b; color: white; cursor: pointer;">?? Æwiczenia</button>
+        <button onclick="testAlert('exercises')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #607d8b; color: white; cursor: pointer;">?? ï¿½wiczenia</button>
         <button onclick="document.getElementById('test-controls').style.display='none'" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #666; color: white; cursor: pointer;">? Ukryj</button>
     `;
     
@@ -1853,29 +1856,29 @@ function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocat
     switch(action) {
         case 'find_safety':
             if (complexity === 'simple') {
-                return `?? ${agePrefix ? 'Maluszku, szukaj' : 'Szukaj'} bezpiecznych miejsc! IdŸ do sklepu, szko³y lub tam gdzie s¹ doroœli ludzie!`;
+                return `?? ${agePrefix ? 'Maluszku, szukaj' : 'Szukaj'} bezpiecznych miejsc! Idï¿½ do sklepu, szkoï¿½y lub tam gdzie sï¿½ doroï¿½li ludzie!`;
             } else if (complexity === 'medium') {
-                return `?? Gdy siê zgubisz, szukaj bezpiecznych miejsc: sklepy, szko³y, biblioteki. Zawsze tam gdzie s¹ doroœli!`;
+                return `?? Gdy siï¿½ zgubisz, szukaj bezpiecznych miejsc: sklepy, szkoï¿½y, biblioteki. Zawsze tam gdzie sï¿½ doroï¿½li!`;
             } else {
-                return `?? Najbli¿sze bezpieczne miejsca to: sklepy, szko³y, biblioteki, komisariaty i urzêdy. Wybieraj miejsca z dobrym oœwietleniem i wieloma osobami.`;
+                return `?? Najbliï¿½sze bezpieczne miejsca to: sklepy, szkoï¿½y, biblioteki, komisariaty i urzï¿½dy. Wybieraj miejsca z dobrym oï¿½wietleniem i wieloma osobami.`;
             }
             
         case 'safe_route':
             if (complexity === 'simple') {
-                return `?? ${agePrefix ? 'Maluszku, i' : 'I'}dŸ g³ówn¹ drog¹! Nie skrêcaj w ciemne uliczki. PrzechodŸ tylko tam gdzie s¹ pasy!`;
+                return `?? ${agePrefix ? 'Maluszku, i' : 'I'}dï¿½ gï¿½ï¿½wnï¿½ drogï¿½! Nie skrï¿½caj w ciemne uliczki. Przechodï¿½ tylko tam gdzie sï¿½ pasy!`;
             } else if (complexity === 'medium') {
-                return `?? Bezpieczna droga: idŸ g³ównymi ulicami, gdzie jest du¿o ludzi. Unikaj pustych miejsc!`;
+                return `?? Bezpieczna droga: idï¿½ gï¿½ï¿½wnymi ulicami, gdzie jest duï¿½o ludzi. Unikaj pustych miejsc!`;
             } else {
-                return `?? Planuj bezpieczn¹ trasê: g³ówne ulice, dobrze oœwietlone miejsca, przejœcia dla pieszych. Unikaj skrótów przez parki czy pustynie tereny.`;
+                return `?? Planuj bezpiecznï¿½ trasï¿½: gï¿½ï¿½wne ulice, dobrze oï¿½wietlone miejsca, przejï¿½cia dla pieszych. Unikaj skrï¿½tï¿½w przez parki czy pustynie tereny.`;
             }
             
         case 'emergency_help':
             if (complexity === 'simple') {
-                return `?? ${agePrefix ? 'Maluszku, w' : 'W'} niebezpieczeñstwie dzwoñ 112! Poproœ doros³ego o pomoc!`;
+                return `?? ${agePrefix ? 'Maluszku, w' : 'W'} niebezpieczeï¿½stwie dzwoï¿½ 112! Poproï¿½ dorosï¿½ego o pomoc!`;
             } else if (complexity === 'medium') {
-                return `?? W sytuacji awaryjnej: dzwoñ 112, znajdŸ doros³ego, idŸ do bezpiecznego miejsca!`;
+                return `?? W sytuacji awaryjnej: dzwoï¿½ 112, znajdï¿½ dorosï¿½ego, idï¿½ do bezpiecznego miejsca!`;
             } else {
-                return `?? Procedura awaryjna: 1) Oceñ sytuacjê 2) Dzwoñ 112 3) Poinformuj zaufanego doros³ego 4) IdŸ do najbli¿szego bezpiecznego miejsca`;
+                return `?? Procedura awaryjna: 1) Oceï¿½ sytuacjï¿½ 2) Dzwoï¿½ 112 3) Poinformuj zaufanego dorosï¿½ego 4) Idï¿½ do najbliï¿½szego bezpiecznego miejsca`;
             }
             
         case 'where_am_i':
@@ -1886,24 +1889,24 @@ function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocat
         case 'welcome':
             if (isFirstVisit) {
                 if (complexity === 'simple') {
-                    return `?? Czeœæ ${agePrefix}! Jestem twoim przyjacielem, który pomo¿e ci byæ bezpiecznym!`;
+                    return `?? Czeï¿½ï¿½ ${agePrefix}! Jestem twoim przyjacielem, ktï¿½ry pomoï¿½e ci byï¿½ bezpiecznym!`;
                 } else if (complexity === 'medium') {
-                    return `?? Witaj! Jestem twoim pomocnikiem bezpieczeñstwa. Poka¿ê ci jak byæ bezpiecznym!`;
+                    return `?? Witaj! Jestem twoim pomocnikiem bezpieczeï¿½stwa. Pokaï¿½ï¿½ ci jak byï¿½ bezpiecznym!`;
                 } else {
-                    return `??? Czeœæ! Jestem AI asystentem bezpieczeñstwa. Pomogê ci w ró¿nych sytuacjach!`;
+                    return `??? Czeï¿½ï¿½! Jestem AI asystentem bezpieczeï¿½stwa. Pomogï¿½ ci w rï¿½nych sytuacjach!`;
                 }
             } else {
                 if (complexity === 'simple') {
-                    return `?? Czeœæ ${agePrefix}! Mi³o ciê znowu widzieæ!`;
+                    return `?? Czeï¿½ï¿½ ${agePrefix}! Miï¿½o ciï¿½ znowu widzieï¿½!`;
                 } else if (complexity === 'medium') {
-                    return `?? Witaj ponownie! Super, ¿e wróci³eœ!`;
+                    return `?? Witaj ponownie! Super, ï¿½e wrï¿½ciï¿½eï¿½!`;
                 } else {
-                    return `??? Witaj z powrotem! Gotowy na nowe przygody z bezpieczeñstwem?`;
+                    return `??? Witaj z powrotem! Gotowy na nowe przygody z bezpieczeï¿½stwem?`;
                 }
             }
             
         default:
-            return 'Czeœæ! Jestem twoim pomocnikiem bezpieczeñstwa!';
+            return 'Czeï¿½ï¿½! Jestem twoim pomocnikiem bezpieczeï¿½stwa!';
     }
 }
 END OF DISABLED FUNCTION */
@@ -1912,7 +1915,7 @@ async function handleWhereAmI() {
     console.log('?? Where Am I clicked');
 
     // Show mascot loader immediately
-    showMascotLoader('?? Szukam gdzie jesteœ...');
+    showMascotLoader('?? Szukam gdzie jesteï¿½...');
 
     // ?? STEP 1: Show "checking" message from parent CMS
     if (window.showLocationMessage) {
@@ -1933,7 +1936,7 @@ async function handleFindSafety() {
     
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
-        mascotText.textContent = '?? Szukam bezpiecznych miejsc w pobli¿u...';
+        mascotText.textContent = '?? Szukam bezpiecznych miejsc w pobliï¿½u...';
     }
     
     // ?? FIRST: Try to get parent-created safety message
@@ -1989,7 +1992,7 @@ async function handleFindSafety() {
         } catch (error) {
             console.error('? Failed to get location or fetch places:', error);
             if (mascotText) {
-                mascotText.textContent = '?? Nie uda³o siê okreœliæ lokalizacji. SprawdŸ uprawnienia GPS.';
+                mascotText.textContent = '?? Nie udaï¿½o siï¿½ okreï¿½liï¿½ lokalizacji. Sprawdï¿½ uprawnienia GPS.';
             }
         }
     }
@@ -2005,7 +2008,10 @@ async function handleFindSafety() {
 }
 
 async function handleSafeRoute() {
-    console.log('?? Safe Route clicked - Find Parent/Home');
+    console.log('ğŸš¶ Safe Route clicked - Find Parent/Home');
+    
+    // Show mascot loader immediately
+    showMascotLoader('ğŸš¶ Szukam bezpiecznej drogi do domu...');
     
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
@@ -2130,8 +2136,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         speechBtn.addEventListener('click', toggleSpeech);
         // Initialize button state
         speechBtn.innerHTML = speechEnabled ? 
-            '<span class="btn-icon">??</span><span class="btn-text">Czytanie w³¹czone</span>' :
-            '<span class="btn-icon">??</span><span class="btn-text">Czytanie wy³¹czone</span>';
+            '<span class="btn-icon">??</span><span class="btn-text">Czytanie wï¿½ï¿½czone</span>' :
+            '<span class="btn-icon">??</span><span class="btn-text">Czytanie wyï¿½ï¿½czone</span>';
         speechBtn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
     }
     
@@ -2195,10 +2201,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 
                 const mascotText = document.getElementById('mascot-text');
                 if (mascotText) {
-                    mascotText.textContent = `?? ${service} - numer ${number}. Dzwoñ tylko w prawdziwych sytuacjach awaryjnych!`;
+                    mascotText.textContent = `?? ${service} - numer ${number}. Dzwoï¿½ tylko w prawdziwych sytuacjach awaryjnych!`;
                 }
                 
-                speakText(`${service}. Numer ${number}. Dzwoñ tylko w prawdziwych sytuacjach awaryjnych!`);
+                speakText(`${service}. Numer ${number}. Dzwoï¿½ tylko w prawdziwych sytuacjach awaryjnych!`);
                 
                 // Track emergency usage
                 trackFeatureUsage('emergency');
@@ -2218,43 +2224,43 @@ document.addEventListener('DOMContentLoaded', async function() {
             if ('Notification' in window) {
                 if (Notification.permission === 'granted') {
                     new Notification('Bezpieczny Pomocnik', {
-                        body: 'Powiadomienia s¹ ju¿ w³¹czone!',
+                        body: 'Powiadomienia sï¿½ juï¿½ wï¿½ï¿½czone!',
                         icon: 'images/logo_192x192.png'
                     });
                     
                     const mascotText = document.getElementById('mascot-text');
                     if (mascotText) {
-                        mascotText.textContent = '?? Powiadomienia s¹ ju¿ w³¹czone!';
+                        mascotText.textContent = '?? Powiadomienia sï¿½ juï¿½ wï¿½ï¿½czone!';
                     }
                     
-                    speakText('Powiadomienia s¹ ju¿ w³¹czone');
+                    speakText('Powiadomienia sï¿½ juï¿½ wï¿½ï¿½czone');
                 } else if (Notification.permission !== 'denied') {
                     Notification.requestPermission().then(permission => {
                         if (permission === 'granted') {
                             new Notification('Bezpieczny Pomocnik', {
-                                body: 'Œwietnie! Powiadomienia zosta³y w³¹czone!',
+                                body: 'ï¿½wietnie! Powiadomienia zostaï¿½y wï¿½ï¿½czone!',
                                 icon: 'images/logo_192x192.png'
                             });
                             
-                            notificationsBtn.innerHTML = '<span class="btn-icon">?</span><span class="btn-text">Powiadomienia w³¹czone</span>';
+                            notificationsBtn.innerHTML = '<span class="btn-icon">?</span><span class="btn-text">Powiadomienia wï¿½ï¿½czone</span>';
                             notificationsBtn.style.background = '#32D74B';
                             
                             const mascotText = document.getElementById('mascot-text');
                             if (mascotText) {
-                                mascotText.textContent = '? Œwietnie! Powiadomienia zosta³y w³¹czone!';
+                                mascotText.textContent = '? ï¿½wietnie! Powiadomienia zostaï¿½y wï¿½ï¿½czone!';
                             }
                             
-                            speakText('Œwietnie! Powiadomienia zosta³y w³¹czone');
+                            speakText('ï¿½wietnie! Powiadomienia zostaï¿½y wï¿½ï¿½czone');
                         }
                     });
                 }
             } else {
                 const mascotText = document.getElementById('mascot-text');
                 if (mascotText) {
-                    mascotText.textContent = '? Twoja przegl¹darka nie obs³uguje powiadomieñ';
+                    mascotText.textContent = '? Twoja przeglï¿½darka nie obsï¿½uguje powiadomieï¿½';
                 }
                 
-                speakText('Twoja przegl¹darka nie obs³uguje powiadomieñ');
+                speakText('Twoja przeglï¿½darka nie obsï¿½uguje powiadomieï¿½');
             }
         });
     }
@@ -2284,10 +2290,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         popup.className = 'call-popup';
         popup.innerHTML = `
             <div class="popup-content">
-                <h3>?? Po³¹czenie</h3>
-                <p>Czy chcesz zadzwoniæ pod numer:</p>
+                <h3>?? Poï¿½ï¿½czenie</h3>
+                <p>Czy chcesz zadzwoniï¿½ pod numer:</p>
                 <div class="phone-display">${phoneNumber}</div>
-                <p><small>Kliknij ponownie aby wykonaæ po³¹czenie</small></p>
+                <p><small>Kliknij ponownie aby wykonaï¿½ poï¿½ï¿½czenie</small></p>
                 <button onclick="this.parentElement.parentElement.remove()" class="popup-close">?</button>
             </div>
         `;
@@ -2309,7 +2315,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Set initial mascot message (will be overridden by updateVisitCount)
         const mascotText = document.getElementById('mascot-text');
         if (mascotText && userMemory.visitCount === 1) {
-            mascotText.textContent = 'Czeœæ! Jestem twoim pomocnikiem bezpieczeñstwa!';
+            mascotText.textContent = 'Czeï¿½ï¿½! Jestem twoim pomocnikiem bezpieczeï¿½stwa!';
         }
     }, 2000);
     
@@ -2436,10 +2442,10 @@ async function showParentLocationWithFallback() {
                 // Show success message
                 const mascotText = document.getElementById('mascot-text');
                 if (mascotText) {
-                    mascotText.textContent = '? Znalaz³em rodziców! Zobacz ich lokalizacjê na mapie.';
+                    mascotText.textContent = '? Znalazï¿½em rodzicï¿½w! Zobacz ich lokalizacjï¿½ na mapie.';
                 }
                 
-                speakText('Znalaz³em rodziców! Zobacz ich lokalizacjê na mapie.');
+                speakText('Znalazï¿½em rodzicï¿½w! Zobacz ich lokalizacjï¿½ na mapie.');
                 return;
             }
         }
@@ -2459,10 +2465,10 @@ async function showParentLocationWithFallback() {
                 // Reassuring message
                 const mascotText = document.getElementById('mascot-text');
                 if (mascotText) {
-                    mascotText.textContent = '?? Nie znalaz³em aktualnej lokalizacji rodziców, ale pokazujê Wam adres domowy. Rodzice na pewno s¹ w pobli¿u i wszystko jest w porz¹dku!';
+                    mascotText.textContent = '?? Nie znalazï¿½em aktualnej lokalizacji rodzicï¿½w, ale pokazujï¿½ Wam adres domowy. Rodzice na pewno sï¿½ w pobliï¿½u i wszystko jest w porzï¿½dku!';
                 }
                 
-                speakText('Nie znalaz³em aktualnej lokalizacji rodziców, ale pokazujê wam adres domowy. Rodzice na pewno s¹ w pobli¿u i wszystko jest w porz¹dku!');
+                speakText('Nie znalazï¿½em aktualnej lokalizacji rodzicï¿½w, ale pokazujï¿½ wam adres domowy. Rodzice na pewno sï¿½ w pobliï¿½u i wszystko jest w porzï¿½dku!');
                 return;
             }
         }
@@ -2472,10 +2478,10 @@ async function showParentLocationWithFallback() {
         
         const mascotText = document.getElementById('mascot-text');
         if (mascotText) {
-            mascotText.textContent = '?? Nie mogê teraz pokazaæ lokalizacji rodziców, ale to nie znaczy, ¿e coœ z³ego siê dzieje! Rodzice czêsto nie udostêpniaj¹ lokalizacji, gdy s¹ w bezpiecznym miejscu. Jeœli martwisz siê, mo¿esz do nich zadzwoniæ - na pewno odpowiedz¹! ¢?';
+            mascotText.textContent = '?? Nie mogï¿½ teraz pokazaï¿½ lokalizacji rodzicï¿½w, ale to nie znaczy, ï¿½e coï¿½ zï¿½ego siï¿½ dzieje! Rodzice czï¿½sto nie udostï¿½pniajï¿½ lokalizacji, gdy sï¿½ w bezpiecznym miejscu. Jeï¿½li martwisz siï¿½, moï¿½esz do nich zadzwoniï¿½ - na pewno odpowiedzï¿½! ï¿½?';
         }
         
-        speakText('Nie mogê teraz pokazaæ lokalizacji rodziców, ale to nie znaczy, ¿e coœ z³ego siê dzieje! Rodzice czêsto nie udostêpniaj¹ lokalizacji, gdy s¹ w bezpiecznym miejscu. Jeœli martwisz siê, mo¿esz do nich zadzwoniæ - na pewno odpowiedz¹!');
+        speakText('Nie mogï¿½ teraz pokazaï¿½ lokalizacji rodzicï¿½w, ale to nie znaczy, ï¿½e coï¿½ zï¿½ego siï¿½ dzieje! Rodzice czï¿½sto nie udostï¿½pniajï¿½ lokalizacji, gdy sï¿½ w bezpiecznym miejscu. Jeï¿½li martwisz siï¿½, moï¿½esz do nich zadzwoniï¿½ - na pewno odpowiedzï¿½!');
         
     } catch (error) {
         console.error('? Error showing parent location:', error);
@@ -2483,10 +2489,10 @@ async function showParentLocationWithFallback() {
         // Error message - still reassuring
         const mascotText = document.getElementById('mascot-text');
         if (mascotText) {
-            mascotText.textContent = '?? Nie mogê teraz sprawdziæ lokalizacji rodziców, ale to nic z³ego! Jeœli chcesz z nimi porozmawiaæ, mo¿esz do nich zadzwoniæ. Na pewno wszystko jest w porz¹dku!';
+            mascotText.textContent = '?? Nie mogï¿½ teraz sprawdziï¿½ lokalizacji rodzicï¿½w, ale to nic zï¿½ego! Jeï¿½li chcesz z nimi porozmawiaï¿½, moï¿½esz do nich zadzwoniï¿½. Na pewno wszystko jest w porzï¿½dku!';
         }
         
-        speakText('Nie mogê teraz sprawdziæ lokalizacji rodziców, ale to nic z³ego! Jeœli chcesz z nimi porozmawiaæ, mo¿esz do nich zadzwoniæ. Na pewno wszystko jest w porz¹dku!');
+        speakText('Nie mogï¿½ teraz sprawdziï¿½ lokalizacji rodzicï¿½w, ale to nic zï¿½ego! Jeï¿½li chcesz z nimi porozmawiaï¿½, moï¿½esz do nich zadzwoniï¿½. Na pewno wszystko jest w porzï¿½dku!');
     }
 }
 
@@ -2537,7 +2543,7 @@ function showAlertMonitoringStatus() {
         /* animation: gentle-pulse 6s ease-in-out infinite; */ /* Disabled - no distracting animations */
     `;
     
-    statusDiv.innerHTML = '?? System Alertów: AKTYWNY';
+    statusDiv.innerHTML = '?? System Alertï¿½w: AKTYWNY';
     
     // Add click handler for detailed status
     statusDiv.onclick = () => {
@@ -2564,7 +2570,7 @@ function updateAlertMonitoringStatus(statusDiv) {
     
     const status = alertMonitoringActive && alertSourceWorking ? 'AKTYWNE ?' : 
                    alertMonitoringActive && !alertSourceWorking ? 'OFFLINE ??' :
-                   'WY£¥CZONE ?';
+                   'WYï¿½ï¿½CZONE ?';
     
     statusDiv.innerHTML = `?? Alerty: ${status} | ${lastCheck}`;  
     
@@ -2608,13 +2614,13 @@ function showDetailedAlertStatus() {
     `;
     
     content.innerHTML = `
-        <h3>?? Status Systemu Alertów</h3>
-        <p><strong>?? Monitoring:</strong> ${alertMonitoringActive ? (alertSourceWorking ? 'AKTYWNY ?' : 'OFFLINE - brak Ÿród³a ??') : 'WY£¥CZONY ?'}</p>
-        <p><strong>?? ród³o alertów:</strong> ${alertSourceWorking ? `RCB RSS (ostatnie: ${lastSuccessfulFetch ? new Date(lastSuccessfulFetch).toLocaleTimeString('pl-PL') : 'nigdy'})` : 'Niedostêpne'}</p>
-        <p><strong>? Czêstotliwoœæ:</strong> Co 90 sekund (tryb deweloperski)</p>
-        <p><strong>?? Lokalizacja:</strong> ${userLocation ? 'W³¹czona' : 'Wy³¹czona'}</p>
+        <h3>?? Status Systemu Alertï¿½w</h3>
+        <p><strong>?? Monitoring:</strong> ${alertMonitoringActive ? (alertSourceWorking ? 'AKTYWNY ?' : 'OFFLINE - brak ï¿½rï¿½dï¿½a ??') : 'WYï¿½ï¿½CZONY ?'}</p>
+        <p><strong>?? ï¿½rï¿½dï¿½o alertï¿½w:</strong> ${alertSourceWorking ? `RCB RSS (ostatnie: ${lastSuccessfulFetch ? new Date(lastSuccessfulFetch).toLocaleTimeString('pl-PL') : 'nigdy'})` : 'Niedostï¿½pne'}</p>
+        <p><strong>? Czï¿½stotliwoï¿½ï¿½:</strong> Co 90 sekund (tryb deweloperski)</p>
+        <p><strong>?? Lokalizacja:</strong> ${userLocation ? 'Wï¿½ï¿½czona' : 'Wyï¿½ï¿½czona'}</p>
         <p><strong>?? Aktywne alerty:</strong> ${activeAlerts.length}</p>
-        <p><strong>?? ród³a danych:</strong></p>
+        <p><strong>?? ï¿½rï¿½dï¿½a danych:</strong></p>
         <ul>
             <li>?? Backend API (/api/alerts/*)</li>
             <li>?? Direct RCB RSS (gov.pl)</li>
@@ -2622,7 +2628,7 @@ function showDetailedAlertStatus() {
         </ul>
         <p><strong>? Przewaga nad oficjalnymi:</strong></p>
         <p style="color: #4CAF50;">? <strong>30 sekund</strong> vs 3-4 godziny RCB</p>
-        <p style="color: #4CAF50;">? <strong>Background alerts</strong> - dzia³a gdy app zamkniêty</p>
+        <p style="color: #4CAF50;">? <strong>Background alerts</strong> - dziaï¿½a gdy app zamkniï¿½ty</p>
         <p style="color: #4CAF50;">? <strong>Child-friendly</strong> - messages dla dzieci</p>
         <hr>
         <button onclick="this.parentNode.parentNode.remove()" 
@@ -2631,7 +2637,7 @@ function showDetailedAlertStatus() {
         </button>
         <button onclick="checkForAlerts(); this.parentNode.parentNode.remove()" 
                 style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-left: 10px;">
-            ?? SprawdŸ teraz
+            ?? Sprawdï¿½ teraz
         </button>
     `;
     
@@ -2745,7 +2751,7 @@ function renderSafetyTips(tips) {
             
             tipCard.innerHTML = `
                 <div class="tip-icon">${tip.icon || '??'}</div>
-                <h4>${tip.title || 'Zasada bezpieczeñstwa'}</h4>
+                <h4>${tip.title || 'Zasada bezpieczeï¿½stwa'}</h4>
                 <p>${tip.content || ''}</p>
             `;
             
@@ -2799,5 +2805,8 @@ if (document.readyState === 'loading') {
 }
 
 console.log('?? App.js loaded successfully');
+
+
+
 
 
