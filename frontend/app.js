@@ -722,7 +722,7 @@ function toggleSpeech() {
     
     const btn = document.getElementById('speech-toggle-btn');
     if (btn) {
-        btn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie wyłączone</span>';
+        btn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie włączone</span>';
         btn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
     }
 }
@@ -2118,7 +2118,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (speechBtn) {
         speechBtn.addEventListener('click', toggleSpeech);
         // Initialize button state
-        speechBtn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie wyłączone</span>';
+        speechBtn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie włączone</span>';
         speechBtn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
     }
     
@@ -2524,7 +2524,7 @@ function showAlertMonitoringStatus() {
         /* animation: gentle-pulse 6s ease-in-out infinite; */ /* Disabled - no distracting animations */
     `;
     
-    statusDiv.innerHTML = '?? System Alert�w: AKTYWNY';
+    statusDiv.innerHTML = '🚨 Alerty: AKTYWNE ✅';
     
     // Add click handler for detailed status
     statusDiv.onclick = () => {
@@ -2786,6 +2786,7 @@ if (document.readyState === 'loading') {
 }
 
 console.log('?? App.js loaded successfully');
+
 
 
 
