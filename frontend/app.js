@@ -78,6 +78,8 @@ if (document.readyState === 'loading') {
 let alertMonitoringActive = false;
 let alertMonitorInterval = null;
 let activeAlerts = [];
+let alertSourceWorking = false; // Track if we have working alert source
+let lastSuccessfulFetch = null; // Track last successful alert fetch
 
 // 🔒 ZK-SECURE USER MEMORY SYSTEM (migrated from localStorage)
 let userMemory = {
@@ -1054,59 +1056,112 @@ function startAlertMonitoring() {
  * Bezpośrednie pobieranie z RSS RCB gdy backend niedostępny
  */
 async function fetchDirectRCBAlerts() {
-    try {
-        console.log('📡 Attempting direct RCB RSS fetch...');
-        
-        // Use CORS proxy to fetch RCB RSS
-        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-        const rcbUrl = 'https://www.gov.pl/web/rcb/ostrzezenia-rcb-rss';
-        
-        const response = await fetch(proxyUrl + rcbUrl);
-        
-        if (!response.ok) {
-            throw new Error(`RCB RSS fetch failed: ${response.status}`);
-        }
-        
-        const rssText = await response.text();
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(rssText, 'text/xml');
-        
-        const items = xmlDoc.querySelectorAll('item');
-        const alerts = [];
-        
-        for (let item of items) {
-            const title = item.querySelector('title')?.textContent || 'Alert RCB';
-            const description = item.querySelector('description')?.textContent || 'Sprawdź szczegóły na stronie RCB';
-            const pubDate = item.querySelector('pubDate')?.textContent || new Date().toISOString();
-            
-            // Only include recent alerts (last 24 hours)
-            const alertDate = new Date(pubDate);
-            const now = new Date();
-            const hoursDiff = (now - alertDate) / (1000 * 60 * 60);
-            
-            if (hoursDiff <= 24) {
-                alerts.push({
-                    id: `rcb-${Date.now()}-${Math.random()}`,
-                    title: title,
-                    content: description,
-                    severity: 'high',
-                    timestamp: alertDate.toISOString(),
-                    location: 'Polska',
-                    source: 'RCB RSS Direct'
-                });
+    // 🎯 TRY MULTIPLE SOURCES IN ORDER
+    const sources = [
+        {
+            name: 'RSS2JSON API',
+            fetch: async () => {
+                const rcbRssUrl = 'https://www.gov.pl/web/rcb/ostrzezenia-rcb-rss';
+                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rcbRssUrl)}`;
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`RSS2JSON returned ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status !== 'ok') {
+                    throw new Error(`RSS2JSON status: ${data.status}`);
+                }
+                
+                const alerts = [];
+                for (let item of (data.items || [])) {
+                    const pubDate = new Date(item.pubDate);
+                    const hoursDiff = (new Date() - pubDate) / (1000 * 60 * 60);
+                    
+                    // Only alerts from last 48 hours
+                    if (hoursDiff <= 48) {
+                        alerts.push({
+                            id: `rcb-${pubDate.getTime()}-${item.title.substring(0, 10)}`,
+                            title: item.title || 'Alert RCB',
+                            content: item.description || item.content || 'Sprawdź szczegóły na stronie RCB',
+                            severity: 'high',
+                            timestamp: pubDate.toISOString(),
+                            location: 'Polska',
+                            source: 'RCB via RSS2JSON'
+                        });
+                    }
+                }
+                
+                return alerts;
+            }
+        },
+        {
+            name: 'AllOrigins Proxy',
+            fetch: async () => {
+                const rcbUrl = 'https://www.gov.pl/web/rcb/ostrzezenia-rcb-rss';
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(rcbUrl)}`;
+                
+                const response = await fetch(proxyUrl);
+                if (!response.ok) {
+                    throw new Error(`AllOrigins returned ${response.status}`);
+                }
+                
+                const rssText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(rssText, 'text/xml');
+                
+                const items = xmlDoc.querySelectorAll('item');
+                const alerts = [];
+                
+                for (let item of items) {
+                    const title = item.querySelector('title')?.textContent || 'Alert RCB';
+                    const description = item.querySelector('description')?.textContent || 'Sprawdź szczegóły';
+                    const pubDate = item.querySelector('pubDate')?.textContent || new Date().toISOString();
+                    
+                    const alertDate = new Date(pubDate);
+                    const hoursDiff = (new Date() - alertDate) / (1000 * 60 * 60);
+                    
+                    if (hoursDiff <= 48) {
+                        alerts.push({
+                            id: `rcb-${alertDate.getTime()}-${title.substring(0, 10)}`,
+                            title: title,
+                            content: description,
+                            severity: 'high',
+                            timestamp: alertDate.toISOString(),
+                            location: 'Polska',
+                            source: 'RCB via AllOrigins'
+                        });
+                    }
+                }
+                
+                return alerts;
             }
         }
-        
-        console.log(`✅ Direct RCB fetch successful: ${alerts.length} alerts found`);
-        return alerts;
-        
-    } catch (error) {
-        console.warn('❌ Direct RCB fetch failed:', error.message);
-        
-        // Final fallback - no test alerts in production
-        console.log('ℹ️ No alert sources available - running in silent mode');
-        return [];
+    ];
+    
+    // Try each source
+    for (let source of sources) {
+        try {
+            console.log(`📡 Trying: ${source.name}...`);
+            const alerts = await source.fetch();
+            
+            console.log(`✅ ${source.name} SUCCESS: ${alerts.length} alerts found`);
+            alertSourceWorking = true;
+            lastSuccessfulFetch = new Date();
+            return alerts;
+            
+        } catch (error) {
+            console.warn(`❌ ${source.name} failed:`, error.message);
+            continue; // Try next source
+        }
     }
+    
+    // All sources failed
+    console.error('🚨 CRITICAL: All alert sources failed!');
+    alertSourceWorking = false;
+    return [];
 }
 
 /**
@@ -1177,45 +1232,19 @@ async function checkForAlerts() {
         else {
             const reason = !useLocation ? 'parent disabled location' : 'no location consent';
             console.log(`🏛️ Using national alerts (${reason})`);
-            try {
-                const response = await fetch(`/api/alerts/national`);
-                if (response.ok) {
-                    alerts = await response.json();
-                } else {
-                    console.log(`⚠️ National alerts API returned: ${response.status} ${response.statusText}`);
-                    // Try direct RCB RSS as fallback
-                    alerts = await fetchDirectRCBAlerts();
-                }
-            } catch (error) {
-                console.log('ℹ️ National alerts endpoint unavailable - trying direct RCB source');
-                alerts = await fetchDirectRCBAlerts();
-            }
+            
+            // GitHub Pages = no backend, go straight to RSS
+            console.log('📡 Fetching from RCB RSS (frontend-only mode)');
+            alerts = await fetchDirectRCBAlerts();
         }
         
-        // 🚨 LEVEL 4: Critical Alerts (Always)
-        try {
-            const criticalResponse = await fetch(`/api/alerts/critical`);
-            if (criticalResponse.ok) {
-                const criticalAlerts = await criticalResponse.json();
-                // Merge and deduplicate
-                alerts = [...alerts, ...criticalAlerts.filter(c => 
-                    !alerts.some(a => a.id === c.id)
-                )];
-            }
-        } catch (error) {
-            console.log('ℹ️ Critical alerts endpoint unavailable - using mock data for testing');
-            console.log('🧪 TESTING MODE: Real-time alerts will be available when backend API is deployed');
-            // Add mock critical alert for testing
-            if (alerts.length === 0) {
-                alerts = [{
-                    id: 'test-alert-1',
-                    title: 'Test Alert - Emergency Drill',
-                    content: 'This is a test alert for emergency preparedness. All systems operational.',
-                    type: 'exercises',
-                    severity: 'info',
-                    location: 'Poland'
-                }];
-            }
+        // 🚨 SAFETY CHECK: Did we get any alerts?
+        if (alerts.length === 0 && !alertSourceWorking) {
+            console.error('🚨 CRITICAL: No alert sources available!');
+            console.log('⚠️ Alert monitoring will show as OFFLINE');
+            
+            // Don't show fake alerts - be honest about status
+            alertMonitoringActive = false;
         }
         
         await processNewAlerts(alerts);
@@ -2512,13 +2541,19 @@ function updateAlertMonitoringStatus(statusDiv) {
         minute: '2-digit' 
     });
     
-    statusDiv.innerHTML = `🚨 Alerty: ${alertMonitoringActive ? 'AKTYWNE' : 'WYŁĄCZONE'} | ${lastCheck}`;
+    const status = alertMonitoringActive && alertSourceWorking ? 'AKTYWNE ✅' : 
+                   alertMonitoringActive && !alertSourceWorking ? 'OFFLINE ⚠️' :
+                   'WYŁĄCZONE ❌';
     
-    // Change color based on status
-    if (alertMonitoringActive) {
-        statusDiv.style.background = 'rgba(76, 175, 80, 0.9)'; // Green
+    statusDiv.innerHTML = `🚨 Alerty: ${status} | ${lastCheck}`;  
+    
+    // Change color based on REAL status
+    if (alertMonitoringActive && alertSourceWorking) {
+        statusDiv.style.background = 'rgba(76, 175, 80, 0.9)'; // Green - working
+    } else if (alertMonitoringActive && !alertSourceWorking) {
+        statusDiv.style.background = 'rgba(255, 152, 0, 0.9)'; // Orange - trying
     } else {
-        statusDiv.style.background = 'rgba(244, 67, 54, 0.9)'; // Red
+        statusDiv.style.background = 'rgba(244, 67, 54, 0.9)'; // Red - off
     }
 }
 
@@ -2553,7 +2588,8 @@ function showDetailedAlertStatus() {
     
     content.innerHTML = `
         <h3>📊 Status Systemu Alertów</h3>
-        <p><strong>🚨 Monitoring:</strong> ${alertMonitoringActive ? 'AKTYWNY ✅' : 'WYŁĄCZONY ❌'}</p>
+        <p><strong>🚨 Monitoring:</strong> ${alertMonitoringActive ? (alertSourceWorking ? 'AKTYWNY ✅' : 'OFFLINE - brak źródła ⚠️') : 'WYŁĄCZONY ❌'}</p>
+        <p><strong>📡 Źródło alertów:</strong> ${alertSourceWorking ? `RCB RSS (ostatnie: ${lastSuccessfulFetch ? new Date(lastSuccessfulFetch).toLocaleTimeString('pl-PL') : 'nigdy'})` : 'Niedostępne'}</p>
         <p><strong>⏰ Częstotliwość:</strong> Co 90 sekund (tryb deweloperski)</p>
         <p><strong>📍 Lokalizacja:</strong> ${userLocation ? 'Włączona' : 'Wyłączona'}</p>
         <p><strong>🎯 Aktywne alerty:</strong> ${activeAlerts.length}</p>

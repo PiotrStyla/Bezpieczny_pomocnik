@@ -1,8 +1,8 @@
 // 🚨 EMERGENCY OFFLINE CACHE - Critical for emergency operation
 // Cache version - increment to force update
-const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1.4.1';
-const STATIC_CACHE = 'static-resources-v1.4.1';
-const DYNAMIC_CACHE = 'dynamic-content-v1.4.1';
+const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1.4.2-real-alerts';
+const STATIC_CACHE = 'static-resources-v1.4.2';
+const DYNAMIC_CACHE = 'dynamic-content-v1.4.2';
 
 const EMERGENCY_ESSENTIALS = [
     // Core App Files
