@@ -13,7 +13,6 @@
 **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**  
 📍 **Adres:** 30-404 Kraków, ul. Cegielniana 6B/45  
 🆔 **KRS:** 0001063161 | **NIP:** 6793279476 | **REGON:** 526664276  
-📞 **Telefon:** +48 735 749 618  
 📧 **E-mail:** kontakt@fundacja-hospicjum.org
 
 ### **Identyfikacja Systemu:**
@@ -221,7 +220,6 @@ Zwiększenie bezpieczeństwa dzieci na terenie Rzeczypospolitej Polskiej poprzez
 
 ### **Współpraca Instytucjonalna:**
 📧 **E-mail:** wspolpraca@fundacja-hospicjum.org  
-📞 **Telefon:** +48 735 749 618  
 📍 **Adres:** ul. Cegielniana 6B/45, 30-404 Kraków
 
 ### **Sprawy Techniczne:**

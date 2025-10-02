@@ -23,7 +23,6 @@ Bezpieczny Pomocnik is a comprehensive child safety application designed to help
 ### 📞 **Foundation Contact**
 - **Full Name:** Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
 - **Address:** 30-404 Kraków, ul. Cegielniana 6B/45
-- **Phone:** +48 735 749 618
 - **Email:** kontakt@fundacja-hospicjum.org
 - **Website:** https://fundacja-hospicjum.org/
 

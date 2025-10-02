@@ -151,7 +151,6 @@ Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adre
 
 **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**  
 📍 30-404 Kraków, ul. Cegielniana 6B/45  
-📞 Tel. +48 735 749 618  
 📧 E-mail: kontakt@fundacja-hospicjum.org  
 🌐 www.fundacja-hospicjum.org
 

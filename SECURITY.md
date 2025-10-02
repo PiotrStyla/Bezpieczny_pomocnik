@@ -9,7 +9,6 @@
 If you discover a security vulnerability, please report it responsibly:
 
 **📧 Email:** kontakt@fundacja-hospicjum.org  
-**📞 Phone:** +48 735 749 618  
 **📍 Address:** 30-404 Kraków, ul. Cegielniana 6B/45
 
 ### ⚠️ **Please DO NOT:**
@@ -42,8 +41,7 @@ This security policy applies to:
 
 **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**
 - **Website:** https://fundacja-hospicjum.org/
-- **Email:** kontakt@fundacja-hospicjum.org  
-- **Phone:** +48 735 749 618
+- **Email:** kontakt@fundacja-hospicjum.org
 - **KRS:** 0001063161
 - **NIP:** 6793279476
 - **REGON:** 526664276

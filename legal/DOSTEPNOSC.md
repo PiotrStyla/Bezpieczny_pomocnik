@@ -13,7 +13,6 @@
 ### 📞 **Dane kontaktowe organizacji:**
 - **Nazwa:** Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
 - **Adres:** 30-404 Kraków, ul. Cegielniana 6B/45  
-- **Telefon:** +48 735 749 618
 - **E-mail:** kontakt@fundacja-hospicjum.org
 - **KRS:** 0001063161
 
@@ -127,9 +126,6 @@ Aplikacja została przetestowana z:
 
 #### **E-mail:** kontakt@fundacja-hospicjum.org
 **Temat:** "Dostępność - Bezpieczny Pomocnik"
-
-#### **Telefon:** +48 735 749 618  
-**(pon-pt, 9:00-17:00)**
 
 #### **Poczta tradycyjna:**
 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie  

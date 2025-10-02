@@ -153,7 +153,6 @@
 
 ### 🤔 **Pytania o cookies?**
 📧 E-mail: kontakt@fundacja-hospicjum.org  
-📞 Telefon: +48 735 749 618  
 📍 Adres: 30-404 Kraków, ul. Cegielniana 6B/45
 
 ### 🛠️ **Problemy techniczne z cookies?**

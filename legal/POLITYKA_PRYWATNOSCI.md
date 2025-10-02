@@ -12,7 +12,6 @@
 
 **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**  
 📍 30-404 Kraków, ul. Cegielniana 6B/45  
-📞 Tel. +48 735 749 618  
 📧 E-mail: kontakt@fundacja-hospicjum.org  
 🆔 KRS: 0001063161, NIP: 6793279476, REGON: 526664276
 
@@ -202,7 +201,6 @@
 
 ### 📞 **Jak skorzystać z praw:**
 - **E-mail:** kontakt@fundacja-hospicjum.org
-- **Telefon:** +48 735 749 618  
 - **Czas odpowiedzi:** Do 30 dni
 
 ### ⚖️ **Skarga do UODO:**
@@ -262,11 +260,8 @@ Masz prawo wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych (UODO) 
 E-mail: kontakt@fundacja-hospicjum.org  
 Temat: "RODO - Bezpieczny Pomocnik"
 
-### 📞 **Pilne sprawy:**
-Tel. +48 735 749 618 (pon-pt, 9:00-17:00)
-
 ### 📋 **Zgłaszanie naruszeń:**
-W przypadku podejrzenia naruszenia danych osobowych prosimy o natychmiastowy kontakt.
+W przypadku podejrzenia naruszenia danych osobowych prosimy o natychmiastowy kontakt na adres e-mail: kontakt@fundacja-hospicjum.org
 
 ---
 
