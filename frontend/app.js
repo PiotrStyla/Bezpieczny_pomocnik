@@ -2118,7 +2118,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (speechBtn) {
         speechBtn.addEventListener('click', toggleSpeech);
         // Initialize button state
-        speechbtn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie wyłączone</span>';
+        speechBtn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie wyłączone</span>';
         speechBtn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
     }
     
