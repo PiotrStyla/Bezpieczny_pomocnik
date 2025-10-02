@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 🔒 PARENT CMS - System Prywatności ZKP
  * Allows parents to create custom child-friendly messages
  * All data encrypted and stored in ZKP system for maximum privacy
@@ -846,6 +846,10 @@ function loadVoices() {
     
     // Populate voice select with Polish voices only
     const voiceSelect = document.getElementById('voice-select');
+    if (!voiceSelect) {
+        // Not in CMS mode, skip UI update
+        return;
+    }
     voiceSelect.innerHTML = '';
     
     if (polishVoices.length > 0) {
@@ -1320,3 +1324,4 @@ window.enableChildSurvivalMode = enableChildSurvivalMode;
 window.disableChildSurvivalMode = disableChildSurvivalMode;
 
 console.log('🔒 Parent CMS module loaded');
+

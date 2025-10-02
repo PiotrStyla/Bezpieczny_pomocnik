@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 🔒 PERSISTENT SETTINGS ZK STORAGE
  * Bezpieczne przechowywanie ustawień dziecka między sesjami
  * Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
@@ -36,7 +36,7 @@ class PersistentSettingsZK {
         try {
             // Import Enhanced Security ZK if available
             if (window.EnhancedSecurityZK) {
-                this.zkStorage = new window.EnhancedSecurityZK();
+                this.zkStorage = window.EnhancedSecurityZK;
                 await this.zkStorage.generateAppKey(); // Ensure encryption key exists
                 console.log('✅ ZK Storage initialized for persistent settings');
             } else {
@@ -270,3 +270,4 @@ window.loadChildSetting = async (key, defaultValue = null) => {
 window.getChildSettingsSummary = async () => {
     return await window.PersistentSettings.getSettingsSummary();
 };
+
