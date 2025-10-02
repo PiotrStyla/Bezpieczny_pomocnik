@@ -1,7 +1,8 @@
 # POLITYKA COOKIES APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja 27.09.2025: Dodano Background Alert System, periodic sync, RCB monitoring**
+**Aktualizacja 02.10.2025: Multi-source alert fetching, real-time source monitoring, honest status tracking**
+**Poprzednia aktualizacja 27.09.2025: Dodano Background Alert System, periodic sync, RCB monitoring**
 
 ---
 
@@ -30,6 +31,10 @@
 | `emergency-data/notified-alerts` | Historia otrzymanych alertów (max 50 ID) | Cache przeglądarki | Service Worker |
 | `emergency-data/rcb-rss-cache` | Tymczasowy cache alertów RCB RSS | 1 godzina | Service Worker |
 | `alert_monitoring_status` | Status systemu monitorowania alertów | Sesja | localStorage |
+| `alert_source_working` | Status działania źródła alertów (true/false) | Sesja | localStorage |
+| `last_successful_fetch` | Timestamp ostatniego udanego pobrania alertów | Sesja | localStorage |
+| `rss2json_api_status` | Status RSS2JSON API | Sesja | localStorage |
+| `allorigins_proxy_status` | Status AllOrigins Proxy | Sesja | localStorage |
 | `location_settings` | Ustawienia lokalizacji z Parent CMS | Do zmiany | localStorage |
 | **🚨 EMERGENCY CACHE** | **Cache awaryjnych danych offline** | **Do usunięcia cache** | **Service Worker** |
 | `emergency_contacts` | Numery alarmowe (112,997,998,999) offline | Cache przeglądarki | Service Worker |

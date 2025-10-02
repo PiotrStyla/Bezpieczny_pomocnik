@@ -1,8 +1,8 @@
 # REGULAMIN UŻYTKOWANIA APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja 28.09.2025: Multi-Child Architecture, Child Session Manager, enhanced child data protection**
-**Poprzednia aktualizacja 27.09.2025: Background Alert System, 24/7 monitoring, direct RCB integration**
+**Aktualizacja 02.10.2025: Multi-source alert fetching (RSS2JSON + AllOrigins), honest status indicator**
+**Poprzednia aktualizacja 28.09.2025: Multi-Child Architecture, Child Session Manager, enhanced child data protection**
 
 ---
 
@@ -20,14 +20,17 @@
 
 2.1. **Wersja podstawowa** Aplikacji dostępna jest bez rejestracji i obejmuje:
 - Przeglądanie alertów pogodowych i ostrzeżeń bezpieczeństwa dla całej Polski
+- **Multi-source Alert System** - RSS2JSON API (primary) + AllOrigins Proxy (fallback)
 - **Background Alert System** - 24/7 monitoring zagrożeń nawet gdy aplikacja zamknięta
-- **Periodic Background Sync** - automatyczne sprawdzanie co 15 minut (vs 3-4h oficjalne systemy)
+- **Periodic Background Sync** - automatyczne sprawdzanie co 90 sekund (vs 3-4h oficjalne systemy)
 - **Direct RCB Integration** - bezpośrednie pobieranie z gov.pl/web/rcb/ostrzezenia-rcb-rss
+- **Real-time Source Monitoring** - honest status indicator (ACTIVE/OFFLINE/DISABLED)
 - **Automatyczne wykrywanie lokalizacji** (z wyraźną zgodą Użytkownika) dla wszystkich gmin, miast i województw Polski
 - **Location-aware background alerts** - cache lokalizacji dla alertów lokalnych w tle
 - **Inteligentne dopasowanie źródeł alertów** - krajowe (RCB, IMGW), wojewódzkie i miejskie
 - **Kompletne pokrycie Polski** - 16 województw, 380 powiatów, wszystkie gminy
-- **Visual monitoring dashboard** - real-time status systemu alertów
+- **Visual monitoring dashboard** - real-time status systemu alertów z timestamp
+- **Force Cache Clear Utility** - narzędzie do wymuszenia aktualizacji
 - Edukacyjne treści o bezpieczeństwie dla dzieci
 - Informacje o numerach alarmowych  
 - Funkcje text-to-speech w językach polskim, angielskim i ukraińskim

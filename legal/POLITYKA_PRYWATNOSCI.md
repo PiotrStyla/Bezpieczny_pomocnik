@@ -1,8 +1,8 @@
 # POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Zgodna z RODO | Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja 28.09.2025: Dodano Multi-Child Architecture, Child Session Manager, child-specific storage separation**
-**Poprzednia aktualizacja 27.09.2025: Background Alert System, location caching, RCB monitoring**
+**Aktualizacja 02.10.2025: Multi-source alert fetching (RSS2JSON API, AllOrigins Proxy), real-time source monitoring**
+**Poprzednia aktualizacja 28.09.2025: Dodano Multi-Child Architecture, Child Session Manager, child-specific storage separation**
 
 ---
 
@@ -60,18 +60,19 @@
 - **Podstawa prawna:** Prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO)
 
 #### **🚨 Background Alert System (Service Worker):**
-- **Background sync data** - cache dla okresowego sprawdzania alertów (co 15 minut)
+- **Background sync data** - cache dla okresowego sprawdzania alertów (co 90 sekund)
 - **Cached location data** - ostatnia znana lokalizacja dla alertów lokalnych w tle
 - **Alert notification history** - lista otrzymanych alertów (max 50, tylko ID)
 - **RCB RSS feed cache** - tymczasowe przechowywanie alertów RCB z gov.pl
-- **CORS proxy data** - techniczne dane dla omijania ograniczeń przeglądarki
+- **Multi-source alert data** - dane z RSS2JSON API i AllOrigins Proxy
+- **Alert source status** - monitoring działania źródeł alertów (alertSourceWorking, lastSuccessfulFetch)
 - **Emergency contacts cache** (112, 997, 998, 999) - TYLKO lokalnie w przeglądarce
 - **Safety instructions cache** - instrukcje bezpieczeństwa dla działania offline
 - **App core files cache** - HTML/CSS/JS dla działania bez internetu
 - **Cel:** 24/7 monitoring zagrożeń nawet gdy aplikacja zamknięta (30s vs 3-4h oficjalne)
 - **Przechowywanie:** WYŁĄCZNIE w Service Worker cache (NIE na serwerach Fundacji)
-- **Frequencja:** Automatic background sync co 15 minut + manual triggers
-- **Źródła danych:** RCB RSS (gov.pl), backend APIs, emergency fallback
+- **Częstotliwość:** Automatic background sync co 90 sekund + manual triggers
+- **Źródła danych:** RCB RSS via RSS2JSON API (primary), AllOrigins Proxy (fallback)
 - **Podstawa prawna:** Żywotny interes osoby fizycznej (art. 6 ust. 1 lit. d RODO)
 - **Szczególne uzasadnienie:** Ochrona życia dzieci - natychmiastowe alerty vs godziny opóźnienia
 
@@ -157,10 +158,22 @@
 
 ### 🌐 **Podmioty zewnętrzne:**
 
-#### **Render.com (hosting):**
-- **Dane:** Dane techniczne, logi aplikacji
-- **Lokalizacja:** Chmura (UE/USA)
-- **Zabezpieczenia:** Szyfrowanie TLS, certyfikaty SOC 2
+#### **GitHub Pages (hosting):**
+- **Dane:** Statyczne pliki aplikacji (HTML/CSS/JS)
+- **Lokalizacja:** CDN globalny GitHub
+- **Zabezpieczenia:** HTTPS, TLS 1.3, GitHub SLA 99.9%
+
+#### **RSS2JSON API (api.rss2json.com):**
+- **Dane:** Zapytania o feed RCB RSS (bez danych osobowych użytkownika)
+- **Lokalizacja:** USA/EU
+- **Cel:** Konwersja RSS do JSON dla alertów bezpieczeństwa
+- **Zabezpieczenia:** HTTPS, brak logowania danych użytkownika
+
+#### **AllOrigins Proxy (api.allorigins.win):**
+- **Dane:** Zapytania o feed RCB RSS (bez danych osobowych użytkownika)
+- **Lokalizacja:** USA/EU
+- **Cel:** Fallback proxy dla alertów gdy RSS2JSON niedostępny
+- **Zabezpieczenia:** HTTPS, brak logowania danych użytkownika
 
 #### **OpenAI (planowane - API tłumaczeń):**
 - **Dane:** Teksty do tłumaczenia (bez danych osobowych)
@@ -257,7 +270,7 @@ W przypadku podejrzenia naruszenia danych osobowych prosimy o natychmiastowy kon
 
 ---
 
-**Ostatnia aktualizacja:** 19 stycznia 2025 r.  
-**Wersja:** 1.0
+**Ostatnia aktualizacja:** 2 października 2025 r.  
+**Wersja:** 1.3 (Multi-source alerts, honest status monitoring)
 
 *Ta polityka została opracowana zgodnie z RODO oraz uwzględnia szczególne wymogi ochrony danych dzieci poniżej 16. roku życia.*
