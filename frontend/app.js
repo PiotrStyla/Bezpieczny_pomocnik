@@ -2047,54 +2047,7 @@ async function handleSafeRoute() {
     );
     
     // OLD CODE REMOVED - replaced with safety validation above
-    /* OLD:
-    const mascotText
-    
-    // ?? FIRST: Try to get parent-created route message
-    let smartMessage = null;
-    if (window.getParentMessage) {
-        try {
-            // Get current child ID for child-specific messages
-            let childId = null;
-            if (window.childSessionManager) {
-                childId = await window.childSessionManager.getCurrentChildId();
-            }
-            
-            smartMessage = await window.getParentMessage('safety', 'route', childId);
-            if (smartMessage) {
-                console.log('? Using parent-created route message from Mina ZK');
-            }
-        } catch (error) {
-            console.error('? Failed to get parent route message:', error);
-        }
     }
-    
-    // ?? FALLBACK: Use AI/rule-based if no parent message
-    if (!smartMessage) {
-        smartMessage = await generateSmartSpeech('safe_route');
-    }
-    
-    // ???????? SHOW PARENT ON MAP (REAL FUNCTIONALITY)
-    if (typeof window.showParentMapFromButton === 'function') {
-        console.log('??? Showing parent on map...');
-        try {
-            await window.showParentMapFromButton();
-        } catch (error) {
-            console.error('? Map display error:', error);
-        }
-    } else {
-        console.warn('?? showParentMapFromButton not loaded - make sure parent-map-display.js is included');
-    }
-    
-    setTimeout(() => {
-        if (mascotText) {
-            mascotText.textContent = smartMessage;
-        }
-        // Remove emoji for speech synthesis (voice can't read emoji properly)
-        const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
-        speakText(speechMessage);
-    }, 800);
-}
 
 async function handleEmergencyHelp() {
     console.log('?? Emergency Help clicked');
