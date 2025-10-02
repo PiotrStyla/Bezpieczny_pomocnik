@@ -2013,10 +2013,42 @@ async function handleSafeRoute() {
     // Show mascot loader immediately
     showMascotLoader('🚶 Szukam bezpiecznej drogi do domu...');
     
-    const mascotText = document.getElementById('mascot-text');
-    if (mascotText) {
-        mascotText.textContent = '?? Szukam drogi do rodzica lub domu...';
+    // Get child location first
+    if (!navigator.geolocation) {
+        const mascotText = document.getElementById('mascot-text');
+        if (mascotText) {
+            mascotText.textContent = '❌ Nie mogę określić Twojej lokalizacji. Sprawdź uprawnienia GPS.';
+        }
+        return;
     }
+    
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            const childLat = position.coords.latitude;
+            const childLon = position.coords.longitude;
+            
+            // Use SAFE version with distance validation
+            if (window.safeShowParentOnMap) {
+                await window.safeShowParentOnMap(childLat, childLon);
+            } else {
+                console.warn('⚠️ Safety module not loaded, using fallback');
+                if (window.showParentOnMap) {
+                    await window.showParentOnMap(childLat, childLon);
+                }
+            }
+        },
+        (error) => {
+            console.error('❌ Failed to get child location:', error);
+            const mascotText = document.getElementById('mascot-text');
+            if (mascotText) {
+                mascotText.textContent = '❌ Nie udało się określić Twojej lokalizacji.';
+            }
+        }
+    );
+    
+    // OLD CODE REMOVED - replaced with safety validation above
+    /* OLD:
+    const mascotText
     
     // ?? FIRST: Try to get parent-created route message
     let smartMessage = null;
@@ -2805,6 +2837,7 @@ if (document.readyState === 'loading') {
 }
 
 console.log('?? App.js loaded successfully');
+
 
 
 
