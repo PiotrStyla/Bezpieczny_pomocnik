@@ -7,27 +7,37 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization
 from .config import settings
 
-# --- Manual VAPID key generation with proper formatting ---
-private_key = ec.generate_private_key(ec.SECP256R1())
-public_key = private_key.public_key()
+def _ensure_vapid_keys():
+    global vapid_public_key, vapid_private_key
+    env_pub = (getattr(settings, 'VAPID_PUBLIC_KEY', None) or '').strip()
+    env_priv = (getattr(settings, 'VAPID_PRIVATE_KEY', None) or '').strip()
 
-# Get the raw public key bytes (65 bytes uncompressed point)
-raw_public_key = public_key.public_bytes(
-    encoding=serialization.Encoding.X962,
-    format=serialization.PublicFormat.UncompressedPoint
-)
+    if env_pub and env_priv:
+        try:
+            padding = '=' * (-len(env_pub) % 4)
+            base64.urlsafe_b64decode((env_pub + padding).encode('utf-8'))
+            vapid_public_key = env_pub
+            vapid_private_key = env_priv
+            logging.info("Using VAPID keys from environment.")
+            return
+        except Exception:
+            pass
 
-# Convert to base64url format (will be 87 characters for 65 bytes)
-vapid_public_key = base64.urlsafe_b64encode(raw_public_key).rstrip(b'=').decode('utf-8')
+    private_key = ec.generate_private_key(ec.SECP256R1())
+    public_key = private_key.public_key()
+    raw_public_key = public_key.public_bytes(
+        encoding=serialization.Encoding.X962,
+        format=serialization.PublicFormat.UncompressedPoint
+    )
+    vapid_public_key = base64.urlsafe_b64encode(raw_public_key).rstrip(b'=').decode('utf-8')
+    vapid_private_key = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption()
+    ).decode('utf-8')
+    logging.info("Generated in-memory VAPID keys for this session.")
 
-# Get the private key in PEM format for pywebpush
-vapid_private_key = private_key.private_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PrivateFormat.PKCS8,
-    encryption_algorithm=serialization.NoEncryption()
-).decode('utf-8')
-
-logging.info("Generated in-memory VAPID keys for this session.")
+_ensure_vapid_keys()
 
 # Store subscriptions in memory instead of a file
 subscriptions_in_memory = []
