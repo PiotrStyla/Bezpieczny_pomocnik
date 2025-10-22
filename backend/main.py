@@ -18,6 +18,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import asyncio
+import os
+import re
 from datetime import datetime
 from typing import Optional, List, Dict, Any, Literal
 from cachetools import TTLCache
@@ -26,10 +28,14 @@ from .config import settings
 from .schema import Alert, SeverityLevel
 from .data_sources import fetch_all_alerts, fetch_alerts_for_location, get_location_coverage_info
 from .ai_processor import simplify_text, generate_tips
-from .push_notifications import get_vapid_public_key, add_subscription, send_notification_to_all
+from . import push_notifications
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-cache = TTLCache(maxsize=10, ttl=settings.CACHE_TTL_SECONDS)
+# Disable cache during pytest runs to avoid cross-test contamination
+def is_cache_enabled() -> bool:
+    return settings.CACHE_TTL_SECONDS > 0 and not os.getenv("PYTEST_CURRENT_TEST")
+
+cache = TTLCache(maxsize=10, ttl=max(1, settings.CACHE_TTL_SECONDS))
 notified_alert_ids = set()
 scheduler = AsyncIOScheduler()
 
@@ -49,7 +55,7 @@ def check_for_new_alerts_job():
             severity = classify_severity(alert["title"], alert["content"])
             if severity == SeverityLevel.WARNING and alert["id"] not in notified_alert_ids:
                 simplified_body = simplify_text(alert["title"], alert["content"]) or alert["content"]
-                send_notification_to_all(title=f"Nowy Alert: {alert['location']}", body=simplified_body[:200])
+                push_notifications.send_notification_to_all(title=f"Nowy Alert: {alert['location']}", body=simplified_body[:200])
                 notified_alert_ids.add(alert["id"])
     except Exception as e:
         logging.error(f"Błąd w zadaniu sprawdzającym alerty: {e}")
@@ -63,10 +69,20 @@ async def startup_event():
 async def shutdown_event():
     scheduler.shutdown()
 
+def _matches_keyword(text: str, keyword: str) -> bool:
+    # Allow morphological suffixes for selected high-signal keywords
+    if keyword.lower() in {"grad"}:
+        pattern = r"\b" + re.escape(keyword) + r"\w*"
+    else:
+        pattern = r"\b" + re.escape(keyword) + r"\b"
+    return re.search(pattern, text, flags=re.IGNORECASE) is not None
+
 def classify_severity(title: str, content: str) -> SeverityLevel:
-    text_to_check = f"{title.lower()} {content.lower()}"
-    if any(keyword in text_to_check for keyword in settings.WARNING_KEYWORDS): return SeverityLevel.WARNING
-    if any(keyword in text_to_check for keyword in settings.CAUTION_KEYWORDS): return SeverityLevel.CAUTION
+    text_to_check = f"{title} {content}"
+    if any(_matches_keyword(text_to_check, kw) for kw in settings.WARNING_KEYWORDS):
+        return SeverityLevel.WARNING
+    if any(_matches_keyword(text_to_check, kw) for kw in settings.CAUTION_KEYWORDS):
+        return SeverityLevel.CAUTION
     return SeverityLevel.INFO
 
 def detect_all_clear(title: str, content: str) -> bool:
@@ -92,12 +108,14 @@ async def process_alerts(raw_alerts: List[dict], lang: str) -> List[Alert]:
 @app.get("/api/alerts", response_model=List[Alert], summary="Pobierz wszystkie aktualne alerty")
 async def get_alerts(lang: Literal['pl', 'en', 'ua'] = Query('pl', description="Język uproszczonych treści.")):
     cache_key = f"alerts_{lang}"
-    if cache_key in cache: return cache[cache_key]
+    if is_cache_enabled() and (cache_key in cache):
+        return cache[cache_key]
     try:
         raw_alerts = fetch_all_alerts()
         processed_alerts = await process_alerts(raw_alerts, lang)
         sorted_alerts = sorted(processed_alerts, key=lambda x: x.timestamp, reverse=True)
-        cache[cache_key] = sorted_alerts
+        if is_cache_enabled():
+            cache[cache_key] = sorted_alerts
         return sorted_alerts
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Wystąpił błąd: {str(e)}")
@@ -106,12 +124,12 @@ async def get_alerts(lang: Literal['pl', 'en', 'ua'] = Query('pl', description="
 def get_vapid_key():
     # Directly return the key from the environment settings.
     # This is the URL-safe base64 encoded public key.
-    public_key = get_vapid_public_key()
+    public_key = push_notifications.get_vapid_public_key()
     return {"public_key": public_key}
 
 @app.post("/api/subscribe", status_code=201, summary="Zapisz subskrypcję na powiadomienia")
 def subscribe(subscription: Dict[str, Any] = Body(...)):
-    add_subscription(subscription)
+    push_notifications.add_subscription(subscription)
     return {"message": "Subskrypcja zapisana."}
 
 @app.get("/api/alerts/location", response_model=List[Alert], summary="Pobierz alerty dla konkretnej lokalizacji")
@@ -128,7 +146,7 @@ async def get_alerts_for_location(
     - Alerty miejskie jeśli dostępne dla tego miasta
     """
     cache_key = f"alerts_location_{lat}_{lon}_{lang}"
-    if cache_key in cache: 
+    if is_cache_enabled() and (cache_key in cache): 
         return cache[cache_key]
     
     try:
@@ -137,7 +155,8 @@ async def get_alerts_for_location(
         processed_alerts = await process_alerts(raw_alerts, lang)
         sorted_alerts = sorted(processed_alerts, key=lambda x: x.timestamp, reverse=True)
         
-        cache[cache_key] = sorted_alerts
+        if is_cache_enabled():
+            cache[cache_key] = sorted_alerts
         return sorted_alerts
     except Exception as e:
         logging.error(f"Error fetching location alerts for {lat}, {lon}: {e}")
