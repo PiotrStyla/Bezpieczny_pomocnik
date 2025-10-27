@@ -21,6 +21,8 @@ import asyncio
 import os
 import re
 from datetime import datetime
+import requests
+import feedparser
 from typing import Optional, List, Dict, Any, Literal
 from cachetools import TTLCache
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -29,6 +31,7 @@ from .schema import Alert, SeverityLevel
 from .data_sources import fetch_all_alerts, fetch_alerts_for_location, get_location_coverage_info
 from .ai_processor import simplify_text, generate_tips
 from . import push_notifications
+from . import poland_locations
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 # Disable cache during pytest runs to avoid cross-test contamination
@@ -182,6 +185,46 @@ def get_coverage_info():
     except Exception as e:
         logging.error(f"Error getting coverage info: {e}")
         raise HTTPException(status_code=500, detail=f"Błąd pobierania informacji o pokryciu: {str(e)}")
+
+@app.get("/api/source-health", summary="Diagnostyka źródeł alertów")
+def source_health():
+    try:
+        sources = poland_locations.get_all_poland_sources()
+        report = []
+        for name, cfg in sources.items():
+            url = cfg.get("url")
+            typ = cfg.get("type")
+            status = None
+            ct = None
+            entries = None
+            try:
+                if typ == "rss":
+                    fd = feedparser.parse(url)
+                    status = getattr(fd, "status", None)
+                    entries = len(getattr(fd, "entries", []) or [])
+                    ct = None
+                    if not entries or (isinstance(status, int) and status >= 400):
+                        resp = requests.get(url, timeout=10)
+                        status = resp.status_code
+                        ct = resp.headers.get("Content-Type")
+                else:
+                    resp = requests.get(url, timeout=10)
+                    status = resp.status_code
+                    ct = resp.headers.get("Content-Type")
+                report.append({
+                    "name": name,
+                    "url": url,
+                    "type": typ,
+                    "http_status": status,
+                    "content_type": ct,
+                    "entries": entries
+                })
+            except Exception as e:
+                report.append({"name": name, "url": url, "type": typ, "error": str(e)})
+        return {"status": "ok", "sources": report, "count": len(report)}
+    except Exception as e:
+        logging.error(f"Source health error: {e}")
+        raise HTTPException(status_code=500, detail="Błąd diagnostyki źródeł")
 
 @app.post("/api/update-location", summary="Aktualizuj źródła alertów dla nowej lokalizacji")
 def update_location_sources(

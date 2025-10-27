@@ -164,6 +164,13 @@ def get_national_alert_sources():
             "level": "national",
             "priority": "high"
         },
+        "rso_national": {
+            "url": "https://komunikaty.tvp.pl/komunikaty/wszystkie/wszystkie/0?_format=xml",
+            "type": "rso_xml",
+            "location": "Polska",
+            "level": "national",
+            "priority": "high"
+        },
         "imgw_national": {
             "url": "https://www.imgw.pl/rss/ostrzezenia_meteorologiczne.xml",
             "type": "rss",

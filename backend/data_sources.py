@@ -7,11 +7,13 @@ import hashlib
 import logging
 import re
 from urllib.parse import urljoin
+import xml.etree.ElementTree as ET
 
 from .config import settings
 
 HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept': 'application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, text/html;q=0.7, */*;q=0.5'
 }
 
 def _generate_id(title: str, published_date: str) -> str:
@@ -21,11 +23,51 @@ def _parse_rss(url: str, location: str) -> List[Dict[str, Any]]:
     logging.info(f"Pobieranie danych RSS z: {url}")
     alerts = []
     try:
-        feed = feedparser.parse(url)
-        for entry in feed.entries:
-            published_time = entry.get("published_parsed")
+        feed = feedparser.parse(url, request_headers=HEADERS)
+        entries = getattr(feed, "entries", [])
+        status = getattr(feed, "status", None)
+        bozo = getattr(feed, "bozo", None)
+        if not entries or (isinstance(status, int) and status >= 400):
+            try:
+                resp = requests.get(url, timeout=10, headers=HEADERS)
+                ct = resp.headers.get('Content-Type', '')
+                logging.info(f"RSS fetch status={resp.status_code} ct={ct} url={url}")
+                resp.raise_for_status()
+                content = resp.content
+                feed2 = feedparser.parse(content)
+                entries = getattr(feed2, "entries", [])
+                if not entries and 'html' in ct.lower():
+                    soup = BeautifulSoup(content, 'html.parser')
+                    rss_url = None
+                    for link in soup.find_all('link', href=True):
+                        t = (link.get('type') or '').lower()
+                        rel = link.get('rel') or []
+                        rel_str = ','.join(rel).lower() if isinstance(rel, list) else str(rel).lower()
+                        if 'rss' in t or 'atom' in t or 'rss' in rel_str or 'application/xml' in t:
+                            rss_url = urljoin(url, link['href'])
+                            break
+                    if rss_url:
+                        logging.info(f"RSS autodiscovery: {rss_url}")
+                        feed3 = feedparser.parse(rss_url, request_headers=HEADERS)
+                        entries = getattr(feed3, "entries", [])
+                        if entries:
+                            url = rss_url
+            except Exception as e:
+                logging.warning(f"Fallback requests dla {url} nieudany: {e}")
+        for entry in entries:
+            published_time = entry.get("published_parsed") if hasattr(entry, "get") else getattr(entry, "published_parsed", None)
             dt_object = datetime.datetime(*published_time[:6]) if published_time else datetime.datetime.now()
-            alerts.append({"id": _generate_id(entry.title, entry.get("published", "")), "source": url, "title": entry.title, "content": entry.summary, "timestamp": dt_object, "location": location})
+            title = entry.get("title", getattr(entry, "title", "Bez tytułu")) if hasattr(entry, "get") else getattr(entry, "title", "Bez tytułu")
+            summary = entry.get("summary", getattr(entry, "summary", "")) if hasattr(entry, "get") else getattr(entry, "summary", "")
+            published = entry.get("published", getattr(entry, "published", "")) if hasattr(entry, "get") else getattr(entry, "published", "")
+            alerts.append({
+                "id": _generate_id(title, published),
+                "source": url,
+                "title": title,
+                "content": summary,
+                "timestamp": dt_object,
+                "location": location
+            })
     except Exception as e:
         logging.error(f"Błąd podczas parsowania RSS z {url}: {e}")
     logging.info(f"Znaleziono {len(alerts)} alertów RSS z {location}.")
@@ -111,11 +153,63 @@ def _parse_web_bialystok(url: str, location: str) -> List[Dict[str, Any]]:
     logging.info(f"Znaleziono {len(alerts)} alertów na stronie Białegostoku.")
     return alerts
 
+def _parse_rso_xml(url: str, location: str) -> List[Dict[str, Any]]:
+    logging.info(f"Pobieranie danych RSO XML z: {url}")
+    alerts: List[Dict[str, Any]] = []
+    try:
+        resp = requests.get(url, timeout=10, headers=HEADERS)
+        resp.raise_for_status()
+        root = ET.fromstring(resp.content)
+        for news in root.findall('.//news'):
+            nid = (news.findtext('id') or '').strip()
+            title = (news.findtext('title') or '').strip() or 'Bez tytułu'
+            shortcut = (news.findtext('shortcut') or '').strip()
+            content = (news.findtext('content') or '').strip()
+            rso_alarm = (news.findtext('rso_alarm') or '').strip()
+            valid_from = (news.findtext('valid_from') or '').strip()
+            valid_to = (news.findtext('valid_to') or '').strip()
+
+            ts = None
+            for candidate in (valid_from, valid_to):
+                if candidate:
+                    try:
+                        # Expecting format like 'YYYY-MM-DD HH:MM:SS'
+                        ts = datetime.datetime.strptime(candidate, '%Y-%m-%d %H:%M:%S')
+                        break
+                    except Exception:
+                        pass
+            if ts is None:
+                ts = datetime.datetime.now()
+
+            body = content or shortcut
+            provinces = []
+            provs = news.find('provinces')
+            if provs is not None:
+                for p in provs.findall('province'):
+                    txt = (p.text or '').strip()
+                    if txt:
+                        provinces.append(txt)
+
+            alerts.append({
+                "id": _generate_id(nid or title, valid_from or valid_to or ''),
+                "source": url,
+                "title": title,
+                "content": body,
+                "timestamp": ts,
+                "location": ', '.join(provinces) if provinces else location,
+                "rso_alarm": rso_alarm,
+            })
+    except Exception as e:
+        logging.error(f"Błąd podczas parsowania RSO XML z {url}: {e}")
+    logging.info(f"Znaleziono {len(alerts)} alertów RSO.")
+    return alerts
+
 PARSER_MAP = {
     "rss": _parse_rss,
     "web_warszawa": _parse_web_warszawa,
     "web_lublin": _parse_web_lublin,
     "web_bialystok": _parse_web_bialystok,
+    "rso_xml": _parse_rso_xml,
 }
 
 def fetch_all_alerts() -> List[Dict[str, Any]]:
