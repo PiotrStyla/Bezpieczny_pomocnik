@@ -16,9 +16,11 @@ For licensing inquiries: kontakt@fundacja-hospicjum.org
 from fastapi import FastAPI, HTTPException, Query, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 import logging
 import asyncio
 from datetime import datetime
+from pathlib import Path
 from typing import Optional, List, Dict, Any, Literal
 from cachetools import TTLCache
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -257,6 +259,17 @@ async def get_ai_config():
         },
         "default_provider": "openai" if openai_key else "fallback"
     }
+
+# Icon aliases for PWA/platform fallbacks
+@app.get("/icon-192.png")
+def get_icon_192():
+    icon_path = Path(__file__).resolve().parent.parent / "frontend" / "images" / "logo_192x192.png"
+    return FileResponse(icon_path, media_type="image/png")
+
+@app.get("/icon-512.png")
+def get_icon_512():
+    icon_path = Path(__file__).resolve().parent.parent / "frontend" / "images" / "logo_512x512.png"
+    return FileResponse(icon_path, media_type="image/png")
 
 app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
 
