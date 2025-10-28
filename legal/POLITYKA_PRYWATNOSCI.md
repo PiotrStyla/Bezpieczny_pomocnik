@@ -1,7 +1,8 @@
-﻿# POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
+# POLITYKA PRYWATNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Zgodna z RODO | Obowiązuje od: 21 września 2025 r.**
 **Aktualizacja 02.10.2025: Multi-source alert fetching (RSS2JSON API, AllOrigins Proxy), real-time source monitoring**
+**Aktualizacja 28.10.2025: EnhancedSecurityZK (IndexedDB + AES-256-GCM), Push (VAPID), reverse geocoding OpenStreetMap Nominatim, TTS tylko po weryfikacji zgody rodzica**
 **Poprzednia aktualizacja 28.09.2025: Dodano Multi-Child Architecture, Child Session Manager, child-specific storage separation**
 
 ---
@@ -11,9 +12,9 @@
 **Administratorem** Twoich danych osobowych jest:
 
 **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**  
-📍 30-404 Kraków, ul. Cegielniana 6B/45  
-📧 E-mail: kontakt@fundacja-hospicjum.org  
-🆔 KRS: 0001063161, NIP: 6793279476, REGON: 526664276
+  30-404 Kraków, ul. Cegielniana 6B/45  
+  E-mail: kontakt@fundacja-hospicjum.org  
+  KRS: 0001063161, NIP: 6793279476, REGON: 526664276
 
 **Inspektor Ochrony Danych:** kontakt@fundacja-hospicjum.org
 
@@ -21,14 +22,14 @@
 
 ## § 2. JAKIE DANE ZBIERAMY
 
-### 🔍 **WERSJA PODSTAWOWA (bez rejestracji):**
+### **WERSJA PODSTAWOWA (bez rejestracji):**
 
 #### **Dane lokalizacyjne (opcjonalnie):**
 - **Współrzędne geograficzne** (szerokość/długość geograficzna) - **TYLKO w przeglądarce użytkownika**
 - **Identyfikacja lokalizacji:** województwo, powiat, najbliższe miasto
 - **Cel:** Automatyczne dopasowanie alertów lokalnych (wojewódzkich i miejskich) 
 - **Zakres pokrycia:** Wszystkie 16 województw, 380 powiatów, wszystkie gminy Polski
-- **Przechowywanie:** WYŁĄCZNIE w localStorage przeglądarki (NIE na serwerach Fundacji)
+- **Przechowywanie:** WYŁĄCZNIE w przeglądarce użytkownika z wykorzystaniem **EnhancedSecurityZK** (IndexedDB, szyfrowanie AES-256-GCM). Dla niesensytywnych preferencji dopuszczalne jest localStorage. **Brak przechowywania na serwerach Fundacji.**
 - **Źródła alertów:** RCB (krajowe), IMGW (wojewódzkie), władze miejskie (lokalne)
 - **Podstawa prawna:** Zgoda (art. 6 ust. 1 lit. a RODO)
 - **Szczególna ochrona dzieci:** Zgodnie z art. 8 RODO - wymagana zgoda rodzica/opiekuna
@@ -39,7 +40,7 @@
 - **Cel:** Personalizacja doświadczenia użytkownika
 - **Podstawa prawna:** Prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO)
 
-#### **🎮 Gamification System (Heroes & Achievements):**
+#### **Gamification System (Heroes & Achievements):**
 - **Wybrany bohater** bezpieczeństwa (Wicher/Kropla/Płomyk) - TYLKO lokalnie
 - **Postęp gracza** (XP, poziom, osiągnięcia) - TYLKO w localStorage przeglądarki
 - **Dzienne logowania** (streak counter) - TYLKO lokalnie dla motywacji
@@ -58,7 +59,13 @@
 - **Cel:** Zapewnienie poprawnego działania aplikacji
 - **Podstawa prawna:** Prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO)
 
-#### **🚨 Background Alert System (Service Worker):**
+#### **Powiadomienia push (za zgodą):**
+- **Zakres:** identyfikator subskrypcji push (endpoint) oraz klucze kryptograficzne przeglądarki (`p256dh`, `auth`)
+- **Cel:** dostarczanie powiadomień krytycznych
+- **Przechowywanie:** endpoint i klucze przechowywane po stronie Fundacji wyłącznie w celu dostarczenia powiadomień; brak łączenia z danymi profilu dziecka/rodzica
+- **Podstawa prawna:** Zgoda (art. 6 ust. 1 lit. a RODO); możliwość wycofania w dowolnym momencie (anulowanie subskrypcji w przeglądarce)
+
+#### **Background Alert System (Service Worker):**
 - **Background sync data** - cache dla okresowego sprawdzania alertów (co 90 sekund)
 - **Cached location data** - ostatnia znana lokalizacja dla alertów lokalnych w tle
 - **Alert notification history** - lista otrzymanych alertów (max 50, tylko ID)
@@ -75,7 +82,7 @@
 - **Podstawa prawna:** Żywotny interes osoby fizycznej (art. 6 ust. 1 lit. d RODO)
 - **Szczególne uzasadnienie:** Ochrona życia dzieci - natychmiastowe alerty vs godziny opóźnienia
 
-#### **🧒 Multi-Child Architecture (Child Session Manager):**
+#### **Multi-Child Architecture (Child Session Manager):**
 - **Child Profiles** - imię dziecka, wiek (6-15 lat), unikalny identyfikator
 - **Child-specific storage** - osobne przestrzenie danych dla każdego dziecka (zk_*_child_${childId})
 - **Family profiles management** - zarządzanie profilami dzieci w ramach jednej rodziny
@@ -89,7 +96,7 @@
 - **Podstawa prawna:** Zgodność z RODO Art. 8 - ochrona danych dzieci poniżej 16 roku życia
 - **Uzasadnienie krytyczne:** Brak mieszania danych między rodzeństwem - każde dziecko chronione osobno
 
-### 👨‍👩‍👧‍👦 **MODUŁY ROZSZERZONE (planowane - po rejestracji Rodzica/Opiekuna):**
+### **MODUŁY ROZSZERZONE (planowane - po rejestracji Rodzica/Opiekuna):**
 
 #### **Dane Rodzica/Opiekuna:**
 - **Imię i nazwisko**
@@ -106,7 +113,7 @@
 - **Cel:** Personalizacja treści edukacyjnych
 - **Podstawa prawna:** Zgoda Rodzica/Opiekuna (art. 6 ust. 1 lit. a + art. 8 RODO)
 
-#### **🔗 Emergency Blockchain Features (Mina Protocol):**
+#### **Emergency Blockchain Features (Mina Protocol):**
 - **Zero-Knowledge Proofs (zk-SNARKs)** - weryfikacja wieku dziecka BEZ ujawniania dokładnych danych
 - **22KB Blockchain Sync** - minimalna synchronizacja w sytuacjach kryzysowych  
 - **Emergency Mode Data** - cache danych ratunkowych (numery alarmowe, lokalizacje schronień)
@@ -116,14 +123,14 @@
 - **Szczególne cechy:** 
   - NIE przechowujemy kluczy prywatnych blockchain
   - NIE zapisujemy żadnych danych dziecka w blockchain
-  - zk-proof NIE ujawnia tożsamości dziecka
+  - zk-proof NIE ujawnia tożsamość dziecka
   - Wszystkie dane blockchain są anonimowe i nieodwracalne
 
 ---
 
 ## § 3. SZCZEGÓLNA OCHRONA DZIECI (ART. 8 RODO)
 
-### 👶 **Dla dzieci poniżej 16. roku życia:**
+### **Dla dzieci poniżej 16. roku życia:**
 
 1. **Zgoda Rodzica/Opiekuna** jest wymagana do przetwarzania jakichkolwiek danych osobowych dziecka
 2. **Weryfikacja zgody** odbywa się poprzez:
@@ -133,11 +140,12 @@
 4. **Bezpieczne przechowywanie** z dodatkowymi zabezpieczeniami
 5. **Prawo cofnięcia zgody** w każdym czasie przez Rodzica/Opiekuna
 
-### 🛡️ **Środki bezpieczeństwa dla dzieci:**
+### **Środki bezpieczeństwa dla dzieci:**
 - Brak funkcji komunikacji z innymi użytkownikami
 - Brak zbierania danych wrażliwych
 - Regularne audyty bezpieczeństwa
 - Szyfrowanie wszystkich przekazywanych danych
+- **Synteza mowy (TTS)** uruchamiana wyłącznie po pozytywnej weryfikacji zgody rodzica/opiekuna (art. 8 RODO). Brak zgody = brak dźwięku.
 
 ---
 
@@ -148,6 +156,7 @@
 | Lokalizacja | Wyświetlanie lokalnych alertów | Zgoda | Do cofnięcia zgody |
 | Preferencje językowe | Personalizacja interfejsu | Prawnie uzasadniony interes | 12 miesięcy nieaktywności |
 | Dane techniczne | Zapewnienie działania app | Prawnie uzasadniony interes | 12 miesięcy |
+| Subskrypcja powiadomień push | Dostarczanie powiadomień krytycznych | Zgoda | Do cofnięcia zgody lub usunięcia subskrypcji |
 | Dane Rodzica/Opiekuna | Weryfikacja i komunikacja | Umowa | Do usunięcia konta + 3 lata |
 | Dane dziecka | Personalizacja edukacji | Zgoda Rodzica/Opiekuna | Do cofnięcia zgody |
 
@@ -155,7 +164,7 @@
 
 ## § 5. PRZEKAZYWANIE DANYCH
 
-### 🌐 **Podmioty zewnętrzne:**
+### **Podmioty zewnętrzne:**
 
 #### **GitHub Pages (hosting):**
 - **Dane:** Statyczne pliki aplikacji (HTML/CSS/JS)
@@ -168,16 +177,23 @@
 - **Cel:** Konwersja RSS do JSON dla alertów bezpieczeństwa
 - **Zabezpieczenia:** HTTPS, brak logowania danych użytkownika
 
+#### **OpenStreetMap Nominatim (nominatim.openstreetmap.org):**
+- **Dane:** zapytania odwrotnego geokodowania (przesyłane współrzędne GPS w celu uzyskania nazwy miejscowości/regionu)
+- **Lokalizacja:** EU/międzynarodowa infrastruktura OSM
+- **Cel:** zamiana współrzędnych na przyjazny opis lokalizacji („Gdzie jestem?”)
+- **Zabezpieczenia:** HTTPS; brak łączenia przez Fundację z innymi danymi; wywoływane wyłącznie po świadomej akcji użytkownika
+
+#### **Push Service dostawcy przeglądarki (np. Google/Apple/Mozilla):**
+- **Dane:** obsługa kanału Web Push dla przesyłania zaszyfrowanych powiadomień (endpoint + klucze przeglądarki)
+- **Lokalizacja:** zgodnie z infrastrukturą dostawcy przeglądarki
+- **Cel:** dostarczenie powiadomień push na urządzenie
+- **Zabezpieczenia:** end-to-end encryption Web Push; brak dostępu Fundacji do treści odszyfrowanej po stronie serwera przeglądarki
+
 #### **AllOrigins Proxy (api.allorigins.win):**
 - **Dane:** Zapytania o feed RCB RSS (bez danych osobowych użytkownika)
 - **Lokalizacja:** USA/EU
 - **Cel:** Fallback proxy dla alertów gdy RSS2JSON niedostępny
 - **Zabezpieczenia:** HTTPS, brak logowania danych użytkownika
-
-#### **OpenAI (planowane - API tłumaczeń):**
-- **Dane:** Teksty do tłumaczenia (bez danych osobowych)
-- **Lokalizacja:** USA
-- **Zabezpieczenia:** Zgodnie z polityką prywatności OpenAI
 
 #### **Nie przekazujemy danych do:**
 - ❌ Firm reklamowych
@@ -265,8 +281,8 @@ W przypadku podejrzenia naruszenia danych osobowych prosimy o natychmiastowy kon
 
 ---
 
-**Ostatnia aktualizacja:** 2 października 2025 r.  
-**Wersja:** 1.3 (Multi-source alerts, honest status monitoring)
+**Ostatnia aktualizacja:** 28 października 2025 r.  
+**Wersja:** 1.4 (EnhancedSecurityZK, Web Push, Nominatim, parental-consent-gated TTS)
 
 *Ta polityka została opracowana zgodnie z RODO oraz uwzględnia szczególne wymogi ochrony danych dzieci poniżej 16. roku życia.*
 
@@ -315,9 +331,9 @@ Dostęp do zaszyfrowanych danych dziecka:
 - ✅ Możliwy tylko przez rodzica z prawidłowym hasłem rodzinnym
 
 #### **Przechowywanie:**
-- Dane przechowywane w localStorage przeglądarki
-- Wszystkie dane w formie zaszyfrowanej
-- Brak przesyłania do serwera (100% client-side)
+- Dane przechowywane w **IndexedDB** w odizolowanym originie przez warstwę **EnhancedSecurityZK** (szyfrowanie AES-256-GCM)
+- Dla niesensytywnych preferencji możliwe użycie localStorage
+- Zasadniczo brak przesyłania danych dziecka do serwera (100% client-side); wyjątek: dobrowolna subskrypcja push – przechowywany endpoint i klucze przeglądarki wyłącznie w celu dostarczania powiadomień
 - Automatyczne usuwanie przy wyczyszczeniu danych przeglądarki
 
 ### Audyt bezpieczeństwa

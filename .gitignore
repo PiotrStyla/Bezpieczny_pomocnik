@@ -16,6 +16,7 @@ __pycache__/
 env/
 venv/
 .venv/
+.venv311/
 
 # Pliki generowane przez edytory i IDE
 .idea/
@@ -28,3 +29,10 @@ venv/
 
 # Pliki tymczasowe
 generate_keys.py
+
+# Node dependencies
+node_modules/
+
+# Klucze PEM (nie śledzić w repozytorium)
+private_key.pem
+public_key.pem

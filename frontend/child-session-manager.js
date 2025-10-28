@@ -33,6 +33,53 @@ class ChildSessionManager {
             this.currentChildId = childId;
             return childId;
         }
+
+        // 2.5 Try auto-select from ZK profiles (when returning from CMS)
+        try {
+            if (window.loadFromMinaZK) {
+                const rawProfiles = await window.loadFromMinaZK('zk_family_children_profiles') || {};
+                let children = [];
+                if (Array.isArray(rawProfiles)) {
+                    children = rawProfiles.filter(Boolean);
+                } else if (rawProfiles && typeof rawProfiles === 'object') {
+                    children = Object.values(rawProfiles);
+                }
+
+                if (children.length === 1 && children[0]?.id) {
+                    const onlyChild = children[0];
+                    console.log(`🧒 Auto-selected only child from ZK: ${onlyChild.id}`);
+                    // Persist selection locally and update last access for UX
+                    localStorage.setItem('current_child_id', onlyChild.id);
+                    this.currentChildId = onlyChild.id;
+                    try {
+                        // Update lastAccess if profiles are stored as object
+                        if (!Array.isArray(rawProfiles) && onlyChild.id in rawProfiles) {
+                            rawProfiles[onlyChild.id].lastAccess = new Date().toISOString();
+                            await window.saveToMinaZK('zk_family_children_profiles', rawProfiles);
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Failed to update lastAccess in ZK:', e);
+                    }
+                    return onlyChild.id;
+                }
+
+                if (children.length > 1) {
+                    // Prefer most recently used
+                    const sorted = children
+                        .filter(c => c && c.id)
+                        .sort((a, b) => new Date(b.lastAccess || b.created || 0) - new Date(a.lastAccess || a.created || 0));
+                    if (sorted[0]?.id) {
+                        const recent = sorted[0];
+                        console.log(`🧒 Auto-selected last used child from ZK: ${recent.id}`);
+                        localStorage.setItem('current_child_id', recent.id);
+                        this.currentChildId = recent.id;
+                        return recent.id;
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('⚠️ Auto-select from ZK failed, falling back to modal:', e);
+        }
         
         // 3. No child ID - request parent selection
         console.log('🧒 No child ID found - requesting parent selection');

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Bezpieczny Pomocnik - Child Safety Application
  * Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Kr�lowej Aposto��w w Krakowie
  */
@@ -36,6 +36,96 @@ let markersLayer = null;
 let userLocation = null;
 let userLocationMarker = null;
 let speechEnabled = localStorage.getItem('speech_enabled') !== 'false'; // Default: true
+const API_BASE_URL = '/api';
+
+function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+async function subscribeUserToPush() {
+    try {
+        console.log('[Push] Start subscription flow');
+        if (!('Notification' in window)) {
+            console.warn('[Push] Notification API not available');
+            const btn = document.getElementById('notifications-btn');
+            if (btn) {
+                btn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Brak wsparcia</span>';
+                btn.style.background = '#FF3B30';
+            }
+            return;
+        }
+        if (!('serviceWorker' in navigator)) {
+            console.warn('[Push] Service Worker not available');
+            const btn = document.getElementById('notifications-btn');
+            if (btn) {
+                btn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Brak SW</span>';
+                btn.style.background = '#FF3B30';
+            }
+            return;
+        }
+
+        const permission = await Notification.requestPermission();
+        console.log('[Push] Permission:', permission);
+        if (permission !== 'granted') {
+            const btn = document.getElementById('notifications-btn');
+            if (btn) {
+                btn.innerHTML = '<span class="btn-icon">🚫</span><span class="btn-text">Zablokowane</span>';
+                btn.style.background = '#FF3B30';
+            }
+            return;
+        }
+
+        const reg = await navigator.serviceWorker.ready;
+        console.log('[Push] SW ready');
+        const existing = await reg.pushManager.getSubscription();
+        if (existing) {
+            console.log('[Push] Existing subscription found, unsubscribing to refresh');
+            try { await existing.unsubscribe(); } catch (e) { console.warn('[Push] Unsubscribe failed (ignored):', e); }
+        }
+
+        const res = await fetch(`${API_BASE_URL}/vapid_public_key`);
+        console.log('[Push] GET /api/vapid_public_key status:', res.status);
+        if (!res.ok) throw new Error('Failed to fetch VAPID key');
+        const data = await res.json();
+        const trimmedKey = (data.public_key || '').trim();
+        console.log('[Push] VAPID key length:', trimmedKey.length);
+        const appServerKey = urlBase64ToUint8Array(trimmedKey);
+
+        const subscription = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: appServerKey
+        });
+        console.log('[Push] Subscribed with endpoint:', subscription?.endpoint);
+
+        const saveRes = await fetch(`${API_BASE_URL}/subscribe`, {
+            method: 'POST',
+            body: JSON.stringify(subscription),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        console.log('[Push] POST /api/subscribe status:', saveRes.status);
+
+        const btn = document.getElementById('notifications-btn');
+        if (btn) {
+            btn.innerHTML = '<span class="btn-icon">🔔</span><span class="btn-text">Powiadomienia włączone!</span>';
+            btn.disabled = true;
+            btn.style.background = '#32D74B';
+        }
+    } catch (error) {
+        console.error('[Push] Subscription error:', error);
+        const btn = document.getElementById('notifications-btn');
+        if (btn) {
+            btn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Błąd subskrypcji</span>';
+            btn.style.background = '#FF3B30';
+        }
+    }
+}
 
 // ?? LOADING STATES - Child-friendly visual feedback
 function showLoader(targetElement, message = '�aduj�...') {
@@ -60,7 +150,7 @@ function hideLoader(targetElement) {
     loaders.forEach(loader => loader.remove());
 }
 
-function showMascotLoader(message = '?? Chwileczk�...') {
+function showMascotLoader(message = 'Chwileczkę...') {
     const mascotText = document.getElementById('mascot-text');
     if (mascotText) {
         mascotText.innerHTML = `
@@ -852,7 +942,7 @@ function getUserLocation(userRequested = false) {
                 
                 userLocationMarker = L.marker([lat, lon])
                     .addTo(map)
-                    .bindPopup('?? Twoja bezpieczna lokalizacja')
+                    .bindPopup('Twoja bezpieczna lokalizacja')
                     .openPopup();
                     
                 map.setView([lat, lon], 12);
@@ -918,19 +1008,19 @@ function handleLocationError(error) {
     const errorType = typeof error === 'string' ? error : error.message || 'Nieznany b��d';
     
     if (childAge <= 6) {
-        message = '?? Nie mog� znale�� gdzie jeste�, ale nie martw si�! Zapytaj doros�ego o pomoc.';
+        message = 'Nie mogę znaleźć gdzie jesteś, ale nie martw się! Zapytaj dorosłego o pomoc.';
         speech = 'Nie... mog�... znale��... gdzie... jeste�... ale... nie... martw... si�... Zapytaj... doros�ego... o... pomoc';
         advice = 'Popro� mam� lub tat� �eby w��czyli lokalizacj� w telefonie.';
     } else if (childAge <= 9) {
-        message = '?? Mam problem ze znalezieniem Twojej lokalizacji. To mo�e by� przez ustawienia telefonu.';
+        message = 'Mam problem ze znalezieniem Twojej lokalizacji. To może być przez ustawienia telefonu.';
         speech = 'Mam... problem... ze... znalezieniem... Twojej... lokalizacji... To... mo�e... by�... przez... ustawienia... telefonu';
         advice = 'Sprawd� czy w��czy�e� lokalizacj� w ustawieniach lub zapytaj doros�ego.';
     } else if (childAge <= 12) {
-        message = '?? Nie uda�o si� ustali� lokalizacji. Mo�esz u�y� aplikacji bez tego, ale niekt�re funkcje b�d� ograniczone.';
+        message = 'Nie udało się ustalić lokalizacji. Możesz użyć aplikacji bez tego, ale niektóre funkcje będą ograniczone.';
         speech = 'Nie... uda�o... si�... ustali�... lokalizacji... Mo�esz... u�y�... aplikacji... bez... tego';
         advice = 'Sprawd� ustawienia lokalizacji w przegl�darce lub spr�buj ponownie.';
     } else {
-        message = '?? B��d geolokalizacji: Brak dost�pu do GPS. Aplikacja b�dzie dzia�a� w trybie podstawowym.';
+        message = 'Błąd geolokalizacji: Brak dostępu do GPS. Aplikacja będzie działać w trybie podstawowym.';
         speech = 'B��d... geolokalizacji... Brak... dost�pu... do... GPS... Aplikacja... b�dzie... dzia�a�... w... trybie... podstawowym';
         advice = 'W��cz lokalizacj� w ustawieniach przegl�darki lub urz�dzenia.';
     }
@@ -1040,19 +1130,36 @@ async function getAddressFromCoords(lat, lon, userRequested = false) {
                 const childFriendlyAddress = makeAddressChildFriendly(fullAddress);
                 console.log('?? Child-friendly address:', childFriendlyAddress);
                 
+                // Update map popup with friendly address for the child
+                if (map && userLocationMarker) {
+                    const addressText = childFriendlyAddress || 'Twoja lokalizacja';
+                    userLocationMarker.setPopupContent(`📍 ${addressText}`);
+                    userLocationMarker.openPopup();
+                }
+                
                 // Only speak address if user requested location
                 if (userRequested) {
                     showLocationMessage('address', { address: childFriendlyAddress });
                 }
             } else {
                 console.log('?? No address data found');
+                // Still provide a friendly fallback address text
+                if (userRequested) {
+                    showLocationMessage('address', { address: 'okolicy' });
+                }
             }
         } else {
             console.log('?? Geocoding service unavailable');
+            if (userRequested) {
+                showLocationMessage('address', { address: 'okolicy' });
+            }
         }
     } catch (error) {
         console.log('?? Address lookup failed, using coordinates only:', error.message);
-        // This is fine, we already showed success message with coordinates
+        // Provide fallback address stage so the child always hears something
+        if (userRequested) {
+            showLocationMessage('address', { address: 'okolicy' });
+        }
     }
 }
 
@@ -1528,790 +1635,126 @@ Odpowied�:`;
  * ?? GENERATE RULE-BASED ALERT (fallback)
  */
 function generateRuleBasedAlert(alert, childAge) {
-    const title = alert.title.toLowerCase();
-    const content = alert.content.toLowerCase();
-    
+    const title = (alert.title || '').toLowerCase();
+    const content = (alert.content || '').toLowerCase();
+
     let message = '';
     let emoji = '??';
-    
-    // Determine alert type and generate appropriate message with CONCRETE actions
+
+    // Storms and strong wind
     if (title.includes('burza') || title.includes('wiatr') || title.includes('grad') || content.includes('burze')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Nadchodzi burza z gradem! Id� szybko do domu. Nie baw si� na dworze. Schowaj zabawki do �rodka.';
+            message = 'Nadchodzi burza z gradem! Idz szybko do domu. Nie baw sie na dworze. Schowaj zabawki do srodka.';
         } else if (childAge <= 9) {
-            message = 'Alert burzowy! Wr�� natychmiast do domu. Unikaj drzew i wysokich budynk�w. Zamknij okna.';
+            message = 'Alert burzowy! Wroc natychmiast do domu. Unikaj drzew i wysokich budynkow. Zamknij okna.';
         } else {
-            message = 'Ostrze�enie przed burzami i gradem. Szukaj natychmiastowego schronienia. Zabezpiecz rzeczy na balkonie.';
+            message = 'Ostrzezenie przed burzami i gradem. Szukaj natychmiastowego schronienia. Zabezpiecz rzeczy na balkonie.';
         }
-    } else if (title.includes('woda niezdatna') || content.includes('nie nadaje si� do spo�ycia') || content.includes('nie nadaje si� do u�ytku')) {
+    }
+    // Contaminated water
+    else if (title.includes('woda niezdatna') || content.includes('nie nadaje sie do spozycia') || content.includes('nie nadaje sie do uzytku')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Nie pij wody z kranu! Woda jest brudna i mo�e ci� rozchorowa�. Pij tylko wod� z butelek.';
+            message = 'Nie pij wody z kranu! Woda moze cie rozchorowac. Pij tylko wode z butelek.';
         } else if (childAge <= 9) {
-            message = 'Woda z kranu jest ska�ona! U�ywaj tylko wody butelkowanej do picia, mycia z�b�w i gotowania.';
+            message = 'Woda z kranu jest skazona! Uzywaj tylko wody butelkowanej do picia i mycia zebow.';
         } else {
-            message = 'Ska�enie wody pitnej! Nie u�ywaj wody z kranu do picia ani przygotowania jedzenia. Tylko woda butelkowana!';
+            message = 'Skazenie wody pitnej! Nie uzywaj wody z kranu do picia ani przygotowania jedzenia. Tylko woda butelkowana!';
         }
-    } else if (title.includes('pow�d�') || content.includes('podtopienia') || content.includes('wezbranych') || content.includes('opady deszczu')) {
+    }
+    // Flooding
+    else if (title.includes('powodz') || content.includes('podtopienia') || content.includes('wezbranych') || content.includes('opady deszczu')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Za du�o wody wsz�dzie! Nie chod� blisko rzek ani potoczk�w. Trzymaj si� z dala od ka�u�.';
+            message = 'Jest bardzo duzo wody! Nie chodz blisko rzek ani potoczkow. Trzymaj sie z dala od kaluz.';
         } else if (childAge <= 9) {
-            message = 'Niebezpieczne podtopienia! Unikaj rzek, most�w i niskich teren�w. Id� na wy�sze miejsce.';
+            message = 'Niebezpieczne podtopienia! Unikaj rzek, mostow i niskich terenow. Idz na wyzsze miejsce.';
         } else {
-            message = 'Alert powodziowy! Natychmiast oddal si� od rzek i potok�w. Udaj si� na wy�szy teren.';
+            message = 'Alert powodziowy! Oddal sie od rzek i potokow. Udaj sie na wyzszy teren.';
         }
-    } else if (title.includes('dron') || title.includes('obiekt') || content.includes('naruszy�y granice')) {
+    }
+    // Drones / objects
+    else if (title.includes('dron') || title.includes('obiekt') || content.includes('naruszyly granice')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Niebezpieczne lataj�ce rzeczy! Id� szybko do domu. Nie dotykaj niczego co spad�o z nieba.';
+            message = 'Niebezpieczne latajace rzeczy! Idz szybko do domu. Nie dotykaj niczego co spadlo z nieba.';
         } else if (childAge <= 9) {
-            message = 'Niebezpieczne drony w okolicy! Wr�� do domu. Je�li widzisz co� spadaj�cego - nie zbli�aj si�!';
+            message = 'Niebezpieczne drony w okolicy! Wroc do domu. Jesli widzisz cos spadajacego - nie zblizaj sie!';
         } else {
-            message = 'Alert wojskowy - drony! Natychmiastowe schronienie. Nie dotykaj podejrzanych obiekt�w!';
+            message = 'Alert wojskowy - drony! Znajdz schronienie. Nie dotykaj podejrzanych obiektow!';
         }
-    } else if (title.includes('�wiczenia') || content.includes('strza��w') || content.includes('helikopter�w')) {
+    }
+    // Exercises / drills
+    else if (title.includes('cwiczenia') || content.includes('strzalow') || content.includes('helikopterow')) {
         emoji = '??';
         if (childAge <= 6) {
-            message = 'Wojsko �wiczy dzisiaj. B�dzie g�o�no ale to nie prawdziwa wojna. Zosta� blisko doros�ych.';
+            message = 'Wojsko cwiczy dzisiaj. Bedzie glosno ale to nie prawdziwa wojna. Zostan blisko doroslych.';
         } else if (childAge <= 9) {
-            message = '�wiczenia wojskowe w okolicy. Odg�osy strza��w i helikopter�w to tylko trening. Wszystko w porz�dku.';
+            message = 'Cwiczenia wojskowe w okolicy. Odglosy strzalow i helikopterow to tylko trening. Wszystko w porzadku.';
         } else {
-            message = '�wiczenia s�u�b mundurowych. Ha�as strza��w i loty helikopter�w to cz�� treningu, zachowaj spok�j.';
+            message = 'Cwiczenia sluzb mundurowych. Hukas strzalow i loty helikopterow to czesc treningu, zachowaj spokoj.';
         }
-    } else {
-        // Generic alert with concrete actions
+    }
+    // Generic fallback
+    else {
         if (childAge <= 6) {
-            message = 'Wa�ne ostrze�enie! Znajd� szybko doros�ego i powiedz mu o tej wiadomo�ci.';
+            message = 'Wazne ostrzezenie! Znajdz szybko doroslego i powiedz mu o tej wiadomosci.';
         } else if (childAge <= 9) {
-            message = 'Alert bezpiecze�stwa! Poinformuj rodzic�w i trzymaj si� blisko domu.';
+            message = 'Alert bezpieczenstwa! Poinformuj rodzicow i trzymaj sie blisko domu.';
         } else {
-            message = 'Ostrze�enie w twojej okolicy. Sprawd� z rodzicami co robi� dalej.';
+            message = 'Ostrzezenie w twojej okolicy. Sprawdz z rodzicami co robic dalej.';
         }
     }
-    
-    return `${emoji} ${message} Zawsze popro� doros�ego o pomoc!`;
+
+    return `${emoji} ${message} Zawsze popros doroslego o pomoc!`;
 }
 
-/**
- * ?? SHOW CHILD ALERT
- * Displays alert to child with speech and visual notification
- */
-function showChildAlert(alert, childMessage) {
-    console.log('?? Showing alert to child:', childMessage);
-    
-    // Update mascot with alert message
-    const mascotText = document.getElementById('mascot-text');
-    if (mascotText) {
-        mascotText.innerHTML = `<div class="alert-message">${childMessage}</div>`;
-        mascotText.style.backgroundColor = '#ffe6e6';
-        mascotText.style.border = '2px solid #ff6b6b';
-        mascotText.style.borderRadius = '12px';
-        mascotText.style.padding = '15px';
-        mascotText.style.animation = 'pulse 2s infinite';
-    }
-    
-    // Speak the alert using professional educational voice synthesis
-    // Remove emoji for speech synthesis (voice can't read emoji properly)
-    const speechMessage = childMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
-    speakText(speechMessage);
-    
-    // Visual alert indicator
-    document.body.style.background = 'linear-gradient(45deg, #ffeb3b, #ff9800)';
-    setTimeout(() => {
-        document.body.style.background = '';
-        if (mascotText) {
-            mascotText.style.backgroundColor = '';
-            mascotText.style.border = '';
-            mascotText.style.animation = '';
-        }
-    }, 10000);
-    
-    // Browser notification if permission granted
-    if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('?? Bezpieczny Pomocnik', {
-            body: childMessage,
-            icon: 'images/logo_192x192.png',
-            requireInteraction: true
-        });
-    }
-}
-
-/**
- * ?? TRACK ALERT FOR PARENTS
- * Stores alert information for parental dashboard (ZK-encrypted)
- */
-function trackAlertForParents(alert, childMessage) {
-    const alertData = {
-        id: alert.id,
-        timestamp: new Date().toISOString(),
-        originalTitle: alert.title,
-        childMessage: childMessage,
-        severity: alert.severity,
-        location: alert.location,
-        childAge: window.getChildAgeForAI ? window.getChildAgeForAI() : null
-    };
-    
-    // Store in ZK system for privacy
-    if (window.saveZKUserProgress && window.getZKUserProgress) {
-        const userProgress = window.getZKUserProgress() || {};
-        const existingAlerts = userProgress.alert_history || [];
-        
-        // Ensure it's an array
-        if (!Array.isArray(existingAlerts)) {
-            console.warn('?? alert_history is not an array, resetting to empty array');
-            userProgress.alert_history = [];
-        } else {
-            existingAlerts.push(alertData);
-            
-            // Keep only last 50 alerts
-            userProgress.alert_history = existingAlerts.slice(-50);
-        }
-        
-        window.saveZKUserProgress(userProgress);
-        
-        console.log('?? Alert tracked in ZK system for parental review');
-    }
-}
-
-// ?? ALERT TESTING SYSTEM
-/**
- * ?? TEST ALERT FUNCTION - For local testing
- * Simulates receiving an alert to test child-friendly translation
- */
-function testAlert(alertType = 'weather') {
-    console.log('?? TESTING ALERT SYSTEM - Simulating real alert...');
-    
-    const testAlerts = {
-        water: {
-            id: 'rcb_water_real',
-            title: 'Alert RCB - woda niezdatna do picia w gminie',
-            content: 'UWAGA! Woda z wodoci�gu w gminie nie nadaje si� do spo�ycia. Gmina zapewnia wod� pitn� w butelkach i z beczkowozu. �led� lokalne komunikaty.',
-            severity: 'critical',
-            location: 'Gmina lokalna',
-            timestamp: new Date().toISOString()
-        },
-        storm: {
-            id: 'rcb_storm_real',
-            title: 'Alert RCB - burze, silny wiatr i lokalnie grad',
-            content: 'Uwaga! Dzi� mo�liwe burze, silny wiatr i lokalnie grad. Zachowaj ostro�no�� i zabezpiecz rzeczy, kt�re mo�e porwa� wiatr.',
-            severity: 'warning',
-            location: 'Wojew�dztwo Ma�opolskie',
-            timestamp: new Date().toISOString()
-        },
-        flood: {
-            id: 'rcb_flood_real',
-            title: 'Alert RCB - intensywne opady deszczu i burze',
-            content: 'Uwaga! Dzi� prognozowane intensywne opady deszczu i burze. Mo�liwe podtopienia. Nie zbli�aj si� do wezbranych rzek. S�uchaj polece� s�u�b.',
-            severity: 'warning',
-            location: 'Dolina Wis�y',
-            timestamp: new Date().toISOString()
-        },
-        drones: {
-            id: 'rcb_drones_real',
-            title: 'Alert RCB - neutralizacja obiekt�w',
-            content: 'Uwaga! W zwi�zku z operacj� neutralizacji obiekt�w, kt�re naruszy�y granice RP, informuj s�u�by o dronach lub miejscach ich upadku. Nie zbli�aj si� do nich.',
-            severity: 'critical',
-            location: 'Wojew�dztwa wschodnie',
-            timestamp: new Date().toISOString()
-        },
-        exercises: {
-            id: 'rcb_exercises_real', 
-            title: 'Alert RCB - �wiczenia s�u�b mundurowych',
-            content: 'Uwaga! �wiczenia s�u�b mundurowych. Mo�liwe odg�osy strza��w i loty helikopter�w. Zachowaj spok�j i ostro�no��.',
-            severity: 'info',
-            location: 'Teren �wicze�',
-            timestamp: new Date().toISOString()
-        }
-    };
-    
-    const testAlert = testAlerts[alertType] || testAlerts.storm;
-    
-    console.log('?? Simulating alert:', testAlert);
-    
-    // Process exactly like real alert
-    processChildFriendlyAlert(testAlert);
-}
-
-// Add test buttons to DOM when page loads
-function addTestButtons() {
-    const testContainer = document.createElement('div');
-    testContainer.id = 'test-controls';
-    testContainer.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        background: #333;
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
-        z-index: 9999;
-        font-family: Arial, sans-serif;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    `;
-    
-    testContainer.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 10px;">?? Test Rzeczywistych Alert�w RCB</div>
-        <button onclick="testAlert('water')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #f44336; color: white; cursor: pointer;">?? Woda Niezdatna</button>
-        <button onclick="testAlert('storm')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #ff9800; color: white; cursor: pointer;">?? Burze+Grad</button>
-        <button onclick="testAlert('flood')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #2196F3; color: white; cursor: pointer;">?? Pow�d�</button>
-        <button onclick="testAlert('drones')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #9c27b0; color: white; cursor: pointer;">?? Drony</button>
-        <button onclick="testAlert('exercises')" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #607d8b; color: white; cursor: pointer;">?? �wiczenia</button>
-        <button onclick="document.getElementById('test-controls').style.display='none'" style="margin: 5px; padding: 8px 12px; border: none; border-radius: 5px; background: #666; color: white; cursor: pointer;">? Ukryj</button>
-    `;
-    
-    document.body.appendChild(testContainer);
-    
-    console.log('?? Test buttons added - you can now test alerts!');
-}
-
-// Frontend AI - Polish AI + ZK privacy  
-async function generateSmartSpeech(action, context = {}) {
-    // ?? FIRST PRIORITY: Check Parent CMS for custom messages
-    if (window.getParentMessage) {
-        try {
-            // Get current child ID for child-specific messages
-            let childId = null;
-            if (window.childSessionManager) {
-                childId = await window.childSessionManager.getCurrentChildId();
-            }
-            
-            // Map actions to CMS categories/types
-            let category, type;
-            if (action === 'welcome') {
-                category = 'safety';
-                type = 'welcome';
-            } else if (action === 'emergency_help') {
-                category = 'safety';
-                type = 'help';
-            } else if (action === 'find_safety') {
-                category = 'safety';
-                type = 'lost';
-            }
-            
-            if (category && type) {
-                const parentMessage = await window.getParentMessage(category, type, childId);
-                if (parentMessage && parentMessage.trim()) {
-                    console.log(`? Using parent-created message from CMS: ${category}.${type}`);
-                    return parentMessage;
-                }
-            }
-        } catch (error) {
-            console.log('?? Failed to get parent message from CMS:', error);
-        }
-    }
-    
-    // ?? NO PARENT MESSAGES = SILENT MODE
-    // If parent hasn't set up CMS messages, stay silent
-    console.log(`?? No parent messages configured for "${action}" - staying silent`);
-    return null;
-}
-
-// ?? FUNCTION DISABLED - generateLocalSmartSpeech no longer used in silent mode
-/* ORIGINAL generateLocalSmartSpeech FUNCTION DISABLED:
-function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocation) {
-    // Try client-side Polish AI first
-    if (window.polishAI && window.polishAI.isConfigured()) {
-        try {
-            const aiContext = {
-                timeOfDay: timeOfDay,
-                isFirstVisit: isFirstVisit,
-                hasLocation: hasLocation
-            };
-            
-            const aiResponse = await window.polishAI.generateResponse(action, age, aiContext);
-            
-            if (aiResponse && aiResponse.length > 10) {
-                console.log(`? Polish AI (${window.polishAI.getAvailableProviders().join(', ')}):`, aiResponse);
-                return aiResponse;
-            }
-        } catch (error) {
-            console.error('? Client-side Polish AI failed:', error);
-        }
-    }
-    
-    // Fallback to local rules
-    console.log('?? Using local rule-based fallback');
-    return generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocation);
-}
-
-function generateLocalSmartSpeech(action, age, timeOfDay, isFirstVisit, hasLocation) {
-    // Local rule-based system as fallback
-    let complexity, agePrefix;
-    if (age <= 6) {
-        complexity = 'simple';
-        agePrefix = 'maluszku';
-    } else if (age <= 9) {
-        complexity = 'medium';
-        agePrefix = '';
-    } else {
-        complexity = 'advanced'; 
-        agePrefix = '';
-    }
-    
-    // Generate responses based on age and action
-    switch(action) {
-        case 'find_safety':
-            if (complexity === 'simple') {
-                return `?? ${agePrefix ? 'Maluszku, szukaj' : 'Szukaj'} bezpiecznych miejsc! Id� do sklepu, szko�y lub tam gdzie s� doro�li ludzie!`;
-            } else if (complexity === 'medium') {
-                return `?? Gdy si� zgubisz, szukaj bezpiecznych miejsc: sklepy, szko�y, biblioteki. Zawsze tam gdzie s� doro�li!`;
-            } else {
-                return `?? Najbli�sze bezpieczne miejsca to: sklepy, szko�y, biblioteki, komisariaty i urz�dy. Wybieraj miejsca z dobrym o�wietleniem i wieloma osobami.`;
-            }
-            
-        case 'safe_route':
-            if (complexity === 'simple') {
-                return `?? ${agePrefix ? 'Maluszku, i' : 'I'}d� g��wn� drog�! Nie skr�caj w ciemne uliczki. Przechod� tylko tam gdzie s� pasy!`;
-            } else if (complexity === 'medium') {
-                return `?? Bezpieczna droga: id� g��wnymi ulicami, gdzie jest du�o ludzi. Unikaj pustych miejsc!`;
-            } else {
-                return `?? Planuj bezpieczn� tras�: g��wne ulice, dobrze o�wietlone miejsca, przej�cia dla pieszych. Unikaj skr�t�w przez parki czy pustynie tereny.`;
-            }
-            
-        case 'emergency_help':
-            if (complexity === 'simple') {
-                return `?? ${agePrefix ? 'Maluszku, w' : 'W'} niebezpiecze�stwie dzwo� 112! Popro� doros�ego o pomoc!`;
-            } else if (complexity === 'medium') {
-                return `?? W sytuacji awaryjnej: dzwo� 112, znajd� doros�ego, id� do bezpiecznego miejsca!`;
-            } else {
-                return `?? Procedura awaryjna: 1) Oce� sytuacj� 2) Dzwo� 112 3) Poinformuj zaufanego doros�ego 4) Id� do najbli�szego bezpiecznego miejsca`;
-            }
-            
-        case 'where_am_i':
-            // ?? NO FALLBACK - Only Parent CMS messages allowed for location checking
-            // If no parent message configured, stay silent
-            return null;
-            
-        case 'welcome':
-            if (isFirstVisit) {
-                if (complexity === 'simple') {
-                    return `?? Cze�� ${agePrefix}! Jestem twoim przyjacielem, kt�ry pomo�e ci by� bezpiecznym!`;
-                } else if (complexity === 'medium') {
-                    return `?? Witaj! Jestem twoim pomocnikiem bezpiecze�stwa. Poka�� ci jak by� bezpiecznym!`;
-                } else {
-                    return `??? Cze��! Jestem AI asystentem bezpiecze�stwa. Pomog� ci w r�nych sytuacjach!`;
-                }
-            } else {
-                if (complexity === 'simple') {
-                    return `?? Cze�� ${agePrefix}! Mi�o ci� znowu widzie�!`;
-                } else if (complexity === 'medium') {
-                    return `?? Witaj ponownie! Super, �e wr�ci�e�!`;
-                } else {
-                    return `??? Witaj z powrotem! Gotowy na nowe przygody z bezpiecze�stwem?`;
-                }
-            }
-            
-        default:
-            return 'Cze��! Jestem twoim pomocnikiem bezpiecze�stwa!';
-    }
-}
-END OF DISABLED FUNCTION */
-
-async function handleWhereAmI() {
-    console.log('?? Where Am I clicked');
-
-    // Show mascot loader immediately
-    showMascotLoader('?? Szukam gdzie jeste�...');
-
-    // ?? STEP 1: Show "checking" message from parent CMS
-    if (window.showLocationMessage) {
-        await showLocationMessage('checking');
-    }
-    
-    // Wait a bit for the checking message to be displayed
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // ?? STEP 2: Get location and show "found" message with location details
-    // The getUserLocation with userRequested=true will trigger showLocationMessage('success')
-    // which will use parent CMS message with location variables replaced
-    getUserLocation(true);
-}
-
-async function handleFindSafety() {
-    console.log('?? Find Safety clicked');
-    
-    const mascotText = document.getElementById('mascot-text');
-    if (mascotText) {
-        mascotText.textContent = '?? Szukam bezpiecznych miejsc w pobli�u...';
-    }
-    
-    // ?? FIRST: Try to get parent-created safety message
-    let smartMessage = null;
-    if (window.getParentMessage) {
-        try {
-            // Get current child ID for child-specific messages
-            let childId = null;
-            if (window.childSessionManager) {
-                childId = await window.childSessionManager.getCurrentChildId();
-            }
-            
-            smartMessage = await window.getParentMessage('safety', 'help', childId);
-            if (smartMessage) {
-                console.log('? Using parent-created safety message from Mina ZK');
-            }
-        } catch (error) {
-            console.error('? Failed to get parent safety message:', error);
-        }
-    }
-    
-    // ?? FALLBACK: Use AI/rule-based if no parent message
-    if (!smartMessage) {
-        smartMessage = await generateSmartSpeech('find_safety');
-    }
-    
-    // ?? GET USER LOCATION AND FETCH REAL PLACES
-    if (navigator.geolocation) {
-        try {
-            console.log('?? Getting user location for real safe places...');
-            
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 60000
-                });
-            });
-            
-            const userLat = position.coords.latitude;
-            const userLon = position.coords.longitude;
-            
-            console.log(`?? User location: ${userLat}, ${userLon}`);
-            
-            // ??? FETCH REAL SAFE PLACES from OpenStreetMap
-            if (typeof window.displayRealSafePlaces === 'function') {
-                await window.displayRealSafePlaces({ lat: userLat, lon: userLon });
-                console.log('? Real safe places displayed');
-            } else {
-                console.warn('?? displayRealSafePlaces not loaded - make sure emergency-real-places.js is included');
-            }
-            
-        } catch (error) {
-            console.error('? Failed to get location or fetch places:', error);
-            if (mascotText) {
-                mascotText.textContent = '?? Nie uda�o si� okre�li� lokalizacji. Sprawd� uprawnienia GPS.';
-            }
-        }
-    }
-    
-    setTimeout(() => {
-        if (mascotText) {
-            mascotText.textContent = smartMessage;
-        }
-        // Remove emoji for speech synthesis (voice can't read emoji properly)
-        const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
-        speakText(speechMessage);
-    }, 800);
-}
-
-async function handleSafeRoute() {
-    console.log('🚶 Safe Route clicked - Find Parent/Home');
-    
-    // Show mascot loader immediately
-    showMascotLoader('🚶 Szukam bezpiecznej drogi do domu...');
-    
-    // Get child location first
-    if (!navigator.geolocation) {
-        const mascotText = document.getElementById('mascot-text');
-        if (mascotText) {
-            mascotText.textContent = '❌ Nie mogę określić Twojej lokalizacji. Sprawdź uprawnienia GPS.';
-        }
-        return;
-    }
-    
-    navigator.geolocation.getCurrentPosition(
-        async (position) => {
-            const childLat = position.coords.latitude;
-            const childLon = position.coords.longitude;
-            
-            // Use SAFE version with distance validation
-            if (window.safeShowParentOnMap) {
-                await window.safeShowParentOnMap(childLat, childLon);
-            } else {
-                console.warn('⚠️ Safety module not loaded, using fallback');
-                if (window.showParentOnMap) {
-                    await window.showParentOnMap(childLat, childLon);
-                }
-            }
-        },
-        (error) => {
-            console.error('❌ Failed to get child location:', error);
-            const mascotText = document.getElementById('mascot-text');
-            if (mascotText) {
-                mascotText.textContent = '❌ Nie udało się określić Twojej lokalizacji.';
-            }
-        }
-    );
-    
-    // OLD CODE REMOVED - replaced with safety validation above
+// Minimal notifications button handler to trigger push subscription
+document.addEventListener('DOMContentLoaded', () => {
+    // Notifications → Push subscription
+    const notifBtn = document.getElementById('notifications-btn');
+    if (notifBtn) {
+      notifBtn.addEventListener('click', () => {
+        console.log('[Push] Notifications button clicked');
+        subscribeUserToPush();
+      });
     }
 
-async function handleEmergencyHelp() {
-    console.log('?? Emergency Help clicked');
-    
-    document.body.style.background = 'linear-gradient(45deg, #ff1744, #ff5722)';
-    setTimeout(() => {
-        document.body.style.background = '';
-    }, 3000);
-    
-    const mascotText = document.getElementById('mascot-text');
-    if (mascotText) {
-        mascotText.textContent = '?? UWAGA! Sytuacja awaryjna!';
+    // Initialize map once DOM and Leaflet are ready
+    try {
+      initMap();
+    } catch (e) {
+      console.error('Map initialization failed:', e);
     }
-    
-    const smartMessage = await generateSmartSpeech('emergency_help');
-    
-    setTimeout(() => {
-        if (mascotText) {
-            mascotText.textContent = smartMessage;
-        }
-        // Remove emoji for speech synthesis (voice can't read emoji properly)
-        const speechMessage = smartMessage.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '').trim();
-        speakText(speechMessage);
-    }, 500);
-}
 
-// DOM Content Loaded
-document.addEventListener('DOMContentLoaded', async function() {
-    console.log('?? DOM CONTENT LOADED');
-    
-    // ?? INITIALIZE CHILD SESSION - CRITICAL FOR MULTI-CHILD SUPPORT
-    if (window.childSessionManager) {
-        try {
-            const childId = await window.childSessionManager.getCurrentChildId();
-            console.log(`?? Child Session initialized: ${childId}`);
-            
-            const childInfo = await window.childSessionManager.getCurrentChildInfo();
-            if (childInfo) {
-                console.log(`?? Child info: ${childInfo.name} (${childInfo.age} lat)`);
-            }
-        } catch (error) {
-            console.error('? Child Session Manager initialization failed:', error);
-        }
-    } else {
-        console.warn('?? Child Session Manager not found - multi-child support disabled');
-    }
-    
-    // Initialize child-friendly voices
-    console.log('?? Initializing child-friendly voice system...');
-    initializeVoices();
-    
-    // Initialize map
-    console.log('??? Initializing map...');
-    initMap();
-    
-    // Setup event listeners
-    console.log('?? Setting up event listeners...');
-    
-    // Language buttons
-    document.querySelectorAll('.lang-btn').forEach(button => {
-        button.addEventListener('click', () => {
-            console.log('?? Language button clicked:', button.id);
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-        });
-    });
-    
-    // Speech toggle button
+    // Speech toggle wiring + initial UI state
     const speechBtn = document.getElementById('speech-toggle-btn');
     if (speechBtn) {
-        speechBtn.addEventListener('click', toggleSpeech);
-        // Initialize button state
-        speechBtn.innerHTML = speechEnabled ? '<span class="btn-icon">🔊</span><span class="btn-text">Czytanie włączone</span>' : '<span class="btn-icon">🔇</span><span class="btn-text">Czytanie włączone</span>';
-        speechBtn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
-    }
-    
-    // Safety action buttons
-    const setupButton = (id, handler) => {
-        const btn = document.getElementById(id);
-        if (btn) {
-            btn.addEventListener('click', handler);
-            console.log(`? ${id} setup complete`);
-        } else {
-            console.log(`?? ${id} not found`);
-        }
-    };
-    
-    setupButton('where-am-i-btn', handleWhereAmI);
-    setupButton('find-safety-btn', handleFindSafety);
-    setupButton('safe-route-btn', handleSafeRoute);
-    setupButton('emergency-help-btn', handleEmergencyHelp);
-    setupButton('test-speech-btn', window.testSpeech);
-    
-    // Universal click handler for debugging
-    document.addEventListener('click', (e) => {
-        console.log('??? Click detected:', {
-            tag: e.target.tagName,
-            id: e.target.id,
-            class: e.target.className
-        });
-    });
-
-    // Handle tip cards clicks
-    document.querySelectorAll('.tip-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const h4 = card.querySelector('h4');
-            const p = card.querySelector('p');
-            if (h4 && p) {
-                const title = h4.textContent;
-                const content = p.textContent;
-                
-                const mascotText = document.getElementById('mascot-text');
-                if (mascotText) {
-                    mascotText.textContent = `?? ${title}: ${content}`;
-                }
-                
-                speakText(`${title}. ${content}`);
-                
-                // Track learning and add to memory
-                addLearnedTip(title);
-                trackFeatureUsage('education');
-            }
-        });
-    });
-
-    // Handle emergency cards clicks
-    document.querySelectorAll('.emergency-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const h4 = card.querySelector('h4');
-            const link = card.querySelector('.emergency-number');
-            if (h4 && link) {
-                const service = h4.textContent;
-                const number = link.textContent;
-                
-                const mascotText = document.getElementById('mascot-text');
-                if (mascotText) {
-                    mascotText.textContent = `?? ${service} - numer ${number}. Dzwo� tylko w prawdziwych sytuacjach awaryjnych!`;
-                }
-                
-                speakText(`${service}. Numer ${number}. Dzwo� tylko w prawdziwych sytuacjach awaryjnych!`);
-                
-                // Track emergency usage
-                trackFeatureUsage('emergency');
-                
-                // Show call popup
-                showCallPopup(number, card);
-            }
-        });
-    });
-
-    // Notifications button handler
-    const notificationsBtn = document.getElementById('notifications-btn');
-    if (notificationsBtn) {
-        notificationsBtn.addEventListener('click', () => {
-            console.log('?? Notifications button clicked');
-            
-            if ('Notification' in window) {
-                if (Notification.permission === 'granted') {
-                    new Notification('Bezpieczny Pomocnik', {
-                        body: 'Powiadomienia s� ju� w��czone!',
-                        icon: 'images/logo_192x192.png'
-                    });
-                    
-                    const mascotText = document.getElementById('mascot-text');
-                    if (mascotText) {
-                        mascotText.textContent = '?? Powiadomienia s� ju� w��czone!';
-                    }
-                    
-                    speakText('Powiadomienia s� ju� w��czone');
-                } else if (Notification.permission !== 'denied') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            new Notification('Bezpieczny Pomocnik', {
-                                body: '�wietnie! Powiadomienia zosta�y w��czone!',
-                                icon: 'images/logo_192x192.png'
-                            });
-                            
-                            notificationsBtn.innerHTML = '<span class="btn-icon">?</span><span class="btn-text">Powiadomienia w��czone</span>';
-                            notificationsBtn.style.background = '#32D74B';
-                            
-                            const mascotText = document.getElementById('mascot-text');
-                            if (mascotText) {
-                                mascotText.textContent = '? �wietnie! Powiadomienia zosta�y w��czone!';
-                            }
-                            
-                            speakText('�wietnie! Powiadomienia zosta�y w��czone');
-                        }
-                    });
-                }
-            } else {
-                const mascotText = document.getElementById('mascot-text');
-                if (mascotText) {
-                    mascotText.textContent = '? Twoja przegl�darka nie obs�uguje powiadomie�';
-                }
-                
-                speakText('Twoja przegl�darka nie obs�uguje powiadomie�');
-            }
-        });
+      speechBtn.addEventListener('click', toggleSpeech);
+      speechBtn.innerHTML = speechEnabled
+        ? '<span class="btn-icon">🔊</span><span class="btn-text">Głos włączony</span>'
+        : '<span class="btn-icon">🔇</span><span class="btn-text">Głos wyłączony</span>';
+      speechBtn.style.background = speechEnabled ? '#32D74B' : '#FF9500';
     }
 
-    // Location button handler - REMOVED (button was deleted from UI)
+    // Where am I? → get location with friendly messages
+    const whereBtn = document.getElementById('where-am-i-btn');
+    if (whereBtn) {
+      whereBtn.addEventListener('click', () => {
+        showLocationMessage && showLocationMessage('checking');
+        getUserLocation(true);
+      });
+    }
 
-    // Parent location button handler
+    // Parent location button
     const parentLocationBtn = document.getElementById('parent-location-btn');
     if (parentLocationBtn) {
-        parentLocationBtn.addEventListener('click', async () => {
-            console.log('???????? Parent location button clicked');
-            await showParentLocationWithFallback();
-            trackFeatureUsage('parent_location');
-        });
+      parentLocationBtn.addEventListener('click', async () => {
+        await showParentLocationWithFallback();
+        trackFeatureUsage('parent_location');
+      });
     }
-
-    // Show call popup function
-    function showCallPopup(phoneNumber, targetElement) {
-        console.log('?? Showing call popup for:', phoneNumber);
-        
-        const existingPopup = document.querySelector('.call-popup');
-        if (existingPopup) {
-            existingPopup.remove();
-        }
-
-        const popup = document.createElement('div');
-        popup.className = 'call-popup';
-        popup.innerHTML = `
-            <div class="popup-content">
-                <h3>?? Po��czenie</h3>
-                <p>Czy chcesz zadzwoni� pod numer:</p>
-                <div class="phone-display">${phoneNumber}</div>
-                <p><small>Kliknij ponownie aby wykona� po��czenie</small></p>
-                <button onclick="this.parentElement.parentElement.remove()" class="popup-close">?</button>
-            </div>
-        `;
-        
-        document.body.appendChild(popup);
-        
-        setTimeout(() => {
-            if (popup.parentNode) {
-                popup.remove();
-            }
-        }, 3000);
-    }
-    
-    // Welcome message and initialize memory
-    setTimeout(() => {
-        // Initialize user memory system
-        updateVisitCount();
-        
-        // Set initial mascot message (will be overridden by updateVisitCount)
-        const mascotText = document.getElementById('mascot-text');
-        if (mascotText && userMemory.visitCount === 1) {
-            mascotText.textContent = 'Cze��! Jestem twoim pomocnikiem bezpiecze�stwa!';
-        }
-    }, 2000);
-    
-    console.log('? App initialization complete!');
-    
-    // ?? START ALERT MONITORING SYSTEM
-    // Starts monitoring 260 Polish alert sources for child safety
-    setTimeout(() => {
-        startAlertMonitoring();
-    }, 5000); // Start after 5 seconds to allow app to fully initialize
-    
-    // ?? ADD TEST BUTTONS for local testing
-    setTimeout(() => {
-        // addTestButtons(); // DISABLED FOR PRODUCTION
-    }, 7000); // Add test buttons after system initialization
 });
 
 /**

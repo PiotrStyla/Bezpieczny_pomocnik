@@ -1,8 +1,9 @@
 # REGULAMIN UŻYTKOWANIA APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja 02.10.2025: Multi-source alert fetching (RSS2JSON + AllOrigins), honest status indicator**
-**Poprzednia aktualizacja 28.09.2025: Multi-Child Architecture, Child Session Manager, enhanced child data protection**
+**Aktualizacja 28.10.2025: EnhancedSecurityZK (IndexedDB + AES-256-GCM), Web Push (VAPID), odwrócone geokodowanie OpenStreetMap Nominatim, TTS wyłącznie po zgodzie rodzica**
+**Poprzednia aktualizacja 02.10.2025: Multi-source alert fetching (RSS2JSON + AllOrigins), honest status indicator**
+**Wcześniejsza: 28.09.2025: Multi-Child Architecture, Child Session Manager, enhanced child data protection**
 
 ---
 
@@ -31,6 +32,7 @@
 - **Kompletne pokrycie Polski** - 16 województw, 380 powiatów, wszystkie gminy
 - **Visual monitoring dashboard** - real-time status systemu alertów z timestamp
 - **Force Cache Clear Utility** - narzędzie do wymuszenia aktualizacji
+- **Powiadomienia Web Push (opcjonalnie)** – wyłącznie za zgodą użytkownika (VAPID), możliwość wycofania w każdej chwili
 - Edukacyjne treści o bezpieczeństwie dla dzieci
 - Informacje o numerach alarmowych  
 - Funkcje text-to-speech w językach polskim, angielskim i ukraińskim
@@ -67,10 +69,11 @@ Użytkownikom zabrania się:
 4.1a. **Funkcja geolokalizacji:**
 - **Cel:** automatyczne dopasowanie alertów do lokalizacji Użytkownika (gmina, powiat, województwo)
 - **Zakres:** współrzędne GPS używane wyłącznie do identyfikacji najbliższego miasta i województwa
-- **Przechowywanie:** lokalizacja zapisywana jedynie w przeglądarce Użytkownika (localStorage)
+- **Przechowywanie:** lokalizacja zapisywana jedynie w przeglądarce Użytkownika z użyciem **EnhancedSecurityZK** (IndexedDB, szyfrowanie AES-256-GCM); dla niesensytywnych preferencji dopuszczalne localStorage
 - **Bez zgody:** aplikacja korzysta z alertów ogólnopolskich (cała Polska)
 - **Ze zgodą:** dodawane alerty wojewódzkie i miejskie dla lokalizacji Użytkownika
 - **Możliwość wycofania:** Użytkownik może w każdej chwili wyłączyć geolokalizację
+- **Odwrócone geokodowanie:** zamiana współrzędnych na nazwę miejscowości/regionu realizowana przez usługę **OpenStreetMap Nominatim** (po świadomej akcji użytkownika)
 
 4.1b. **🚨 Funkcja offline emergency (tryb awaryjny):**
 - **Cel:** zapewnienie działania aplikacji podczas katastrof naturalnych gdy brak internetu
@@ -80,6 +83,10 @@ Użytkownikom zabrania się:
 - **Aktywacja:** automatyczna gdy aplikacja wykryje brak połączenia internetowego
 - **Bezpieczeństwo dzieci:** funkcja kluczowa dla ochrony życia dzieci podczas sytuacji kryzysowych
 - **Zgodność RODO:** podstawa prawna - żywotny interes osoby fizycznej (art. 6 ust. 1 lit. d RODO)
+
+4.1c. **Synteza mowy (TTS) a zgoda rodzica:**
+- **Warunek uruchomienia:** TTS włącza się wyłącznie po weryfikacji zgody rodzica/opiekuna zgodnie z art. 8 RODO
+- **Brak zgody:** całkowity brak dźwięku – respektujemy prywatność dziecka
 
 4.2. **🎮 System gamifikacji (bohaterowie bezpieczeństwa):**
 - **Cel:** motywacja dzieci do aktywnego uczenia się zasad bezpieczeństwa
