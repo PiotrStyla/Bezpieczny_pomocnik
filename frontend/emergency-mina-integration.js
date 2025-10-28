@@ -95,16 +95,16 @@ class EmergencyMinaManager {
             if (navigator.onLine) return; // Came back online
 
             const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), 1500);
-            // Fast, lightweight endpoint
-            const resp = await fetch('/api/vapid_public_key', {
+            const timer = setTimeout(() => controller.abort(), 2000);
+            // Probe a static asset that always exists in production
+            const resp = await fetch('./index.html', {
                 cache: 'no-store',
                 signal: controller.signal
             }).catch(() => null);
             clearTimeout(timer);
 
             // If still offline or request failed → activate survival
-            if (!navigator.onLine || !resp || (resp.status && resp.status >= 400)) {
+            if (!navigator.onLine || !resp || !resp.ok) {
                 this.activateSurvivalMode();
             } else {
                 console.log('✅ Connectivity verified - skipping survival mode');

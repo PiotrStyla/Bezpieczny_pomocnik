@@ -308,11 +308,14 @@
             const isSlowConnection = navigator.connection?.effectiveType === 'slow-2g' ||
                                    navigator.connection?.effectiveType === '2g';
 
-            if (isOffline || isLowBattery || isSlowConnection) {
-                console.log('🚨 Crisis conditions detected - activating emergency mode');
-                if (window.emergencyMina && typeof window.emergencyMina.activateSurvivalMode === 'function') {
-                    window.emergencyMina.activateSurvivalMode();
+            if (isOffline) {
+                console.log('🚨 Offline detected - verifying before survival');
+                if (window.emergencyMina && typeof window.emergencyMina.verifyOfflineThenActivate === 'function') {
+                    window.emergencyMina.verifyOfflineThenActivate();
                 }
+            }
+            if (isLowBattery) {
+                console.log('🔋 Low battery - not auto-activating survival mode');
             }
         });
         
@@ -320,11 +323,15 @@
         if (navigator.getBattery) {
             navigator.getBattery().then(battery => {
                 battery.addEventListener('levelchange', () => {
-                    if (battery.level < 0.2 && window.emergencyMina) {
-                        console.log('🔋 Low battery - activating emergency mode');
-                        if (typeof window.emergencyMina.activateSurvivalMode === 'function') {
+                    try {
+                        if (window.emergencySurvival && typeof window.emergencySurvival.checkBatteryLevel === 'function') {
+                            window.emergencySurvival.checkBatteryLevel(battery);
+                        } else if (battery.level <= 0.1 && window.emergencyMina && typeof window.emergencyMina.activateSurvivalMode === 'function') {
+                            console.log('🔋 Very low battery - activating survival mode');
                             window.emergencyMina.activateSurvivalMode();
                         }
+                    } catch (e) {
+                        console.warn('⚠️ Battery event handling failed:', e);
                     }
                 });
             });
@@ -332,11 +339,9 @@
         
         // 📡 NETWORK MONITORING
         window.addEventListener('offline', () => {
-            console.log('📡 Network lost - activating offline mode');
-            if (window.emergencyMina) {
-                if (typeof window.emergencyMina.activateSurvivalMode === 'function') {
-                    window.emergencyMina.activateSurvivalMode();
-                }
+            console.log('📡 Network lost - verifying before enabling survival mode');
+            if (window.emergencyMina && typeof window.emergencyMina.verifyOfflineThenActivate === 'function') {
+                window.emergencyMina.verifyOfflineThenActivate();
             }
         });
         
