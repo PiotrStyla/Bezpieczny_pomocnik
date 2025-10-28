@@ -16,6 +16,7 @@ __pycache__/
 env/
 venv/
 .venv/
+.venv311/
 
 # Pliki generowane przez edytory i IDE
 .idea/

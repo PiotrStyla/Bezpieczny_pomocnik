@@ -195,10 +195,6 @@
 - **Cel:** Fallback proxy dla alertów gdy RSS2JSON niedostępny
 - **Zabezpieczenia:** HTTPS, brak logowania danych użytkownika
 
-- **Dane:** Teksty do tłumaczenia (bez danych osobowych)
-- **Lokalizacja:** USA
-- **Zabezpieczenia:** Zgodnie z polityką prywatności OpenAI
-
 #### **Nie przekazujemy danych do:**
 - ❌ Firm reklamowych
 - ❌ Brokerów danych  
