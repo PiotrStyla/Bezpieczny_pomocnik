@@ -1,8 +1,8 @@
 // 🚨 EMERGENCY OFFLINE CACHE - Critical for emergency operation
 // Cache version - increment to force update
-const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1.4.2-real-alerts';
-const STATIC_CACHE = 'static-resources-v1.4.2';
-const DYNAMIC_CACHE = 'dynamic-content-v1.4.2';
+const CACHE_NAME = 'bezpieczny-pomocnik-emergency-v1.4.3-real-alerts';
+const STATIC_CACHE = 'static-resources-v1.4.3';
+const DYNAMIC_CACHE = 'dynamic-content-v1.4.3';
 
 const EMERGENCY_ESSENTIALS = [
     // Core App Files
@@ -45,11 +45,12 @@ self.addEventListener('install', event => {
 // Activate - Clean old caches
 self.addEventListener('activate', event => {
     console.log('🔥 Activating Emergency Service Worker...');
+    const keepCaches = [CACHE_NAME, STATIC_CACHE, DYNAMIC_CACHE];
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
+                    if (!keepCaches.includes(cacheName)) {
                         console.log('🗑️ Deleting old cache:', cacheName);
                         return caches.delete(cacheName);
                     }
