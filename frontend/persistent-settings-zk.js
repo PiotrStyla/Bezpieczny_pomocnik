@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 🔒 PERSISTENT SETTINGS ZK STORAGE
  * Bezpieczne przechowywanie ustawień dziecka między sesjami
  * Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
@@ -25,6 +25,37 @@ class PersistentSettingsZK {
                 speechEnabled: true
             }
         };
+    }
+
+    // 🔒 Backward-compatible secure wrappers used elsewhere in app.js
+    async loadSecureZK(key) {
+        try {
+            await this.init();
+            if (this.zkStorage && typeof this.zkStorage.loadSecureZK === 'function') {
+                return await this.zkStorage.loadSecureZK(key);
+            }
+            if (window.EnhancedSecurityZK && typeof window.EnhancedSecurityZK.loadSecureZK === 'function') {
+                return await window.EnhancedSecurityZK.loadSecureZK(key);
+            }
+            return null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async saveSecureZK(key, data) {
+        try {
+            await this.init();
+            if (this.zkStorage && typeof this.zkStorage.saveSecureZK === 'function') {
+                return await this.zkStorage.saveSecureZK(key, data);
+            }
+            if (window.EnhancedSecurityZK && typeof window.EnhancedSecurityZK.saveSecureZK === 'function') {
+                return await window.EnhancedSecurityZK.saveSecureZK(key, data);
+            }
+            return false;
+        } catch (e) {
+            return false;
+        }
     }
 
     /**

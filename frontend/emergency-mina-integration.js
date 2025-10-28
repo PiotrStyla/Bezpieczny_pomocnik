@@ -65,14 +65,14 @@ class EmergencyMinaManager {
         
         // Check current status
         if (!navigator.onLine) {
-            console.log('🚨 OFFLINE DETECTED - Enabling SURVIVAL mode!');
-            setTimeout(() => this.activateSurvivalMode(), 100);
+            console.log('🚨 OFFLINE DETECTED - verifying before survival...');
+            this.verifyOfflineThenActivate();
         }
         
         // Listen for offline event
         window.addEventListener('offline', () => {
-            console.log('🚨 CONNECTION LOST - Enabling SURVIVAL mode!');
-            this.activateSurvivalMode();
+            console.log('🚨 CONNECTION LOST - verifying before survival...');
+            this.verifyOfflineThenActivate();
         });
         
         // Listen for online event
@@ -82,6 +82,37 @@ class EmergencyMinaManager {
         });
         
         console.log('✅ Offline detection active');
+    }
+
+    /**
+     * 🔍 VERIFY OFFLINE BEFORE ACTIVATION
+     * Avoid false positives by testing quick connectivity to local API
+     */
+    async verifyOfflineThenActivate() {
+        try {
+            // Small grace delay for transient blips
+            await new Promise(r => setTimeout(r, 800));
+            if (navigator.onLine) return; // Came back online
+
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 1500);
+            // Fast, lightweight endpoint
+            const resp = await fetch('/api/vapid_public_key', {
+                cache: 'no-store',
+                signal: controller.signal
+            }).catch(() => null);
+            clearTimeout(timer);
+
+            // If still offline or request failed → activate survival
+            if (!navigator.onLine || !resp || (resp.status && resp.status >= 400)) {
+                this.activateSurvivalMode();
+            } else {
+                console.log('✅ Connectivity verified - skipping survival mode');
+            }
+        } catch (e) {
+            console.warn('⚠️ Connectivity check failed, enabling survival mode as safety:', e.message || e);
+            this.activateSurvivalMode();
+        }
     }
     
     /**

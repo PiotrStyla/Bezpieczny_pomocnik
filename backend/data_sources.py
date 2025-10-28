@@ -6,7 +6,7 @@ import datetime
 import hashlib
 import logging
 import re
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 import xml.etree.ElementTree as ET
 
 from .config import settings
@@ -18,6 +18,25 @@ HEADERS = {
 
 def _generate_id(title: str, published_date: str) -> str:
     return hashlib.sha256(f"{title}{published_date}".encode()).hexdigest()
+
+def _normalize_text(s: str) -> str:
+    """Best-effort safe normalization to fix common mojibake like 'Å¼Ã³Åty'.
+    If typical mojibake markers are present, try latin1->utf8 roundtrip.
+    Keep original on failure. Also collapse excessive whitespace.
+    """
+    if not isinstance(s, str):
+        return s
+    txt = s
+    if any(m in txt for m in ("Ã", "Å", "Â")):
+        try:
+            txt2 = txt.encode('latin-1', errors='ignore').decode('utf-8', errors='ignore')
+            if txt2 and txt2 != txt:
+                txt = txt2
+        except Exception:
+            pass
+    # normalize whitespace
+    txt = re.sub(r"\s+", " ", txt).strip()
+    return txt
 
 def _parse_rss(url: str, location: str) -> List[Dict[str, Any]]:
     logging.info(f"Pobieranie danych RSS z: {url}")
@@ -73,6 +92,115 @@ def _parse_rss(url: str, location: str) -> List[Dict[str, Any]]:
     logging.info(f"Znaleziono {len(alerts)} alertów RSS z {location}.")
     return alerts
 
+def _parse_web_city_auto(url: str, location: str) -> List[Dict[str, Any]]:
+    logging.info(f"Pobieranie danych web (auto) z: {url}")
+    alerts: List[Dict[str, Any]] = []
+    try:
+        try:
+            resp = requests.get(url, timeout=10, headers=HEADERS)
+            if resp.status_code >= 400:
+                raise requests.RequestException(f"HTTP {resp.status_code}")
+            base_soup = BeautifulSoup(resp.content, 'html.parser')
+            base_url = url
+        except Exception:
+            # fallback to site root
+            up = urlparse(url)
+            root = f"{up.scheme}://{up.netloc}"
+            resp = requests.get(root, timeout=10, headers=HEADERS)
+            resp.raise_for_status()
+            base_soup = BeautifulSoup(resp.content, 'html.parser')
+            base_url = root
+
+        # Heuristic: find subpages relevant to alerts/communications
+        keywords = [
+            'komunikaty', 'komunikat', 'ostrze', 'awarie', 'utrudn', 'bezpiecze',
+            'alert', 'pogod', 'rso', 'sztab', 'kryzys', 'wyłączenia', 'wylaczenia', 'przerwy'
+        ]
+        candidates: Dict[str, str] = {}
+        for a in base_soup.find_all('a', href=True):
+            text = (a.get_text(strip=True) or '').lower()
+            href = a['href']
+            href_l = href.lower()
+            if any(kw in text for kw in keywords) or any(kw in href_l for kw in keywords):
+                full = urljoin(base_url, href)
+                if full not in candidates:
+                    candidates[full] = a.get_text(strip=True) or full
+
+        # Limit candidates to avoid overfetching
+        for sub_url, link_title in list(candidates.items())[:5]:
+            try:
+                sub_resp = requests.get(sub_url, timeout=10, headers=HEADERS)
+                if sub_resp.status_code >= 400:
+                    continue
+                sub_soup = BeautifulSoup(sub_resp.content, 'html.parser')
+
+                # Try to collect multiple items from listings
+                items = []
+                # common containers
+                for sel in [
+                    ('article', {}),
+                    ('div', {'class': re.compile(r'(article|news|komunikat|lista|list|posts)')})
+                ]:
+                    for node in sub_soup.find_all(sel[0], **sel[1]):
+                        # find heading
+                        h = node.find(['h1', 'h2', 'h3'])
+                        p = node.find('p')
+                        title = (h.get_text(strip=True) if h else '').strip()
+                        content = (p.get_text(strip=True) if p else '').strip()
+                        if title and len(title) > 5:
+                            items.append((title, content))
+                        if len(items) >= 5:
+                            break
+                    if len(items) >= 5:
+                        break
+
+                # Fallback to page-level heading + first paragraph
+                if not items:
+                    heading_tag = sub_soup.find(['h1', 'h2'])
+                    heading = (heading_tag.get_text(strip=True) if heading_tag else (link_title or location)).strip()
+                    main = sub_soup.find('main') or sub_soup
+                    para = None
+                    for p in main.find_all('p'):
+                        t = p.get_text(strip=True)
+                        if t:
+                            para = t
+                            break
+                    items.append((heading, para or 'Informacje miejskie'))
+
+                now = datetime.datetime.now()
+                for title, content in items[:5]:
+                    alerts.append({
+                        "id": _generate_id(title, now.isoformat()),
+                        "source": sub_url,
+                        "title": title,
+                        "content": content,
+                        "timestamp": now,
+                        "location": location
+                    })
+                if len(alerts) >= 6:
+                    break
+            except Exception as e:
+                logging.warning(f"Auto-web parser: błąd przetwarzania {sub_url}: {e}")
+
+        # Final fallback from base page if still empty
+        if not alerts:
+            heading_tag = base_soup.find(['h1', 'h2'])
+            if heading_tag:
+                t = heading_tag.get_text(strip=True)
+                now = datetime.datetime.now()
+                alerts.append({
+                    "id": _generate_id(t, now.isoformat()),
+                    "source": base_url,
+                    "title": t,
+                    "content": "Informacje miejskie",
+                    "timestamp": now,
+                    "location": location
+                })
+    except Exception as e:
+        logging.error(f"Błąd parsera web (auto) dla {url}: {e}")
+    logging.info(f"Znaleziono {len(alerts)} alertów (auto) dla {location}.")
+    return alerts
+
 def _parse_web_warszawa(url: str, location: str) -> List[Dict[str, Any]]:
     logging.info(f"Pobieranie danych web z: {url}")
     alerts = []
@@ -80,15 +208,67 @@ def _parse_web_warszawa(url: str, location: str) -> List[Dict[str, Any]]:
         response = requests.get(url, timeout=10, headers=HEADERS)
         response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
-        articles = soup.find_all('div', class_='article-item')
-        for article in articles:
-            title_tag = article.find('h3')
-            content_tag = article.find('p')
-            if title_tag and content_tag:
-                title = title_tag.get_text(strip=True)
-                content = content_tag.get_text(strip=True)
+
+        # 1) Discover key subpages related to alerts/outages and follow them
+        patterns = [
+            'komunikaty-ostrzezenia',
+            'informacje-o-przerwach-w-dostawach',
+            'wylaczenia-wody',
+        ]
+        found: Dict[str, str] = {}
+        for a in soup.find_all('a', href=True):
+            href = a['href']
+            if any(p in href for p in patterns):
+                full_url = urljoin(url, href)
+                title = a.get_text(strip=True) or full_url
+                # de-duplicate by URL
+                if full_url not in found:
+                    found[full_url] = title
+
+        # 2) For each discovered subpage, fetch and extract a heading + first paragraph
+        for sub_url, title in list(found.items())[:6]:  # limit to avoid overfetching
+            try:
+                sub_resp = requests.get(sub_url, timeout=10, headers=HEADERS)
+                sub_resp.raise_for_status()
+                sub_soup = BeautifulSoup(sub_resp.content, 'html.parser')
+                heading_tag = sub_soup.find(['h1', 'h2'])
+                heading = heading_tag.get_text(strip=True) if heading_tag else title
+                # find first meaningful paragraph
+                main = sub_soup.find('main') or sub_soup
+                para = None
+                for p in main.find_all('p'):
+                    text = p.get_text(strip=True)
+                    if text:
+                        para = text
+                        break
                 now = datetime.datetime.now()
-                alerts.append({"id": _generate_id(title, now.isoformat()), "source": url, "title": title, "content": content, "timestamp": now, "location": location})
+                alerts.append({
+                    "id": _generate_id(heading, now.isoformat()),
+                    "source": sub_url,
+                    "title": heading,
+                    "content": para or "Komunikaty i ostrzeżenia m.st. Warszawa",
+                    "timestamp": now,
+                    "location": location
+                })
+            except Exception as e:
+                logging.warning(f"Nie udało się przetworzyć podstrony Warszawy {sub_url}: {e}")
+
+        # 3) Fallback: if nothing found, try to extract any prominent headings from the main page
+        if not alerts:
+            for h in soup.find_all(['h2', 'h3']):
+                t = h.get_text(strip=True)
+                if t:
+                    now = datetime.datetime.now()
+                    alerts.append({
+                        "id": _generate_id(t, now.isoformat()),
+                        "source": url,
+                        "title": t,
+                        "content": "Informacje miejskie Warszawa 19115",
+                        "timestamp": now,
+                        "location": location
+                    })
+                    if len(alerts) >= 3:
+                        break
     except requests.RequestException as e:
         logging.error(f"Błąd sieciowy podczas pobierania danych z {url}: {e}")
     except Exception as e:
@@ -162,9 +342,9 @@ def _parse_rso_xml(url: str, location: str) -> List[Dict[str, Any]]:
         root = ET.fromstring(resp.content)
         for news in root.findall('.//news'):
             nid = (news.findtext('id') or '').strip()
-            title = (news.findtext('title') or '').strip() or 'Bez tytułu'
-            shortcut = (news.findtext('shortcut') or '').strip()
-            content = (news.findtext('content') or '').strip()
+            title = _normalize_text((news.findtext('title') or '').strip() or 'Bez tytułu')
+            shortcut = _normalize_text((news.findtext('shortcut') or '').strip())
+            content = _normalize_text((news.findtext('content') or '').strip())
             rso_alarm = (news.findtext('rso_alarm') or '').strip()
             valid_from = (news.findtext('valid_from') or '').strip()
             valid_to = (news.findtext('valid_to') or '').strip()
@@ -209,6 +389,7 @@ PARSER_MAP = {
     "web_warszawa": _parse_web_warszawa,
     "web_lublin": _parse_web_lublin,
     "web_bialystok": _parse_web_bialystok,
+    "web_city_auto": _parse_web_city_auto,
     "rso_xml": _parse_rso_xml,
 }
 

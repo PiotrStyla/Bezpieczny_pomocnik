@@ -157,52 +157,18 @@ MAJOR_CITIES = {
 def get_national_alert_sources():
     """Źródła alertów ogólnopolskich"""
     return {
-        "rcb_national": {
-            "url": "https://www.gov.pl/web/rcb/ostrzezenia-rcb-rss",
-            "type": "rss", 
-            "location": "Polska",
-            "level": "national",
-            "priority": "high"
-        },
         "rso_national": {
             "url": "https://komunikaty.tvp.pl/komunikaty/wszystkie/wszystkie/0?_format=xml",
             "type": "rso_xml",
             "location": "Polska",
             "level": "national",
             "priority": "high"
-        },
-        "imgw_national": {
-            "url": "https://www.imgw.pl/rss/ostrzezenia_meteorologiczne.xml",
-            "type": "rss",
-            "location": "Polska", 
-            "level": "national",
-            "priority": "high"
-        },
-        "imgw_hydro": {
-            "url": "https://www.imgw.pl/rss/ostrzezenia_hydrologiczne.xml", 
-            "type": "rss",
-            "location": "Polska",
-            "level": "national", 
-            "priority": "high"
         }
     }
 
 def get_voivodeship_alert_sources():
     """Źródła alertów wojewódzkich"""
-    sources = {}
-    
-    # IMGW ostrzeżenia dla województw
-    for code, info in WOJEWODZTWA.items():
-        sources[f"imgw_{code}"] = {
-            "url": f"https://www.imgw.pl/rss/ostrzezenia/{info['imgw_code']}.xml",
-            "type": "rss",
-            "location": info["name"],
-            "level": "voivodeship", 
-            "priority": "medium",
-            "voivodeship_code": code
-        }
-    
-    return sources
+    return {}
 
 def get_city_alert_sources():
     """Źródła alertów miejskich dla największych miast"""
@@ -220,7 +186,7 @@ def get_city_alert_sources():
     # Kraków
     sources["krakow_city"] = {
         "url": "https://www.krakow.pl/informacje/20026,48,komunikat,bezpieczenstwo.html",
-        "type": "rss", 
+        "type": "web_city_auto", 
         "location": "Kraków",
         "level": "city",
         "priority": "high"
@@ -229,7 +195,7 @@ def get_city_alert_sources():
     # Wrocław  
     sources["wroclaw_city"] = {
         "url": "https://www.wroclaw.pl/rss/komunikaty-urzedu",
-        "type": "rss",
+        "type": "web_city_auto",
         "location": "Wrocław", 
         "level": "city",
         "priority": "medium"
@@ -238,7 +204,7 @@ def get_city_alert_sources():
     # Gdańsk
     sources["gdansk_city"] = {
         "url": "https://www.gdansk.pl/rss/komunikaty",
-        "type": "rss",
+        "type": "web_city_auto",
         "location": "Gdańsk",
         "level": "city", 
         "priority": "medium"
@@ -247,7 +213,7 @@ def get_city_alert_sources():
     # Poznań
     sources["poznan_city"] = {
         "url": "https://www.poznan.pl/mim/rss/komunikaty.xml",
-        "type": "rss", 
+        "type": "web_city_auto", 
         "location": "Poznań",
         "level": "city",
         "priority": "medium"
@@ -256,7 +222,7 @@ def get_city_alert_sources():
     # Łódź
     sources["lodz_city"] = {
         "url": "https://uml.lodz.pl/dla-mieszkancow/aktualnosci/rss/",
-        "type": "rss",
+        "type": "web_city_auto",
         "location": "Łódź",
         "level": "city", 
         "priority": "medium"

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -294,16 +294,24 @@
                 }
             }, 2000);
 
-            // Check for crisis conditions
-            const isLowBattery = navigator.getBattery?.()?.then(b => b.level < 0.3);
+            // Check for crisis conditions (battery check must be awaited)
+            let isLowBattery = false;
+            try {
+                if (navigator.getBattery) {
+                    const batteryInfo = await navigator.getBattery();
+                    isLowBattery = batteryInfo.level < 0.3;
+                }
+            } catch (e) {
+                isLowBattery = false;
+            }
             const isOffline = !navigator.onLine;
             const isSlowConnection = navigator.connection?.effectiveType === 'slow-2g' ||
                                    navigator.connection?.effectiveType === '2g';
 
             if (isOffline || isLowBattery || isSlowConnection) {
                 console.log('🚨 Crisis conditions detected - activating emergency mode');
-                if (window.emergencyMina) {
-                    window.emergencyMina.enableEmergencyMode();
+                if (window.emergencyMina && typeof window.emergencyMina.activateSurvivalMode === 'function') {
+                    window.emergencyMina.activateSurvivalMode();
                 }
             }
         });
@@ -314,7 +322,9 @@
                 battery.addEventListener('levelchange', () => {
                     if (battery.level < 0.2 && window.emergencyMina) {
                         console.log('🔋 Low battery - activating emergency mode');
-                        window.emergencyMina.enableEmergencyMode();
+                        if (typeof window.emergencyMina.activateSurvivalMode === 'function') {
+                            window.emergencyMina.activateSurvivalMode();
+                        }
                     }
                 });
             });
@@ -324,18 +334,18 @@
         window.addEventListener('offline', () => {
             console.log('📡 Network lost - activating offline mode');
             if (window.emergencyMina) {
-                window.emergencyMina.enableEmergencyMode();
+                if (typeof window.emergencyMina.activateSurvivalMode === 'function') {
+                    window.emergencyMina.activateSurvivalMode();
+                }
             }
         });
         
         window.addEventListener('online', () => {
             console.log('📡 Network restored - attempting Mina sync');
-            if (window.emergencyMina) {
+            if (window.emergencyMina && typeof window.emergencyMina.syncSatellite === 'function') {
                 window.emergencyMina.syncSatellite();
             }
         });
     </script>
 </body>
 </html>
-
-

@@ -29,6 +29,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .config import settings
 from .schema import Alert, SeverityLevel
 from .data_sources import fetch_all_alerts, fetch_alerts_for_location, get_location_coverage_info
+from .data_sources import PARSER_MAP
 from .ai_processor import simplify_text, generate_tips
 from . import push_notifications
 from . import poland_locations
@@ -198,12 +199,17 @@ def source_health():
             ct = None
             entries = None
             try:
+                # 1) Try our app parser to count actual parsable items (handles autodiscovery and XML)
+                parser_func = PARSER_MAP.get(typ)
+                if parser_func:
+                    parsed_alerts = parser_func(url, cfg.get("location", "Polska"))
+                    entries = len(parsed_alerts or [])
+
+                # 2) Also probe raw HTTP status/content-type for visibility
                 if typ == "rss":
                     fd = feedparser.parse(url)
                     status = getattr(fd, "status", None)
-                    entries = len(getattr(fd, "entries", []) or [])
-                    ct = None
-                    if not entries or (isinstance(status, int) and status >= 400):
+                    if not isinstance(status, int) or status < 200 or status >= 400:
                         resp = requests.get(url, timeout=10)
                         status = resp.status_code
                         ct = resp.headers.get("Content-Type")
