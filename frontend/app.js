@@ -71,6 +71,26 @@ async function subscribeUserToPush() {
             return;
         }
 
+        if (!('PushManager' in window)) {
+            console.warn('[Push] Push API not supported');
+            const btn = document.getElementById('notifications-btn');
+            if (btn) {
+                btn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Brak Push API</span>';
+                btn.style.background = '#FF3B30';
+            }
+            return;
+        }
+
+        if (!window.isSecureContext) {
+            console.warn('[Push] Insecure context. Push requires HTTPS or localhost');
+            const btn = document.getElementById('notifications-btn');
+            if (btn) {
+                btn.innerHTML = '<span class="btn-icon">🔒</span><span class="btn-text">Włącz HTTPS</span>';
+                btn.style.background = '#FF9500';
+            }
+            return;
+        }
+
         const permission = await Notification.requestPermission();
         console.log('[Push] Permission:', permission);
         if (permission !== 'granted') {
@@ -90,26 +110,57 @@ async function subscribeUserToPush() {
             try { await existing.unsubscribe(); } catch (e) { console.warn('[Push] Unsubscribe failed (ignored):', e); }
         }
 
-        const res = await fetch(`${API_BASE_URL}/vapid_public_key`);
-        console.log('[Push] GET /api/vapid_public_key status:', res.status);
-        if (!res.ok) throw new Error('Failed to fetch VAPID key');
-        const data = await res.json();
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        let res;
+        try {
+            res = await fetch(`${API_BASE_URL}/vapid_public_key`, {
+                cache: 'no-store',
+                signal: controller.signal,
+                credentials: 'same-origin'
+            });
+        } catch (e) {
+            throw new Error('Nie można połączyć z serwerem powiadomień');
+        } finally {
+            clearTimeout(timeout);
+        }
+        console.log('[Push] GET /api/vapid_public_key status:', res && res.status);
+        if (!res || !res.ok) throw new Error('Serwer powiadomień niedostępny');
+        let data;
+        try {
+            data = await res.json();
+        } catch (e) {
+            throw new Error('Błędna odpowiedź klucza VAPID');
+        }
         const trimmedKey = (data.public_key || '').trim();
         console.log('[Push] VAPID key length:', trimmedKey.length);
+        if (!trimmedKey) throw new Error('Brak klucza VAPID');
         const appServerKey = urlBase64ToUint8Array(trimmedKey);
 
-        const subscription = await reg.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: appServerKey
-        });
+        let subscription;
+        try {
+            subscription = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: appServerKey
+            });
+        } catch (e) {
+            console.error('[Push] subscribe() failed:', e);
+            throw new Error('Subskrypcja Push nie powiodła się');
+        }
         console.log('[Push] Subscribed with endpoint:', subscription?.endpoint);
 
-        const saveRes = await fetch(`${API_BASE_URL}/subscribe`, {
-            method: 'POST',
-            body: JSON.stringify(subscription),
-            headers: { 'Content-Type': 'application/json' }
-        });
-        console.log('[Push] POST /api/subscribe status:', saveRes.status);
+        let saveRes;
+        try {
+            saveRes = await fetch(`${API_BASE_URL}/subscribe`, {
+                method: 'POST',
+                body: JSON.stringify(subscription),
+                headers: { 'Content-Type': 'application/json' }
+            });
+        } catch (e) {
+            throw new Error('Zapis subskrypcji nie powiódł się');
+        }
+        console.log('[Push] POST /api/subscribe status:', saveRes && saveRes.status);
+        if (!saveRes || !saveRes.ok) throw new Error('Serwer odrzucił subskrypcję');
 
         const btn = document.getElementById('notifications-btn');
         if (btn) {
@@ -121,7 +172,8 @@ async function subscribeUserToPush() {
         console.error('[Push] Subscription error:', error);
         const btn = document.getElementById('notifications-btn');
         if (btn) {
-            btn.innerHTML = '<span class="btn-icon">❌</span><span class="btn-text">Błąd subskrypcji</span>';
+            const reason = (error && error.message) ? `: ${error.message}` : '';
+            btn.innerHTML = `<span class="btn-icon">❌</span><span class="btn-text">Błąd subskrypcji${reason ? ' ' + reason : ''}</span>`;
             btn.style.background = '#FF3B30';
         }
     }
