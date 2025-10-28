@@ -15,3 +15,18 @@
 - `backend/push_notifications.py`
 - `.gitignore`
 - `frontend/parent-cms.html`
+
+## Postępy – 2025-10-28
+
+- **[legal/RODO]** Uaktualniono dokumenty prawne zgodnie z ostatnimi zmianami w aplikacji:
+  - `legal/POLITYKA_PRYWATNOSCI.md`: EnhancedSecurityZK (IndexedDB + AES-256-GCM), Web Push (VAPID), Nominatim, TTS tylko po zgodzie rodzica.
+  - `legal/REGULAMIN.md`: doprecyzowanie geolokalizacji (EnhancedSecurityZK), TTS z wymaganą zgodą (Art. 8 RODO), powiadomienia Web Push jako opcjonalne.
+  - `legal/POLITYKA_COOKIES.md`: sekcje o Web Push (nie są cookies), Nominatim; preferencja EnhancedSecurityZK nad localStorage.
+  - `legal/DOSTEPNOSC.md`: poprawki dostępności – weryfikacja offline przed trybem awaryjnym, poprawna detekcja baterii, czytelne dymki mapy, fallback adresu „okolicy”, TTS tylko po zgodzie.
+- **[frontend UX]** Usunięto prefiks „??” z dymków i komunikatów mapy; zawsze przyjazny opis lokalizacji po kliknięciu „Gdzie jestem?”.
+
+## Zmienione pliki (wybór)
+- `legal/POLITYKA_PRYWATNOSCI.md`
+- `legal/REGULAMIN.md`
+- `legal/POLITYKA_COOKIES.md`
+- `legal/DOSTEPNOSC.md`

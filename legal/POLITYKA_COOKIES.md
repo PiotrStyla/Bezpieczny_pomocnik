@@ -1,8 +1,9 @@
 # POLITYKA COOKIES APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Obowiązuje od: 21 września 2025 r.**
-**Aktualizacja 02.10.2025: Multi-source alert fetching, real-time source monitoring, honest status tracking**
-**Poprzednia aktualizacja 27.09.2025: Dodano Background Alert System, periodic sync, RCB monitoring**
+**Aktualizacja 28.10.2025: EnhancedSecurityZK (IndexedDB + AES-256-GCM), Web Push (VAPID) – nie są cookies, reverse geocoding OpenStreetMap Nominatim**
+**Poprzednia aktualizacja 02.10.2025: Multi-source alert fetching, real-time source monitoring, honest status tracking**
+**Wcześniejsza: 27.09.2025: Dodano Background Alert System, periodic sync, RCB monitoring**
 
 ---
 
@@ -14,12 +15,12 @@
 
 ## 📋 JAKIE COOKIES UŻYWAMY?
 
-### ✅ **COOKIES NIEZBĘDNE** *(nie wymagają zgody)*
+### ✅ **COOKIES/PRZECHOWYWANIE NIEZBĘDNE** *(nie wymagają zgody)*
 
 | **Nazwa** | **Cel** | **Czas życia** | **Typ** |
 |-----------|---------|----------------|---------|
-| `lang_preference` | Zapamiętanie wybranego języka (PL/EN/UA) | 12 miesięcy | localStorage |
-| `speech_enabled` | Ustawienie włączenia/wyłączenia głosu | 12 miesięcy | localStorage |
+| `lang_preference` | Zapamiętanie wybranego języka (PL/EN/UA) | 12 miesięcy | localStorage / EnhancedSecurityZK |
+| `speech_enabled` | Ustawienie włączenia/wyłączenia głosu | 12 miesięcy | localStorage / EnhancedSecurityZK |
 | `location_consent` | Zgoda na lokalizację | Do cofnięcia | localStorage |
 | `cookie_consent` | Status zgody na cookies | 12 miesięcy | localStorage |
 | **🎮 GAMIFICATION** | **System bohaterów i osiągnięć** | **Do usunięcia** | **localStorage** |
@@ -108,12 +109,15 @@
 
 ---
 
-## 🔄 LOCAL STORAGE VS COOKIES
+## 🔄 LOCAL STORAGE / ENHANCEDSECURITYZK VS COOKIES
 
-### 📦 **Local Storage** *(preferujemy)*:
-- **Bezpieczniejsze** - nie są wysyłane na serwer
-- **Kontrola użytkownika** - można łatwo wyczyścić
-- **Tylko niezbędne dane** - preferencje językowe, ustawienia dostępności
+### 📦 **EnhancedSecurityZK (IndexedDB + AES-256-GCM)** *(preferujemy)*:
+- **Bezpieczniejsze** – szyfrowanie po stronie przeglądarki, izolowany origin
+- **Kontrola użytkownika** – dane kasowane wraz z danymi przeglądarki
+- **Zastosowanie** – ustawienia aplikacji, dane dzieci (tylko lokalnie)
+
+### 📦 **Local Storage** *(ograniczamy do niesensytywnych preferencji)*:
+- Nie jest szyfrowany – używany tylko dla mniej wrażliwych ustawień i jako fallback
 
 ### 🍪 **Tradycyjne Cookies** *(ograniczone użycie)*:
 - Tylko dla sesji technicznych
@@ -132,6 +136,24 @@
 ### 👶 **Szczególne przepisy dla dzieci:**
 - **Art. 8 RODO** - zgoda rodzica/opiekuna dla dzieci poniżej 16 lat
 - **Dyrektywa o Usługach Cyfrowych** - dodatkowe środki ochrony dzieci
+
+---
+
+## 🔔 POWIADOMIENIA WEB PUSH (NIE SĄ COOKIES)
+
+- **Zakres:** subskrypcja Web Push w przeglądarce (endpoint + klucze `p256dh`, `auth`)
+- **Podstawa:** wyłączna zgoda użytkownika; można w każdej chwili wycofać (anulować subskrypcję)
+- **Cel:** krytyczne powiadomienia bezpieczeństwa
+- **Przechowywanie:** endpoint i klucze po stronie Fundacji tylko w celu dostarczenia powiadomień
+- **Prywatność:** brak powiązania z profilem dziecka; treść szyfrowana end-to-end przez przeglądarkę
+
+---
+
+## 🗺️ ODWRÓCONE GEOKODOWANIE (OpenStreetMap Nominatim)
+
+- **Co to jest:** zamiana współrzędnych GPS na nazwę miejscowości/regionu
+- **Kiedy:** tylko po świadomej akcji użytkownika („Gdzie jestem?”)
+- **Prywatność:** zapytanie wysyłane przez przeglądarkę; nie łączymy z innymi danymi użytkownika
 
 ---
 
@@ -173,7 +195,7 @@ Opisz problem podając:
 
 ---
 
-**Ostatnia aktualizacja:** 19 stycznia 2025 r.  
-**Wersja:** 1.0
+**Ostatnia aktualizacja:** 28 października 2025 r.  
+**Wersja:** 1.1
 
 *Polityka cookies została opracowana z myślą o maksymalnej ochronie prywatności dzieci i przejrzystości dla rodziców/opiekunów.*

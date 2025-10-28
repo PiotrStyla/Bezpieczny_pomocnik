@@ -1,8 +1,8 @@
 # OŚWIADCZENIE O DOSTĘPNOŚCI APLIKACJI "BEZPIECZNY POMOCNIK"
 
 **Data opublikowania:** 19 stycznia 2025 r.  
-**Data ostatniej aktualizacji:** 27 września 2025 r.
-**Aktualizacja:** Background Alert System, visual monitoring dashboard, accessibility w alertach
+**Data ostatniej aktualizacji:** 28 października 2025 r.
+**Aktualizacja:** Weryfikacja offline przed aktywacją trybu awaryjnego, poprawna detekcja baterii (await), czytelniejsze dymki mapy (bez artefaktów „??”), przyjazny opis lokalizacji nawet bez danych CMS, TTS tylko po zgodzie rodzica
 
 ---
 
@@ -31,14 +31,14 @@
 - **Skalowanie:** Tekst można powiększyć do 200% bez utraty funkcjonalności
 - **📱 **OFFLINE ACCESS (Dostęp offline)**
 
-✅ **ZAIMPLEMENTOWANO - dostępne od 20 września 2025:**
+✅ **ZAIMPLEMENTOWANO:**
 - **🚨 Emergency Offline Mode** - pełne funkcje awaryjne bez internetu
 - **📞 Emergency Contacts** - numery alarmowe (112,997,998,999) dostępne offline
 - **🛡️ Safety Instructions** - instrukcje bezpieczeństwa dla dzieci offline
 - **🎯 Auto-Detection** - automatyczne przełączanie na tryb awaryjny gdy brak internetu
 - **📦 Service Worker Cache** - niezbędne dane awaryjne cache'owane lokalnie
 - **👶 Child-Friendly** - interfejs dostosowany do dzieci podczas sytuacji kryzysowych
-- **🔊 Offline TTS** - działające czytanie na głos bez internetu (Web Speech API)
+- **🔊 Offline TTS** - działające czytanie na głos bez internetu (Web Speech API) wyłącznie po weryfikacji zgody rodzica (Art. 8 RODO)
 - **Progressive Web App (PWA)** - możliwość instalacji na urządzeniach
 
 #### ⌨️ **Operacyjność (Operable):**
@@ -76,8 +76,8 @@
 
 #### 1. **Mapa interaktywna (kryterium 1.1.1, 2.1.1):**
 - **Problem:** Zewnętrzna biblioteka map może mieć ograniczoną dostępność
-- **Rozwiązanie:** Alternatywna lista tekstowa lokalizacji
-- **Termin naprawy:** Q2 2025
+- **Rozwiązanie:** Alternatywna lista tekstowa lokalizacji; uproszczone teksty w dymkach (bez zbędnych emoji), automatyczny opis lokalizacji („okolicy”) przy braku adresu z geokodowania
+- **Termin naprawy:** w toku (ciągłe usprawnienia)
 
 #### 2. **Text-to-Speech (kryterium 1.2.5):**
 - **Problem:** Zależność od dostępności głosów w systemie operacyjnym
