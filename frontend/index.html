@@ -253,6 +253,25 @@
     <script src="parent-map-display.js"></script> <!-- Parent Map Display -->
     <script src="real-sync-system.js"></script> <!-- Real Synchronization System -->
     <script src="emergency-survival-mode.js"></script> <!-- TRUE Emergency Survival Mode (72+ hours) -->
+    <!-- Runtime API base override: use ?api=https://your-backend.example.com/api or stored value -->
+    <script>
+      (function() {
+        try {
+          const qs = new URLSearchParams(location.search);
+          const apiOverride = qs.get('api');
+          if (apiOverride) {
+            localStorage.setItem('app_api_base_url', apiOverride);
+          }
+          const stored = localStorage.getItem('app_api_base_url');
+          if (stored) {
+            window.APP_API_BASE_URL = stored;
+            console.log('[Config] Using API base from override:', stored);
+          }
+        } catch (e) {
+          console.warn('[Config] API base override not set:', e);
+        }
+      })();
+    </script>
     <script src="app.js"></script>
     <script src="location-message-fix.js"></script> <!-- Enhanced Location Messages with Parent CMS -->
     <!-- 🚨 MINA EMERGENCY INTEGRATION - CRITICAL! -->

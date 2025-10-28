@@ -36,7 +36,7 @@ let markersLayer = null;
 let userLocation = null;
 let userLocationMarker = null;
 let speechEnabled = localStorage.getItem('speech_enabled') !== 'false'; // Default: true
-const API_BASE_URL = '/api';
+const API_BASE_URL = window.APP_API_BASE_URL || '/api';
 
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);

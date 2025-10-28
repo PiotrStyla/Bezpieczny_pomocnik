@@ -289,8 +289,8 @@ function generateBackgroundChildMessage(alert) {
 async function showEmergencyNotification(title, body, alertData = null) {
     const options = {
         body: body,
-        icon: '/images/logo_192x192.png',
-        badge: '/images/logo_192x192.png',
+        icon: './images/logo_192x192.png',
+        badge: './images/logo_192x192.png',
         tag: 'emergency-alert',
         requireInteraction: true,
         vibrate: [200, 100, 200, 100, 200], // Alert vibration pattern
@@ -389,7 +389,7 @@ self.addEventListener('notificationclick', event => {
     } else {
         // Open app
         event.waitUntil(
-            clients.openWindow('/')
+            clients.openWindow('./index.html')
         );
     }
 });
