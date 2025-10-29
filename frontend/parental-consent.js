@@ -43,7 +43,8 @@ class ParentalConsentManager {
     async logConsentToServer(consentData) {
         try {
             // Optional server-side audit log
-            await fetch('/api/audit/parental-consent', {
+            const base = window.APP_API_BASE_URL || '/api';
+            await fetch(`${base}/audit/parental-consent`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
