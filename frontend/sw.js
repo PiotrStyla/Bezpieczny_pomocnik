@@ -355,8 +355,8 @@ self.addEventListener('push', event => {
     const title = data.title || '🚨 Bezpieczny Pomocnik';
     const options = {
         body: data.body || 'Nowy alert awaryjny! Sprawdź aplikację.',
-        icon: data.icon || '/images/logo_192x192.png',
-        badge: '/images/logo_192x192.png',
+        icon: data.icon || './images/logo_192x192.png',
+        badge: './images/logo_192x192.png',
         tag: 'emergency-alert',
         requireInteraction: true, // Stays visible until user acts
         vibrate: [200, 100, 200, 100, 200],
