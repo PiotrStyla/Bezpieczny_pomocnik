@@ -45,7 +45,8 @@ class PolishAIClient {
     async loadApiKeys() {
         // First try to load from backend (Render environment)
         try {
-            const response = await fetch('/api/ai-config');
+            const base = window.APP_API_BASE_URL || '/api';
+            const response = await fetch(`${base}/ai-config`, { cache: 'no-store' });
             if (response.ok) {
                 const config = await response.json();
                 

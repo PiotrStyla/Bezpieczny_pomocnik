@@ -216,8 +216,8 @@ function showSyncNotification(syncResults) {
     if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('Bezpieczny Pomocnik', {
             body: `Zaktualizowano: ${updatedItems}`,
-            icon: '/icon-192.png',
-            badge: '/icon-192.png'
+            icon: './images/logo_192x192.png',
+            badge: './images/logo_192x192.png'
         });
     }
     
