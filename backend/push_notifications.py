@@ -11,6 +11,9 @@ def _ensure_vapid_keys():
     global vapid_public_key, vapid_private_key
     env_pub = (getattr(settings, 'VAPID_PUBLIC_KEY', None) or '').strip()
     env_priv = (getattr(settings, 'VAPID_PRIVATE_KEY', None) or '').strip()
+    # Allow PEM stored in .env with escaped newlines
+    if env_priv:
+        env_priv = env_priv.replace('\\n', '\n')
 
     if env_pub and env_priv:
         try:
@@ -54,7 +57,7 @@ def add_subscription(subscription_info: dict):
         subscriptions_in_memory.append(subscription_info)
 
 def send_notification_to_all(title: str, body: str):
-    notification_payload = json.dumps({"title": title, "body": body, "icon": "/images/icon-192x192.png"})
+    notification_payload = json.dumps({"title": title, "body": body, "icon": "./images/logo_192x192.png"})
     # Use the VAPID_EMAIL from the environment variables.
     vapid_claims = {"sub": settings.VAPID_EMAIL}
 

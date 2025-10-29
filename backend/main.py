@@ -328,6 +328,27 @@ async def get_ai_config():
         "default_provider": "openai" if openai_key else "fallback"
     }
 
+@app.post("/api/audit/parental-consent", status_code=201)
+def audit_parental_consent(entry: Dict[str, Any] = Body(...)):
+    """
+    Minimal audit receiver for parental consent events.
+    Logs the entry and returns 201 Created.
+    """
+    logging.info(f"Audit parental-consent: {entry}")
+    return {"status": "ok"}
+
+@app.post("/api/push/test", status_code=202, summary="Wyślij testowe powiadomienie push")
+def push_test(data: Dict[str, Any] = Body(None)):
+    """Send a simple test push notification to all current subscriptions."""
+    title = (data or {}).get("title", "🔔 Test powiadomień")
+    body = (data or {}).get("body", "To jest testowe powiadomienie z backendu.")
+    try:
+        push_notifications.send_notification_to_all(title, body)
+        return {"status": "queued"}
+    except Exception as e:
+        logging.error(f"Error sending test push: {e}")
+        raise HTTPException(status_code=500, detail="Błąd wysyłania testowego powiadomienia")
+
 # Icon aliases for PWA/platform fallbacks
 @app.get("/icon-192.png")
 def get_icon_192():
