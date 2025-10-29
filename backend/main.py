@@ -343,8 +343,15 @@ def push_test(data: Dict[str, Any] = Body(None)):
     title = (data or {}).get("title", "🔔 Test powiadomień")
     body = (data or {}).get("body", "To jest testowe powiadomienie z backendu.")
     try:
-        push_notifications.send_notification_to_all(title, body)
-        return {"status": "queued"}
+        results = push_notifications.send_notification_to_all(title, body)
+        return {
+            "status": "ok",
+            "count": {
+                "success": len(results.get("successes", [])),
+                "failure": len(results.get("failures", []))
+            },
+            "results": results
+        }
     except Exception as e:
         logging.error(f"Error sending test push: {e}")
         raise HTTPException(status_code=500, detail="Błąd wysyłania testowego powiadomienia")

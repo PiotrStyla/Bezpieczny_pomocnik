@@ -62,18 +62,35 @@ def send_notification_to_all(title: str, body: str):
     vapid_claims = {"sub": settings.VAPID_EMAIL}
 
     # Create a copy to iterate over, so we can modify the original list
+    results = {"successes": [], "failures": []}
     for sub in list(subscriptions_in_memory):
         try:
             webpush(
                 subscription_info=sub,
                 data=notification_payload,
                 vapid_private_key=vapid_private_key,
-                vapid_claims=vapid_claims
+                vapid_claims=vapid_claims,
+                ttl=60
             )
+            results["successes"].append(sub.get("endpoint"))
         except WebPushException as ex:
             logging.error(f"Error sending notification to {sub.get('endpoint')}: {ex}")
             # If the subscription is gone (410), remove it from our list
             if ex.response and ex.response.status_code == 410:
                 logging.info(f"Removing expired subscription: {sub.get('endpoint')}")
                 subscriptions_in_memory.remove(sub)
+            status = getattr(ex.response, 'status_code', None) if hasattr(ex, 'response') else None
+            results["failures"].append({
+                "endpoint": sub.get("endpoint"),
+                "error": str(ex),
+                "status": status
+            })
+        except Exception as ex:
+            logging.error(f"Unexpected error sending notification: {ex}")
+            results["failures"].append({
+                "endpoint": sub.get("endpoint"),
+                "error": str(ex),
+                "status": None
+            })
+    return results
 

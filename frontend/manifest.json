@@ -25,14 +25,6 @@
             "purpose": "any maskable"
         }
     ],
-    "screenshots": [
-        {
-            "src": "./images/screenshot-mobile.png",
-            "sizes": "320x640",
-            "type": "image/png",
-            "form_factor": "narrow"
-        }
-    ],
     "shortcuts": [
         {
             "name": "🚨 Sprawdź Alerty",
