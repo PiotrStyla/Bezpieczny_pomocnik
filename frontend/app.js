@@ -36,7 +36,8 @@ let markersLayer = null;
 let userLocation = null;
 let userLocationMarker = null;
 let speechEnabled = localStorage.getItem('speech_enabled') !== 'false'; // Default: true
-const API_BASE_URL = window.APP_API_BASE_URL || '/api';
+// Dynamic API base URL getter - reads from window or localStorage at call time
+const getApiBaseUrl = () => window.APP_API_BASE_URL || localStorage.getItem('app_api_base_url') || '/api';
 
 function urlBase64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -114,7 +115,7 @@ async function subscribeUserToPush() {
         const timeout = setTimeout(() => controller.abort(), 5000);
         let res;
         try {
-            res = await fetch(`${API_BASE_URL}/vapid_public_key`, {
+            res = await fetch(`${getApiBaseUrl()}/vapid_public_key`, {
                 cache: 'no-store',
                 signal: controller.signal,
                 credentials: 'same-origin'
@@ -151,7 +152,7 @@ async function subscribeUserToPush() {
 
         let saveRes;
         try {
-            saveRes = await fetch(`${API_BASE_URL}/subscribe`, {
+            saveRes = await fetch(`${getApiBaseUrl()}/subscribe`, {
                 method: 'POST',
                 body: JSON.stringify(subscription),
                 headers: { 'Content-Type': 'application/json' }
