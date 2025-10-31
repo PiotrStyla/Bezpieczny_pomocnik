@@ -70,9 +70,14 @@ self.addEventListener('fetch', event => {
     
     // Skip chrome-extension and other protocols
     if (!event.request.url.startsWith('http')) return;
+
+    // Do not intercept cross-origin requests (e.g., Cloudflare tunnel)
+    const url = new URL(event.request.url);
+    if (url.origin !== self.location.origin) {
+        return;
+    }
     
     // Icon alias mapping to avoid 404s
-    const url = new URL(event.request.url);
     if (url.origin === self.location.origin) {
         if (url.pathname.endsWith('/icon-192.png')) {
             event.respondWith(caches.match('./images/logo_192x192.png').then(r => r || fetch('./images/logo_192x192.png')));
