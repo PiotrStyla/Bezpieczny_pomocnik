@@ -6,4 +6,4 @@ requests==2.31.0
 feedparser==6.0.10
 python-dotenv==1.0.1
 cryptography==42.0.5
-# Deploy fix
+# Author fix
