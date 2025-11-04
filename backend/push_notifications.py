@@ -12,8 +12,8 @@ SUBSCRIPTIONS_FILE = os.path.join(os.path.dirname(__file__), "subscriptions.json
 
 def _load_subscriptions_from_file():
     """Load subscriptions from JSON file if it exists."""
-    if os.path.exists(SUBSCRIPTIONS_FILE):
-        try:
+    try:
+        if os.path.exists(SUBSCRIPTIONS_FILE):
             with open(SUBSCRIPTIONS_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 # Ensure it's a list
@@ -23,9 +23,8 @@ def _load_subscriptions_from_file():
                 else:
                     logging.warning("Subscriptions file is not a list; starting fresh.")
                     return []
-        except Exception as e:
-            logging.error(f"Failed to load subscriptions file: {e}")
-            return []
+    except Exception as e:
+        logging.warning(f"Failed to load subscriptions file (read-only filesystem?): {e}")
     return []
 
 def _save_subscriptions_to_file(subscriptions):
@@ -38,12 +37,19 @@ def _save_subscriptions_to_file(subscriptions):
         os.replace(temp_file, SUBSCRIPTIONS_FILE)
         logging.info(f"Saved {len(subscriptions)} subscriptions to file.")
     except Exception as e:
-        logging.error(f"Failed to save subscriptions file: {e}")
+        logging.warning(f"Failed to save subscriptions file (read-only filesystem?): {e}")
 
 def _ensure_vapid_keys():
     global vapid_public_key, vapid_private_key
     env_pub = (getattr(settings, 'VAPID_PUBLIC_KEY', None) or '').strip()
     env_priv = (getattr(settings, 'VAPID_PRIVATE_KEY', None) or '').strip()
+    
+    # Ignore default placeholder values
+    if env_pub.startswith('Your_') or env_priv.startswith('Your_'):
+        logging.info("Ignoring placeholder VAPID keys from config")
+        env_pub = ''
+        env_priv = ''
+    
     # Allow PEM stored in .env with escaped newlines
     if env_priv:
         env_priv = env_priv.replace('\\n', '\n')
