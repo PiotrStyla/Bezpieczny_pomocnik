@@ -136,9 +136,38 @@ pytest
 
 Zobacz `TESTING-GUIDE.md` dla szczegółowego przewodnika testowania manualnego z dziećmi.
 
-## ☁️ Wdrożenie na Render.com (Zalecane)
+## ☁️ Wdrożenie (Deployment)
 
-Aplikacja jest w pełni przygotowana do wdrożenia na Render.com przy użyciu konfiguracji "Infrastructure as Code".
+### 🚀 Vercel + GitHub Pages (Recommended) ⭐
+
+**Architektura split deployment:**
+- **Frontend**: GitHub Pages (hosting statyczny, darmowy)
+- **Backend**: Vercel (serverless functions, darmowy tier)
+
+**Zalety:**
+- ✅ Zawsze dostępne (24/7)
+- ✅ Auto-skalowanie serverless
+- ✅ Zerowe koszty utrzymania (darmowe tiery)
+- ✅ Automatyczny HTTPS
+- ✅ Globalny CDN
+
+**📖 Szczegółowa dokumentacja:** Zobacz [DEPLOYMENT.md](DEPLOYMENT.md) dla pełnego przewodnika wdrożenia.
+
+**Szybki start:**
+1. Deploy backend na Vercel (import z GitHub)
+2. Włącz GitHub Pages (Settings → Pages → `/frontend`)
+3. Skonfiguruj API URL w `frontend/app.js`
+4. Gotowe! 🎉
+
+**Demo:** 
+- Frontend: https://piotrstyla.github.io/Bezpieczny_pomocnik/frontend/
+- Backend API: https://pomocnikapp.vercel.app/api/
+
+---
+
+### 🐳 Render.com (Alternatywa)
+
+Aplikacja jest także przygotowana do wdrożenia na Render.com przy użyciu konfiguracji "Infrastructure as Code".
 
 1.  **Załóż konto** na [Render.com](https://render.com/) i połącz je ze swoim kontem GitHub.
 2.  W panelu Render kliknij **"New +"** i wybierz **"Blueprint"**.
