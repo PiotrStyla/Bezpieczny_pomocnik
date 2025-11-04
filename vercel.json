@@ -1,9 +1,11 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/index.py", "use": "@vercel/python" }
+    { "src": "api/index.py", "use": "@vercel/python" },
+    { "src": "api/vapid.py", "use": "@vercel/python" }
   ],
   "routes": [
+    { "src": "/api/vapid_public_key", "dest": "/api/vapid.py" },
     { "src": "/api/(.*)", "dest": "/api/index.py" }
   ]
 }
