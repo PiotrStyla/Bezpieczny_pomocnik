@@ -1830,6 +1830,8 @@ if ('serviceWorker' in navigator) {
                 console.log('?? Push notifications not set up - using background sync instead');
             } else {
                 console.log('? Push notifications active - full background alerts available');
+                // Auto-resubscribe to backend (in case of backend restart)
+                autoResubscribeToBackend(subscription);
             }
         })
         .catch(error => {
@@ -1894,6 +1896,36 @@ function setupManualBackgroundSync(registration) {
                 .catch(err => console.warn('Periodic background sync failed:', err));
         }
     }, 10 * 60 * 1000); // Every 10 minutes as backup
+}
+
+/**
+ * 🔄 AUTO-RESUBSCRIBE TO BACKEND
+ * Automatically re-register push subscription with backend on app load
+ * This ensures notifications work even after backend restarts (Vercel cold starts)
+ */
+async function autoResubscribeToBackend(subscription) {
+    if (!subscription) return;
+    
+    try {
+        console.log('[Push] Auto-resubscribe: Sending subscription to backend...');
+        
+        const response = await fetch(`${getApiBaseUrl()}/subscribe`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(subscription)
+        });
+        
+        if (response.ok) {
+            console.log('[Push] ✅ Auto-resubscribe successful - backend notified');
+        } else {
+            console.warn('[Push] ⚠️ Auto-resubscribe failed:', response.status);
+        }
+    } catch (error) {
+        // Fail silently - user doesn't need to know about this background operation
+        console.warn('[Push] Auto-resubscribe error (backend may be starting):', error.message);
+    }
 }
 
 /**
