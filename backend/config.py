@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, Field
+from pydantic_settings import BaseSettings
+from pydantic import Field
 from typing import List, Dict, Any, Optional
 import logging
 from .poland_locations import get_all_poland_sources, get_relevant_sources_for_location
