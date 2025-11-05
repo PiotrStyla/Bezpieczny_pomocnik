@@ -1,6 +1,11 @@
-/*
+/**
  * Bezpieczny Pomocnik - Child Safety Application
- * Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Kr�lowej Aposto��w w Krakowie
+ * 
+ * Foundation Approval License 1.0
+ * ANY USE REQUIRES FOUNDATION PERMISSION
+ * Contact: kontakt@fundacja-hospicjum.org
+ * 
+ * Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
  */
 
 console.log('?? APP.JS LOADING...');

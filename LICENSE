@@ -1,12 +1,11 @@
-PROPRIETARY LICENSE
+Foundation Approval License 1.0
 
 Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
-All Rights Reserved.
+All rights reserved.
 
 ================================================================================
 
-This software application "Bezpieczny Pomocnik" (Safety Helper) and all associated
-documentation, code, graphics, and other materials are the exclusive property of:
+This software application "Bezpieczny Pomocnik" (Safety Helper) is owned by:
 
     Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
     30-404 Kraków, ul. Cegielniana 6B/45
@@ -16,36 +15,71 @@ documentation, code, graphics, and other materials are the exclusive property of
     KRS: 0001063161
     NIP: 6793279476  
     REGON: 526664276
+    🔗 https://fundacja-hospicjum.org
 
 ================================================================================
 
-TERMS AND CONDITIONS:
+PERMISSIONS GRANTED (OPEN DEVELOPMENT):
+✓ View source code for educational and learning purposes
+✓ Submit contributions and improvements to the main repository
+✓ Fork for development, testing, and personal experimentation
+✓ Report issues and suggest features
+✓ Study the code for research and academic purposes
+✓ Learn from the implementation for personal development
 
-1. OWNERSHIP: All intellectual property rights, including but not limited to
-   copyrights, trademarks, patents, and trade secrets in this software are
-   owned exclusively by Fundacja na rzecz Hospicjum Maryi Królowej Apostołów
-   w Krakowie.
-
-2. RESTRICTIONS: No person or entity may, without prior written permission
-   from the Foundation:
-   - Copy, modify, distribute, or create derivative works
-   - Reverse engineer, decompile, or disassemble the software
-   - Use the software for commercial purposes
-   - Remove or alter any copyright notices
-
-3. CONFIDENTIALITY: This software contains proprietary and confidential
-   information. Any unauthorized disclosure is strictly prohibited.
-
-4. LIABILITY: The Foundation provides this software "as is" without warranty
-   of any kind. The Foundation shall not be liable for any damages arising
-   from the use of this software.
-
-5. TERMINATION: Any unauthorized use will result in immediate termination
-   of any implied license and may result in legal action.
-
-For licensing inquiries, please contact: kontakt@fundacja-hospicjum.org
+RESTRICTIONS (FOUNDATION APPROVAL REQUIRED):
+❌ ANY deployment or production use requires explicit written permission from the Foundation
+❌ Redistribution of the software or any derivatives without Foundation approval
+❌ Commercial use without separate commercial agreement with the Foundation
+❌ Using the software in any service, product, or platform without permission
+❌ Removing or modifying this license notice
+❌ Implying Foundation endorsement without explicit approval
 
 ================================================================================
 
-Bezpieczny Pomocnik - Created with ❤️ for children's safety
+HOW TO REQUEST USE PERMISSION:
+
+📧 Email: kontakt@fundacja-hospicjum.org
+📋 Please include in your request:
+   - Your organization name and contact information
+   - Intended use case and deployment scope
+   - Target audience and geographic region
+   - Expected timeline for implementation
+   - Any modifications or customizations planned
+
+FOUNDATION APPROVAL PROCESS:
+1. Submit request via email with required information
+2. Foundation review (typically 3-5 business days)
+3. Response with approval, conditions, or denial
+4. If approved, separate usage agreement will be provided
+5. Commercial users will receive commercial license terms
+
+COMMERCIAL LICENSE OPTIONS:
+Custom commercial licenses are available for:
+- Enterprise deployments
+- Commercial service integration
+- White-label solutions
+- Priority support and maintenance
+- Custom development and modifications
+
+================================================================================
+
+LEGAL DISCLAIMER:
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+FOUNDATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+The Foundation reserves the right to approve or deny any use request at its
+sole discretion and to modify these terms without notice.
+
+================================================================================
+
+Bezpieczny Pomocnik - Open for Learning, Protected for Use
+Created with ❤️ for children's safety
 www.fundacja-hospicjum.org
+
+For questions about licensing or use permissions: kontakt@fundacja-hospicjum.org

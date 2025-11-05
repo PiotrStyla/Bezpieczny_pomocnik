@@ -31,13 +31,43 @@ Bezpieczny Pomocnik is a comprehensive child safety application designed to help
 - **NIP:** 6793279476  
 - **REGON:** 526664276
 
-## 🔒 **License**
+## 📄 **Licensing & Use**
 
-This software is proprietary and confidential. All rights are reserved by Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie. 
+**Important:** This software requires Foundation approval for any use.
 
-**Unauthorized copying, distribution, modification, or use is strictly prohibited.**
+### 🔍 **Open Development**
+- ✅ **Source code visibility** - educational and learning purposes
+- ✅ **Community contributions** - submit improvements and fixes
+- ✅ **Development forks** - for testing and personal experimentation
+- ✅ **Academic research** - study implementation for research
+- ✅ **Issue reporting** - help improve the software
 
-For licensing inquiries, please contact: kontakt@fundacja-hospicjum.org
+### 🛡️ **Use Requires Foundation Approval**
+- ❌ **No automatic deployment rights** - production use needs permission
+- ❌ **No redistribution permission** - cannot share without approval
+- ❌ **No commercial use** - requires separate commercial agreement
+- ❌ **No service integration** - platform use requires explicit consent
+
+### 📋 **Request Use Permission**
+**Contact:** 📧 kontakt@fundacja-hospicjum.org  
+**Include in your request:**
+- Your organization name and contact information
+- Intended use case and deployment scope
+- Target audience and geographic region
+- Expected timeline for implementation
+- Any modifications or customizations planned
+
+**Response time:** Usually within 3-5 business days
+
+### 💼 **Commercial Options**
+Custom commercial licenses available for:
+- Enterprise deployments
+- Commercial service integration
+- White-label solutions
+- Priority support and maintenance
+- Custom development and modifications
+
+**📄 Full License:** [View Foundation Approval License 1.0](LICENSE)
 
 ## 🛡️ **Security**
 
