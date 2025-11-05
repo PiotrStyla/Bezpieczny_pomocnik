@@ -17,11 +17,30 @@ const DATA_VERSIONS = {
 };
 
 /**
+ * 🛡️ SYNC GUARD - Prevents overlapping syncs
+ */
+let syncInProgress = false;
+const SYNC_TIMEOUT = 10000; // 10 seconds max per sync
+
+/**
  * 🔄 SYNC FROM PARENT CMS
  * Checks for updates and syncs new data
  */
 async function syncFromParentCMS() {
+    // 🛡️ PREVENT OVERLAPPING SYNCS
+    if (syncInProgress) {
+        console.log('⏭️ Sync already in progress, skipping...');
+        return { skipped: true, reason: 'Sync already running' };
+    }
+    
+    syncInProgress = true;
     console.log('🔄 Starting sync from Parent CMS...');
+    
+    // ⏱️ SYNC TIMEOUT PROTECTION
+    const syncTimeout = setTimeout(() => {
+        console.warn('⚠️ Sync timeout - taking too long!');
+        syncInProgress = false;
+    }, SYNC_TIMEOUT);
     
     const syncResults = {
         updated: [],
@@ -71,10 +90,14 @@ async function syncFromParentCMS() {
         }
         
         console.log('✅ Sync complete:', syncResults);
+        clearTimeout(syncTimeout);
+        syncInProgress = false;
         return syncResults;
         
     } catch (error) {
         console.error('❌ Sync failed:', error);
+        clearTimeout(syncTimeout);
+        syncInProgress = false;
         return { error: error.message, syncResults };
     }
 }
