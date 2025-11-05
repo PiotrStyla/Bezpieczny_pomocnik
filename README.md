@@ -2,6 +2,33 @@
 
 **Created with ❤️ for children's safety by Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**
 
+[![GitHub contributors](https://img.shields.io/github/contributors/PiotrStyla/Bezpieczny_pomocnik)](https://github.com/PiotrStyla/Bezpieczny_pomocnik/graphs/contributors)
+[![GitHub issues](https://img.shields.io/github/issues/PiotrStyla/Bezpieczny_pomocnik)](https://github.com/PiotrStyla/Bezpieczny_pomocnik/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/PiotrStyla/Bezpieczny_pomocnik)](https://github.com/PiotrStyla/Bezpieczny_pomocnik/pulls)
+[![License](https://img.shields.io/badge/license-Foundation%20Approval%20License-blue)](LICENSE)
+
+---
+
+## 🚀 **Quick Start for Developers**
+
+Want to contribute? **It's easy!** 
+
+```bash
+# 1. Fork and clone
+git clone https://github.com/YOUR-USERNAME/Bezpieczny_pomocnik.git
+cd Bezpieczny_pomocnik
+
+# 2. Start developing
+# Frontend: Open frontend/index.html in browser
+# Backend: cd backend && python -m uvicorn main:app --reload
+
+# 3. Make your contribution! 🎉
+```
+
+📖 **[Contributing Guide](CONTRIBUTING.md)** - Everything you need to know  
+🐛 **[Report Bug](https://github.com/PiotrStyla/Bezpieczny_pomocnik/issues/new?template=bug_report.md)** - Found something broken?  
+💡 **[Suggest Feature](https://github.com/PiotrStyla/Bezpieczny_pomocnik/issues/new?template=feature_request.md)** - Have an idea?  
+
 ---
 
 ## 📋 **About**
@@ -14,6 +41,29 @@ Bezpieczny Pomocnik is a comprehensive child safety application designed to help
 - 📞 **Emergency contact system** with smart calling
 - 🗺️ **Location-based alerts** and mapping
 - 👶 **Child-friendly interface** with mascot interactions
+
+---
+
+## 🤝 **Contributing to Child Safety**
+
+We welcome developers, designers, testers, and anyone passionate about child safety! 
+
+### 🎯 **Areas Where We Need Help**
+- 🎨 **Frontend:** UI/UX improvements, accessibility, animations
+- ⚡ **Backend:** API optimization, new alert sources, performance
+- 📱 **Mobile:** PWA features, offline capabilities, push notifications
+- 🌍 **Internationalization:** More languages, localization
+- 🧪 **Testing:** Unit tests, integration tests, user testing
+- 📚 **Documentation:** Guides, API docs, tutorials
+
+### 🏆 **Contributor Recognition**
+- 🐛 **Bug Hunter** - Found and reported critical bugs
+- 💡 **Feature Pioneer** - Suggested implemented features
+- 🔧 **Code Champion** - Significant code contributions
+- 🌍 **Global Guardian** - Localization contributions
+- 📚 **Doc Master** - Documentation improvements
+
+**All contributors are acknowledged in our releases and documentation!**
 
 ## 🏛️ **Copyright & Ownership**
 

@@ -1,0 +1,50 @@
+name: Welcome New Contributors
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Welcome
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const user = context.payload.pull_request.user.login;
+            
+            const message = `🎉 **Welcome to Bezpieczny Pomocnik, @${user}!** 
+
+Thank you for your first contribution to help keep children safe in Poland! 🛡️
+
+### 🚀 **Next Steps:**
+1. **Review the [Contributing Guide](https://github.com/${owner}/${repo}/blob/main/CONTRIBUTING.md)** - Everything you need to know
+2. **Check your pull request** - Ensure tests pass and documentation is updated
+3. **Join our community** - We're excited to have you!
+
+### 🏆 **Recognition:**
+Your contribution will be acknowledged in:
+- 📋 README.md contributor section
+- 📢 Release notes
+- 🏅 Special contributor badge
+
+### 💬 **Questions?**
+- 📧 Email: kontakt@fundacja-hospicjum.org
+- 💬 Create an [issue](https://github.com/${owner}/${repo}/issues/new?assignees=&labels=question&template=question.md)
+- 📖 Check our [Development Guide](https://github.com/${owner}/${repo}/blob/main/DEVELOPMENT.md)
+
+**Every contribution helps make children safer!** ❤️
+
+---
+
+The Foundation Hospicjum Team`;
+
+            github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body: message
+            });
