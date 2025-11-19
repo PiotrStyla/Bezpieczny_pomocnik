@@ -33,14 +33,19 @@ cd Bezpieczny_pomocnik
 
 ## 📋 **About**
 
-Bezpieczny Pomocnik is a comprehensive child safety application designed to help children and parents stay informed about weather alerts and safety warnings across Poland. The application features:
+Bezpieczny Pomocnik is a progressive web application (PWA) designed specifically for **children aged 5–16** and their caregivers.
+It helps them understand **weather and safety alerts across Poland** in clear, age‑appropriate language.
 
-- 🌦️ **Real-time weather alerts and safety warnings**
-- 🗣️ **Multilingual text-to-speech** (Polish, English, Ukrainian)
-- 🎯 **Interactive safety education** for children
-- 📞 **Emergency contact system** with smart calling
-- 🗺️ **Location-based alerts** and mapping
-- 👶 **Child-friendly interface** with mascot interactions
+**Key capabilities:**
+
+- 🌦️ **Multi‑source alert aggregation** from national and local sources (see `backend/data_sources.py`, `poland_locations.py`)
+- 🎯 **AI‑powered simplification** of official alerts into child‑friendly messages (`backend/ai_processor.py`)
+- 🗣️ **Voice guidance** via Web Speech API with child‑appropriate Polish voices
+- 🗺️ **Map‑based view** of alerts with location filtering
+- 📲 **PWA & offline mode** – service worker, emergency cache, works when the internet is down
+- 🔔 **Push notifications** for new critical alerts
+- 👨‍👩‍👧‍👦 **Parent CMS & child profiles** with parental consent flows (RODO Art. 8)
+- 🔒 **Zero‑knowledge, encrypted storage** of sensitive data in the browser (no child profiles on the server)
 
 ---
 
@@ -134,41 +139,114 @@ Our mission is to provide innovative technology solutions that enhance child saf
 
 ## ✨ Kluczowe Funkcjonalności
 
-- **Agregacja Danych**: Pobiera alerty z oficjalnych źródeł (RCB) oraz stron miejskich (Warszawa, Kraków, Lublin, Białystok).
-- **Przetwarzanie AI**: Upraszcza komunikaty i generuje porady przy użyciu API OpenAI.
-- **Wielojęzyczność**: Obsługuje języki polski, angielski i ukraiński (PL/EN/UA).
-- **Powiadomienia Push**: Proaktywnie informuje użytkowników o nowych zagrożeniach, przechowując subskrypcje w trwałej bazie danych.
-- **Interfejs PWA**: Działa jako aplikacja instalowalna, z obsługą trybu offline i interaktywną mapą.
-- **Wydajność i Stabilność**: Wyniki API są cachowane, a zadania w tle zarządzane przez niezawodny harmonogram.
+### 🛰️ System alertów bezpieczeństwa
+
+- Agregacja alertów z wielu źródeł rządowych i lokalnych (`backend/data_sources.py`, `poland_locations.py`)
+- Punktowy **Alert Classifier** (`frontend/alert-classifier.js`) – bezpieczniejsza klasyfikacja niż proste `if/else`
+- Filtrowanie po lokalizacji (GPS, źródła wojewódzkie/miastowe)
+- Upraszczanie treści i generowanie porad przy użyciu modułu AI (`backend/ai_processor.py`)
+
+### 🧒 Interfejs przyjazny dzieciom
+
+- Teksty pisane z myślą o dzieciach 5–16 lat
+- Prosty, kontrastowy interfejs z dużymi przyciskami
+- Głosowe odczytywanie komunikatów (Web Speech API, dobór profesjonalnego głosu edukacyjnego)
+- Wielojęzyczność: **PL / EN / UA**
+
+### 🔐 Zgoda rodzicielska i prywatność (RODO Art. 8)
+
+- Moduł **Parental Consent** (`frontend/parental-consent.js`):
+  - rozmycie aplikacji do czasu uzyskania zgody
+  - tworzenie profilu dziecka po stronie rodzica
+- **Mina ZK‑Parental Storage** (`frontend/mina-parental-zk.js`):
+  - profile dzieci przechowywane w zaszyfrowanym ZK‑storage w przeglądarce
+- **Enhanced Security ZK Storage** (`frontend/enhanced-security-zk.js`, `web-crypto-security.js`):
+  - szyfrowanie AES‑256‑GCM, klucze per‑urządzenie
+  - brak serwerowego przechowywania danych dziecka
+
+### 👨‍👩‍👧 Parent CMS i Real Sync
+
+- **Parent CMS** (`frontend/parent-cms.html`, `parent-cms.js`):
+  - edycja komunikatów i „safety tips” dla konkretnego dziecka
+  - zarządzanie profilami dzieci (`zk_family_children_profiles`)
+- **Real Sync System** (`frontend/real-sync-system.js`):
+  - wersjonowanie danych (DATA_VERSIONS)
+  - bezpieczna, cykliczna synchronizacja danych rodzic → aplikacja dziecka
+  - ochrona przed nakładającymi się syncami i pętlami nieskończonymi
+
+### 🚨 Tryb awaryjny i PWA
+
+- Service Worker (`frontend/sw.js`):
+  - awaryjny cache numerów alarmowych i kluczowych instrukcji
+  - działanie w trybie offline
+- **Emergency Survival Mode** (`frontend/emergency-survival-mode.js`):
+  - optymalizacja zużycia baterii w sytuacjach kryzysowych
+- **Emergency Mina Integration** (`frontend/emergency-mina-integration.js`):
+  - przygotowany interfejs pod lekką synchronizację blockchain (22 KB)
+
+### 🔔 Powiadomienia Push
+
+- Backend (`backend/push_notifications.py`, `api/vapid.py`):
+  - generowanie / ładowanie kluczy VAPID
+  - przechowywanie subskrypcji w pliku `backend/subscriptions.json`
+- Frontend (`frontend/app.js`):
+  - przycisk „Włącz powiadomienia”
+  - integracja z Push API i Service Workerem
 
 ## 🏗 Architektura i Struktura Projektu
 
-Aplikacja jest monorepo, które zawiera backend i frontend. Backend (FastAPI) jest skonfigurowany tak, aby serwować również statyczne pliki frontendu, co upraszcza wdrożenie.
+Repozytorium jest monorepo z **frontendem (PWA)** i **backendem (FastAPI)**.
+
+### Produkcyjna architektura (split deployment)
+
+- **Frontend (PWA)** – GitHub Pages
+  - URL: `https://piotrstyla.github.io/Bezpieczny_pomocnik/frontend/`
+  - statyczne pliki: `frontend/index.html`, `style.css`, `app.js`, `sw.js`, `manifest.json`
+
+- **Backend (API)** – Vercel serverless
+  - URL bazowy: `https://pomocnikapp.vercel.app/api/`
+  - przykładowe endpointy:
+    - `GET /api/alerts` – aktualne alerty
+    - `GET /api/alerts/location` – alerty dla współrzędnych (lat, lon)
+    - `GET /api/vapid_public_key` – klucz publiczny VAPID
+    - `POST /api/subscribe` – zapis subskrypcji push
+    - `GET /api/coverage` – informacje o pokryciu źródeł
+    - `GET /api/ai-config` – konfiguracja funkcji AI
+    - `POST /api/audit/parental-consent` – audyt zgody rodzicielskiej (anonimowy)
+
+### Struktura katalogów (skrót)
 
 ```
 .
-├── .github/workflows/
-│   └── ci.yml              # Automatyczne testy (CI/CD)
 ├── backend/
 │   ├── tests/
-│   ├── data/               # Folder na trwałe dane (np. baza subskrypcji)
-│   ├── ai_processor.py
-│   ├── config.py
-│   ├── data_sources.py
-│   ├── main.py
-│   ├── push_notifications.py
-│   ├── schema.py
+│   ├── ai_processor.py        # Upraszczanie treści + porady
+│   ├── config.py              # Konfiguracja (Pydantic Settings)
+│   ├── data_sources.py        # Integracje z RCB/IMGW/miastami
+│   ├── main.py                # FastAPI + harmonogram alertów
+│   ├── poland_locations.py    # Mapowanie źródeł na lokalizacje
+│   ├── push_notifications.py  # Web Push (VAPID, pywebpush)
+│   ├── schema.py              # Modele Pydantic
 │   └── requirements.txt
 ├── frontend/
-│   ├── index.html
-│   ├── style.css
-│   ├── app.js
-│   ├── sw.js
+│   ├── index.html             # Główna aplikacja dziecka
+│   ├── style.css              # UI/UX
+│   ├── app.js                 # Logika alertów, mapa, push
+│   ├── sw.js                  # Service Worker / PWA / offline
+│   ├── parent-cms.html/js     # Panel rodzica i zarządzanie treściami
+│   ├── parental-consent.js    # Zgoda rodzicielska
+│   ├── mina-parental-zk.js    # ZK storage dla profili dzieci
+│   ├── enhanced-security-zk.js
+│   ├── web-crypto-security.js # AES-256-GCM w przeglądarce
+│   ├── real-sync-system.js    # Synchronizacja Parent CMS → appka dziecka
+│   ├── emergency-*.js         # Tryby awaryjne (survival, Mina integration)
 │   └── manifest.json
-├── .env.example            # Szablon zmiennych środowiskowych
-├── Procfile                # Konfiguracja dla Heroku (alternatywa)
-├── render.yaml             # Konfiguracja "Infrastruktura jako Kod" dla Render.com
-└── runtime.txt             # Wersja Pythona
+├── api/
+│   ├── index.py               # Wejście dla Vercel (FastAPI)
+│   └── vapid.py               # Lekkie endpointy do klucza VAPID i subskrypcji
+├── .env.example               # Szablon zmiennych środowiskowych
+├── DEPLOYMENT.md              # Szczegóły wdrożenia (Vercel + GitHub Pages)
+└── render.yaml                # Alternatywna konfiguracja dla Render.com
 ```
 
 ## 🚀 Uruchomienie Lokalnie
