@@ -49,6 +49,18 @@ It helps them understand **weather and safety alerts across Poland** in clear, a
 
 ---
 
+## 🖼️ Screenshots
+
+**Child app – safety map and actions**
+
+![Bezpieczny Pomocnik – child app view](docs/screenshots/child-app.png)
+
+**Parent CMS – safety message creator for children**
+
+![Parent CMS – komunikaty bezpieczeństwa dla dzieci](docs/screenshots/parent-cms.png)
+
+---
+
 ## 🤝 **Contributing to Child Safety**
 
 We welcome developers, designers, testers, and anyone passionate about child safety! 
