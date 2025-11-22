@@ -1,0 +1,157 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2024-09-19",
+  "emergencyContacts": {
+    "112": {
+      "name": "Numer Alarmowy",
+      "icon": "📞",
+      "description": "Główny numer ratunkowy w Polsce",
+      "whenToCall": "W każdej sytuacji zagrożenia życia"
+    },
+    "997": {
+      "name": "Policja", 
+      "icon": "👮",
+      "description": "Pomoc policji",
+      "whenToCall": "Gdy ktoś cię krzywdzi lub jest niebezpiecznie"
+    },
+    "998": {
+      "name": "Straż Pożarna",
+      "icon": "🚒", 
+      "description": "Pomoc przy pożarach",
+      "whenToCall": "Gdy widzisz ogień lub dym"
+    },
+    "999": {
+      "name": "Pogotowie Ratunkowe",
+      "icon": "🚑",
+      "description": "Pomoc medyczna",
+      "whenToCall": "Gdy ktoś jest ranny lub chory"
+    }
+  },
+  
+  "offlineInstructions": {
+    "earthquake": {
+      "title": "🌍 Trzęsienie Ziemi",
+      "immediate": [
+        "🛡️ KUCNIJ - upuść się na kolana",
+        "🏠 SCHOWAJ SIĘ - pod stół lub biurko", 
+        "✋ TRZYMAJ - mocno trzymaj się mebla",
+        "⏰ CZEKAJ - aż przestanie się trząść"
+      ],
+      "after": [
+        "👀 Sprawdź czy nie jesteś ranny",
+        "👨‍👩‍👧‍👦 Znajdź rodzinę",
+        "🚪 Wyjdź ostrożnie z budynku",
+        "🚫 Nie używaj wind!"
+      ],
+      "kidsFriendly": "Ziemia się trzęsie jak wielki olbrzym. Schowaj się pod stół jak mała żółwik w skorupce!"
+    },
+    
+    "fire": {
+      "title": "🔥 Pożar",
+      "immediate": [
+        "🚨 KRZYCZ 'POŻAR!' głośno",
+        "🚪 Dotknij drzwi - czy są gorące?",
+        "🐍 Czołgaj się nisko pod dymem", 
+        "🏃‍♂️ Wyjdź najkrótszą drogą"
+      ],
+      "if_trapped": [
+        "🚪 Zamknij drzwi między tobą a ogniem",
+        "💧 Zatka szczeliny mokrymi ręcznikami",
+        "🪟 Idź do okna i wzywaj pomocy",
+        "📞 Zadzwoń 998 lub 112"
+      ],
+      "kidsFriendly": "Ogień to nie zabawka! Gdy widzisz ogień - biegaj jak szybka mysz, bardzo nisko przy ziemi!"
+    },
+    
+    "flood": {
+      "title": "🌊 Powódź",
+      "immediate": [
+        "⬆️ IDŹ WYŻEJ - na piętro lub wzgórze",
+        "🚫 NIE WCHODŹ do wody",
+        "📱 Zabierz telefon i latarkę",
+        "👨‍👩‍👧‍👦 Zostań z rodziną"
+      ],
+      "avoid": [
+        "🚗 Nie jedź przez zalane drogi",
+        "🌊 Nie próbuj przejść przez wodę",
+        "⚡ Unikaj przewodów elektrycznych",
+        "🏠 Nie zostań w piwnicy"
+      ],
+      "kidsFriendly": "Woda robi się niegrzeczna i wchodzi gdzie nie powinna. Wspinaj się wysoko jak kotek na drzewo!"
+    },
+    
+    "storm": {
+      "title": "⛈️ Burza",
+      "immediate": [
+        "🏠 ZOSTAŃ W DOMU",
+        "🪟 Zamknij okna i drzwi",
+        "⚡ Odłącz urządzenia elektryczne",
+        "📻 Słuchaj radia lub TV"
+      ],
+      "outside": [
+        "🌳 Unikaj drzew i słupów",
+        "🚗 Nie chowaj się pod wiaduktem",
+        "📱 Nie używaj telefonu na zewnątrz", 
+        "🏃‍♂️ Biegnij do najbliższego budynku"
+      ],
+      "kidsFriendly": "Na niebie są gniewne chmury! Schowaj się w domu jak mały zajączek w norce!"
+    }
+  },
+  
+  "calming": {
+    "breathingExercise": {
+      "title": "🫁 Spokojny Oddech",
+      "steps": [
+        "1️⃣ Wdech przez nos (4 sekundy)",
+        "2️⃣ Zatrzymaj oddech (4 sekundy)", 
+        "3️⃣ Wydech przez usta (6 sekund)",
+        "🔄 Powtórz 5 razy"
+      ],
+      "kidVersion": "Oddychaj jak śpiący miś: powoli i spokojnie. Wdech... wydech... już lepiej!"
+    },
+    
+    "grounding": {
+      "title": "🌍 Technika 5-4-3-2-1", 
+      "steps": [
+        "👀 5 rzeczy które WIDZISZ",
+        "✋ 4 rzeczy których możesz DOTKNĄĆ",
+        "👂 3 rzeczy które SŁYSZYSZ", 
+        "👃 2 rzeczy które PACHNĄ",
+        "👅 1 rzecz którą możesz POSMAKOWAĆ"
+      ],
+      "kidVersion": "Bądź detektywem! Znajdź 5 kolorów, dotknij 4 rzeczy, posłuchaj 3 dźwięków!"
+    }
+  },
+  
+  "heroes": {
+    "wicher": {
+      "name": "Wicher",
+      "specialty": "Burze i wiatry",
+      "phrase": "Hej! Widzę że jest burza. Nie martw się, pokażę ci co robić!",
+      "advice": "Podczas burzy zostań w domu jak ja w mojej chmurce!"
+    },
+    
+    "kropla": {
+      "name": "Kropla", 
+      "specialty": "Woda i powodzie",
+      "phrase": "Cześć! Jestem Kropla. Woda może być niebezpieczna, ale razem damy radę!",
+      "advice": "Gdy jest powódź, idź wysoko jak ja gdy wpadam do chmurki!"
+    },
+    
+    "plomyk": {
+      "name": "Płomyk",
+      "specialty": "Pożary",
+      "phrase": "Płomyk tu! Ogień to nie zabawka. Pokażę ci jak być bezpiecznym!",
+      "advice": "Gdy widzisz ogień, wyjdź szybko ale ostrożnie, tak jak ja gasząc się!"
+    }
+  },
+  
+  "offlineMessages": {
+    "noInternet": "📵 Brak internetu, ale aplikacja nadal ci pomoże!",
+    "emergencyMode": "🚨 Tryb awaryjny aktywny - wszystkie ważne informacje są dostępne offline",
+    "dataStale": "⚠️ Dane mogą być nieaktualne. Sprawdź radio lub TV gdy internet wróci.",
+    "callEmergency": "📞 W nagłych przypadkach zawsze dzwoń 112!",
+    "stayCalm": "😌 Zostań spokojny. Aplikacja ma wszystkie informacje których potrzebujesz.",
+    "findAdult": "👨‍👩‍👧‍👦 Znajdź dorosłego który ci pomoże."
+  }
+}

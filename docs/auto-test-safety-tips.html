@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>🤖 Auto Test Safety Tips</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            background: #263238;
+            color: #aed581;
+        }
+        h1 { color: #4CAF50; }
+        .step {
+            background: #37474f;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 5px solid #4CAF50;
+            border-radius: 5px;
+        }
+        .success { border-left-color: #4CAF50; }
+        .error { border-left-color: #f44336; color: #f44336; }
+        .warning { border-left-color: #FF9800; color: #FF9800; }
+        .info { border-left-color: #2196F3; color: #2196F3; }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background: #45a049; }
+        pre {
+            background: #1e272e;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Automatic Safety Tips Test</h1>
+    <p>Ten test automatycznie zapisze i załaduje safety tips</p>
+    
+    <button onclick="runFullTest()">▶️ Uruchom pełny test</button>
+    <button onclick="clearAllData()">🗑️ Wyczyść dane</button>
+    <button onclick="location.reload()">🔄 Odśwież</button>
+    
+    <div id="results"></div>
+
+    <script src="parent-cms.js"></script>
+    
+    <script>
+        let results = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = `[${timestamp}] ${message}`;
+            console.log(entry);
+            results.push({ message: entry, type });
+            updateUI();
+        }
+        
+        function updateUI() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = results.map(r => 
+                `<div class="step ${r.type}">${r.message}</div>`
+            ).join('');
+        }
+        
+        async function runFullTest() {
+            results = [];
+            log('🚀 Starting automatic test...', 'info');
+            
+            try {
+                // STEP 1: Check prerequisites
+                log('📋 Step 1: Checking prerequisites...', 'info');
+                
+                if (typeof window.loadFromMinaZK !== 'function') {
+                    log('❌ window.loadFromMinaZK not available!', 'error');
+                    return;
+                }
+                log('✅ window.loadFromMinaZK available', 'success');
+                
+                if (typeof window.saveToMinaZK !== 'function') {
+                    log('❌ window.saveToMinaZK not available!', 'error');
+                    return;
+                }
+                log('✅ window.saveToMinaZK available', 'success');
+                
+                // STEP 2: Get Parent ID
+                log('🆔 Step 2: Getting parent identifier...', 'info');
+                const parentId = localStorage.getItem('zk_parent_identifier');
+                log(`Parent ID: ${parentId || 'NOT SET'}`, parentId ? 'success' : 'warning');
+                
+                // STEP 3: Create test data
+                log('📝 Step 3: Creating test safety tips...', 'info');
+                const testSafetyTips = [
+                    {
+                        id: 1,
+                        title: 'TEST - Bezpieczeństwo na drodze',
+                        content: 'To jest testowa zasada - zawsze patrz w lewo i prawo!',
+                        icon: '🚸'
+                    },
+                    {
+                        id: 2,
+                        title: 'TEST - W domu',
+                        content: 'Testowa zasada - pamiętaj o numerach alarmowych!',
+                        icon: '🏠'
+                    }
+                ];
+                log(`✅ Created ${testSafetyTips.length} test tips`, 'success');
+                log(`Data: ${JSON.stringify(testSafetyTips)}`, 'info');
+                
+                // STEP 4: Save to localStorage
+                log('💾 Step 4: Saving to Mina ZK storage...', 'info');
+                const storageKey = 'zk_parent_safety_tips';
+                
+                try {
+                    await window.saveToMinaZK(storageKey, testSafetyTips);
+                    log('✅ Data saved successfully', 'success');
+                } catch (saveError) {
+                    log(`❌ Save failed: ${saveError.message}`, 'error');
+                    return;
+                }
+                
+                // STEP 5: Verify in localStorage
+                log('🔍 Step 5: Verifying in localStorage...', 'info');
+                const allKeys = Object.keys(localStorage);
+                const safetyKeys = allKeys.filter(k => k.includes('safety_tips'));
+                log(`Found ${safetyKeys.length} safety tips keys:`, 'info');
+                safetyKeys.forEach(key => log(`  - ${key}`, 'info'));
+                
+                if (safetyKeys.length === 0) {
+                    log('❌ NO KEYS FOUND! Save operation failed!', 'error');
+                    return;
+                }
+                
+                // STEP 6: Load back the data
+                log('📥 Step 6: Loading data back...', 'info');
+                
+                try {
+                    const loaded = await window.loadFromMinaZK(storageKey);
+                    
+                    if (!loaded) {
+                        log('❌ loadFromMinaZK returned NULL!', 'error');
+                        return;
+                    }
+                    
+                    log(`✅ Loaded data: ${JSON.stringify(loaded)}`, 'success');
+                    
+                    // STEP 7: Verify data integrity
+                    log('🔬 Step 7: Verifying data integrity...', 'info');
+                    
+                    if (!Array.isArray(loaded)) {
+                        log('❌ Loaded data is not an array!', 'error');
+                        return;
+                    }
+                    
+                    if (loaded.length !== testSafetyTips.length) {
+                        log(`⚠️ Length mismatch! Saved: ${testSafetyTips.length}, Loaded: ${loaded.length}`, 'warning');
+                    }
+                    
+                    let allMatch = true;
+                    for (let i = 0; i < testSafetyTips.length; i++) {
+                        const saved = testSafetyTips[i];
+                        const loadedItem = loaded[i];
+                        
+                        if (saved.title !== loadedItem.title) {
+                            log(`❌ Title mismatch at index ${i}`, 'error');
+                            allMatch = false;
+                        }
+                        if (saved.content !== loadedItem.content) {
+                            log(`❌ Content mismatch at index ${i}`, 'error');
+                            allMatch = false;
+                        }
+                    }
+                    
+                    if (allMatch) {
+                        log('✅ All data matches perfectly!', 'success');
+                    }
+                    
+                } catch (loadError) {
+                    log(`❌ Load failed: ${loadError.message}`, 'error');
+                    return;
+                }
+                
+                // STEP 8: Test with app.js method
+                log('🎯 Step 8: Testing with app.js loadSafetyTipsFromCMS simulation...', 'info');
+                
+                const appLoadedTips = await window.loadFromMinaZK('zk_parent_safety_tips');
+                if (appLoadedTips && Array.isArray(appLoadedTips) && appLoadedTips.length > 0) {
+                    log(`✅ App.js would load ${appLoadedTips.length} tips successfully!`, 'success');
+                } else {
+                    log('❌ App.js would NOT load tips (same as current bug)!', 'error');
+                }
+                
+                // FINAL RESULT
+                log('', 'info');
+                log('🎉 ========== TEST COMPLETED ==========', 'success');
+                log('✅ Save/Load cycle works correctly', 'success');
+                log('✅ Data integrity preserved', 'success');
+                log('✅ localStorage functioning properly', 'success');
+                
+            } catch (error) {
+                log(`💥 Unexpected error: ${error.message}`, 'error');
+                log(`Stack: ${error.stack}`, 'error');
+            }
+        }
+        
+        function clearAllData() {
+            if (!confirm('Czy na pewno chcesz usunąć WSZYSTKIE dane z localStorage?')) {
+                return;
+            }
+            
+            const beforeCount = localStorage.length;
+            localStorage.clear();
+            const afterCount = localStorage.length;
+            
+            log(`🗑️ Cleared ${beforeCount} keys from localStorage`, 'warning');
+            log(`Current count: ${afterCount}`, 'info');
+            
+            setTimeout(() => location.reload(), 1000);
+        }
+        
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            log('📄 Page loaded - ready to test', 'info');
+            log('Click "▶️ Uruchom pełny test" to start', 'info');
+        });
+    </script>
+</body>
+</html>

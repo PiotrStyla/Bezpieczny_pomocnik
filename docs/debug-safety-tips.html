@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Debug Safety Tips</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2196F3;
+        }
+        h2 {
+            color: #FF9800;
+            border-bottom: 2px solid #FF9800;
+            padding-bottom: 10px;
+        }
+        .key-value {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #4CAF50;
+        }
+        .key {
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .value {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            word-break: break-all;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        pre {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Safety Tips Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h2>📊 LocalStorage Keys</h2>
+        <div id="storage-keys"></div>
+        <button onclick="refreshStorageKeys()">🔄 Odśwież</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>💾 Saved Safety Tips Data</h2>
+        <div id="safety-tips-data"></div>
+        <button onclick="loadSafetyTips()">📥 Załaduj Safety Tips</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🔑 Parent Identifier</h2>
+        <div id="parent-id"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🧪 Test Functions</h2>
+        <button onclick="testLoadFromMinaZK()">Test window.loadFromMinaZK</button>
+        <button onclick="clearSafetyTips()">🗑️ Wyczyść Safety Tips</button>
+        <button onclick="exportData()">💾 Eksportuj dane</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2>📋 Console Output</h2>
+        <pre id="console-output"></pre>
+    </div>
+
+    <script src="parent-cms.js"></script>
+    
+    <script>
+        let consoleOutput = [];
+        
+        // Override console.log to capture output
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleOutput.push(args.join(' '));
+            updateConsoleOutput();
+        };
+        
+        function updateConsoleOutput() {
+            document.getElementById('console-output').textContent = consoleOutput.join('\n');
+        }
+        
+        function refreshStorageKeys() {
+            const keysDiv = document.getElementById('storage-keys');
+            const keys = Object.keys(localStorage);
+            
+            if (keys.length === 0) {
+                keysDiv.innerHTML = '<p class="error">❌ Brak kluczy w localStorage</p>';
+                return;
+            }
+            
+            let html = '<h3>Znalezione klucze:</h3>';
+            keys.forEach(key => {
+                const isSafetyTip = key.includes('safety_tips');
+                const className = isSafetyTip ? 'success' : '';
+                html += `
+                    <div class="key-value ${className}">
+                        <div class="key">${isSafetyTip ? '✅' : '📌'} ${key}</div>
+                        <div class="value">${localStorage.getItem(key).substring(0, 100)}...</div>
+                    </div>
+                `;
+            });
+            
+            keysDiv.innerHTML = html;
+            console.log(`📊 Found ${keys.length} localStorage keys`);
+        }
+        
+        async function loadSafetyTips() {
+            const dataDiv = document.getElementById('safety-tips-data');
+            
+            try {
+                console.log('💡 Loading safety tips...');
+                
+                // Check if function exists
+                if (typeof window.loadFromMinaZK !== 'function') {
+                    dataDiv.innerHTML = '<p class="error">❌ window.loadFromMinaZK is not available!</p>';
+                    console.error('❌ window.loadFromMinaZK not found');
+                    return;
+                }
+                
+                console.log('✅ window.loadFromMinaZK is available');
+                
+                // Load safety tips
+                const storageKey = 'zk_parent_safety_tips';
+                console.log(`📥 Loading from key: ${storageKey}`);
+                
+                const safetyTips = await window.loadFromMinaZK(storageKey);
+                
+                if (!safetyTips) {
+                    dataDiv.innerHTML = '<p class="error">❌ Brak danych safety tips w storage</p>';
+                    console.error('❌ No safety tips found');
+                    return;
+                }
+                
+                console.log('✅ Safety tips loaded:', safetyTips);
+                
+                // Display data
+                let html = '<h3 class="success">✅ Safety Tips znalezione!</h3>';
+                html += `<p>Liczba zasad: ${Array.isArray(safetyTips) ? safetyTips.length : 'N/A'}</p>`;
+                html += '<pre>' + JSON.stringify(safetyTips, null, 2) + '</pre>';
+                
+                dataDiv.innerHTML = html;
+                
+            } catch (error) {
+                dataDiv.innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+                console.error('❌ Error loading safety tips:', error);
+            }
+        }
+        
+        function showParentId() {
+            const parentId = localStorage.getItem('zk_parent_identifier');
+            const idDiv = document.getElementById('parent-id');
+            
+            if (parentId) {
+                idDiv.innerHTML = `
+                    <div class="key-value">
+                        <div class="key">Parent ID:</div>
+                        <div class="value success">${parentId}</div>
+                    </div>
+                `;
+            } else {
+                idDiv.innerHTML = '<p class="error">❌ Brak parent identifier w localStorage</p>';
+            }
+        }
+        
+        async function testLoadFromMinaZK() {
+            console.log('🧪 Testing window.loadFromMinaZK...');
+            
+            if (typeof window.loadFromMinaZK !== 'function') {
+                alert('❌ window.loadFromMinaZK nie istnieje!');
+                return;
+            }
+            
+            alert('✅ window.loadFromMinaZK istnieje i jest funkcją');
+            await loadSafetyTips();
+        }
+        
+        function clearSafetyTips() {
+            if (!confirm('Czy na pewno chcesz usunąć wszystkie safety tips?')) {
+                return;
+            }
+            
+            const keys = Object.keys(localStorage).filter(k => k.includes('safety_tips'));
+            keys.forEach(key => localStorage.removeItem(key));
+            
+            console.log(`🗑️ Usunięto ${keys.length} safety tips keys`);
+            alert(`🗑️ Usunięto ${keys.length} kluczy`);
+            refreshStorageKeys();
+        }
+        
+        function exportData() {
+            const data = {};
+            Object.keys(localStorage).forEach(key => {
+                data[key] = localStorage.getItem(key);
+            });
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'safety-tips-debug-export.json';
+            a.click();
+            
+            console.log('💾 Data exported');
+        }
+        
+        // Auto-load on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Debug tool loaded');
+            refreshStorageKeys();
+            showParentId();
+            
+            // Wait for parent-cms.js
+            setTimeout(async () => {
+                await loadSafetyTips();
+            }, 100);
+        });
+    </script>
+</body>
+</html>

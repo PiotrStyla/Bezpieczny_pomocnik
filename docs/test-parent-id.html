@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>🔍 Test Parent ID</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .result {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 5px solid #4CAF50;
+        }
+        .key {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        .value {
+            color: #333;
+            background: #f9f9f9;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Parent ID Test</h1>
+    
+    <div class="result">
+        <div class="key">localStorage Parent ID:</div>
+        <div class="value" id="parent-id"></div>
+    </div>
+    
+    <div class="result">
+        <div class="key">All localStorage keys with 'safety_tips':</div>
+        <div id="safety-keys"></div>
+    </div>
+    
+    <div class="result">
+        <div class="key">Expected key format:</div>
+        <div class="value" id="expected-key"></div>
+    </div>
+    
+    <div class="result">
+        <div class="key">Raw localStorage dump:</div>
+        <pre id="raw-storage" style="background: #263238; color: #aed581; padding: 15px; overflow-x: auto;"></pre>
+    </div>
+
+    <script src="parent-cms.js"></script>
+    
+    <script>
+        async function testParentId() {
+            console.log('🔍 Testing Parent ID system...');
+            
+            // 1. Get parent ID from localStorage directly
+            const storedId = localStorage.getItem('zk_parent_identifier');
+            document.getElementById('parent-id').textContent = storedId || '❌ NOT FOUND';
+            console.log('📝 Stored parent ID:', storedId);
+            
+            // 2. Get parent ID via function (if available)
+            if (typeof window.getParentIdentifier === 'function') {
+                try {
+                    const functionId = await window.getParentIdentifier();
+                    console.log('🔧 Function-generated parent ID:', functionId);
+                    
+                    if (storedId !== functionId) {
+                        console.error('⚠️ MISMATCH! Stored ID differs from function ID!');
+                    }
+                } catch (error) {
+                    console.error('❌ Error getting parent ID via function:', error);
+                }
+            }
+            
+            // 3. Find all safety_tips keys
+            const allKeys = Object.keys(localStorage);
+            const safetyKeys = allKeys.filter(k => k.includes('safety_tips'));
+            
+            let safetyHtml = '';
+            if (safetyKeys.length === 0) {
+                safetyHtml = '<div class="value">❌ NO SAFETY TIPS KEYS FOUND</div>';
+            } else {
+                safetyKeys.forEach(key => {
+                    safetyHtml += `<div class="value">✅ ${key}</div>`;
+                });
+            }
+            document.getElementById('safety-keys').innerHTML = safetyHtml;
+            
+            console.log('🔑 Found safety tips keys:', safetyKeys);
+            
+            // 4. Show expected key format
+            if (storedId) {
+                const expectedKey = `zk_parent_safety_tips_${storedId}`;
+                document.getElementById('expected-key').textContent = expectedKey;
+                console.log('📌 Expected key:', expectedKey);
+                
+                // Check if expected key exists
+                if (localStorage.getItem(expectedKey)) {
+                    console.log('✅ Expected key EXISTS in localStorage');
+                } else {
+                    console.error('❌ Expected key NOT FOUND in localStorage!');
+                }
+            }
+            
+            // 5. Raw dump - SHOW ALL KEYS
+            const dump = {};
+            console.log(`\n📊 Total localStorage keys: ${allKeys.length}`);
+            allKeys.forEach(key => {
+                const value = localStorage.getItem(key);
+                const shortValue = value.substring(0, 200);
+                dump[key] = shortValue + (value.length > 200 ? '...' : '');
+                
+                // Log each key for debugging
+                console.log(`Key: ${key} | Length: ${value.length}`);
+            });
+            document.getElementById('raw-storage').textContent = JSON.stringify(dump, null, 2);
+            
+            // Show statistics
+            console.log('\n📈 Key Statistics:');
+            console.log(`Total keys: ${allKeys.length}`);
+            console.log(`Safety tips keys: ${safetyKeys.length}`);
+            console.log(`Keys with 'zk_': ${allKeys.filter(k => k.includes('zk_')).length}`);
+            console.log(`Keys with 'parent': ${allKeys.filter(k => k.includes('parent')).length}`);
+            
+            // 6. Test actual loading
+            console.log('\n🧪 Testing actual loadFromMinaZK...');
+            if (typeof window.loadFromMinaZK === 'function') {
+                try {
+                    const loaded = await window.loadFromMinaZK('zk_parent_safety_tips');
+                    console.log('✅ Loaded safety tips:', loaded);
+                    
+                    if (!loaded) {
+                        console.error('❌ loadFromMinaZK returned NULL or undefined!');
+                    } else if (Array.isArray(loaded) && loaded.length === 0) {
+                        console.warn('⚠️ loadFromMinaZK returned EMPTY ARRAY!');
+                    } else {
+                        console.log(`✅ SUCCESS! Loaded ${loaded.length} safety tips`);
+                    }
+                } catch (error) {
+                    console.error('❌ Error loading safety tips:', error);
+                }
+            } else {
+                console.error('❌ window.loadFromMinaZK is not available!');
+            }
+        }
+        
+        // Wait for parent-cms.js to load
+        setTimeout(testParentId, 100);
+    </script>
+</body>
+</html>

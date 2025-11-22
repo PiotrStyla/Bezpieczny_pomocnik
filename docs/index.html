@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛡️ Bezpieczny Pomocnik dla Dzieci</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="parental-consent.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="images/logo_192x192.png">
+    
+    <!-- Friendly fonts for kids -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="kids-container">
+        <header class="kids-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">🛡️</div>
+                    <h1 class="kids-title">Bezpieczny Pomocnik</h1>
+                    <p class="kids-subtitle">Twój przyjaciel bezpieczeństwa!</p>
+                </div>
+                
+                <!-- Language selection simplified - Polski is default -->
+            </div>
+        </header>
+
+        <main class="kids-main">
+            <!-- Fun Safety Mascot -->
+            <div class="mascot-section">
+                <div class="mascot">🤖</div>
+                <div class="speech-bubble">
+                    <p id="mascot-text">Cześć! Jestem twoim pomocnikiem bezpieczeństwa. Sprawdź, co dzieje się w twojej okolicy!</p>
+                </div>
+            </div>
+
+            <!-- Interactive Controls -->
+            <div class="kids-controls">
+                <!-- Location filter removed - app uses automatic GPS location and Parent CMS region settings -->
+
+                <div class="control-card">
+                    <h3>🔔 Powiadomienia o zagrożeniach</h3>
+                    <button id="notifications-btn" class="kids-button notifications-btn">
+                        <span class="btn-icon">📱</span>
+                        <span class="btn-text">Włącz powiadomienia</span>
+                    </button>
+                </div>
+
+                <div class="control-card">
+                    <h3>🔊 Głos pomocnika</h3>
+                    <button id="speech-toggle-btn" class="kids-button speech-btn">
+                        <span class="btn-icon">🔊</span>
+                        <span class="btn-text">Głos włączony</span>
+                    </button>
+                </div>
+
+                <!-- Location button removed - duplicates 'Gdzie jestem?' functionality -->
+
+                <div class="control-card">
+                    <h3>👨‍👩‍👧 Gdzie są rodzice?</h3>
+                    <button id="parent-location-btn" class="kids-button parent-location-btn">
+                        <span class="btn-icon">🏠</span>
+                        <span class="btn-text">Pokaż rodziców</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Map Section -->
+            <div class="map-section">
+                <h3 class="section-title">🗺️ Mapa bezpieczeństwa</h3>
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <div class="legend-color red"></div>
+                        <span>⚠️ Uwaga! Ważne ostrzeżenie</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color orange"></div>
+                        <span>⚡ Ostrożnie!</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color green"></div>
+                        <span>ℹ️ Informacja</span>
+                    </div>
+                </div>
+                <div id="map" class="kids-map"></div>
+            </div>
+
+            <!-- 🛡️ SAFETY ACTION BUTTONS -->
+            <div class="safety-actions-section">
+                <h3 class="section-title">🛡️ Bezpieczeństwo w akcji</h3>
+                <div class="safety-actions">
+                    <div class="action-card">
+                        <div class="action-icon">🧭</div>
+                        <h4>Gdzie jestem?</h4>
+                        <p>Sprawdź swoją lokalizację i otoczenie</p>
+                        <button id="where-am-i-btn" class="action-button orange">
+                            📍 Opowiedz gdzie jestem
+                        </button>
+                    </div>
+                    
+                    <div class="action-card">
+                        <div class="action-icon">🏃</div>
+                        <h4>Znajdź bezpieczeństwo</h4>
+                        <p>Lokalizuj najbliższe bezpieczne miejsca</p>
+                        <button id="find-safety-btn" class="action-button green">
+                            🏪 Gdzie jest bezpiecznie?
+                        </button>
+                    </div>
+                    
+                    <div class="action-card">
+                        <div class="action-icon">🚶</div>
+                        <h4>Bezpieczna droga</h4>
+                        <p>Jak bezpiecznie dotrzeć do domu</p>
+                        <button id="safe-route-btn" class="action-button blue">
+                            🏠 Pokaż drogę do domu
+                        </button>
+                    </div>
+                    
+                    <div class="action-card emergency">
+                        <div class="action-icon">🚨</div>
+                        <h4>Potrzebuję pomocy!</h4>
+                        <p>Natychmiastowa pomoc w sytuacji zagrożenia</p>
+                        <button id="emergency-help-btn" class="action-button red emergency-button">
+                            🆘 POTRZEBUJĘ POMOCY!
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Section -->
+            <div class="alerts-section">
+                <h3 class="section-title">📢 Ważne wiadomości dla ciebie</h3>
+                <div id="alerts-container" class="kids-alerts"></div>
+            </div>
+
+            <!-- Safety Tips Section - Loaded dynamically from Parent CMS -->
+            <div class="tips-section">
+                <h3 class="section-title">💡 Złote zasady bezpieczeństwa</h3>
+                <div class="safety-tips">
+                    <!-- Tips will be loaded from Parent CMS via loadSafetyTipsFromCMS() -->
+                    <!-- Default fallback tips if no custom tips are set: -->
+                    <div class="tip-card default-tip">
+                        <div class="tip-icon">🚸</div>
+                        <h4>Bezpieczeństwo na drodze</h4>
+                        <p>Zawsze patrz w lewo i prawo przed przejściem przez ulicę!</p>
+                    </div>
+                    <div class="tip-card default-tip">
+                        <div class="tip-icon">🏠</div>
+                        <h4>W domu</h4>
+                        <p>Pamiętaj numery telefonu do rodziców i służb ratunkowych: 112</p>
+                    </div>
+                    <div class="tip-card default-tip">
+                        <div class="tip-icon">👥</div>
+                        <h4>Z nieznajomymi</h4>
+                        <p>Nigdy nie rozmawiaj z nieznajomymi i nie chodź z nimi nigdzie!</p>
+                    </div>
+                    <div class="tip-card default-tip">
+                        <div class="tip-icon">🌦️</div>
+                        <h4>Zła pogoda</h4>
+                        <p>Podczas burzy zostań w domu i unikaj wysokich drzew!</p>
+                    </div>
+                    <div class="tip-card default-tip">
+                        <div class="tip-icon">🛴</div>
+                        <h4>Hulajnogi elektryczne</h4>
+                        <p>Zawsze noś kask i uważaj na pieszych! Jeźdź powoli i zachowaj bezpieczną odległość.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Safe Places Section (Real Data from OpenStreetMap) -->
+            <div class="safe-places-section" style="margin: 20px 0; display: none;" id="safe-places-section">
+                <h3 class="section-title">🏥 Bezpieczne miejsca w pobliżu</h3>
+                <div id="safe-places-list" class="safe-places-list">
+                    <!-- Real places will be loaded here by emergency-real-places.js -->
+                    <div class="loading-message">
+                        <div class="spinner">🔄</div>
+                        <p>Szukam najbliższych bezpiecznych miejsc...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="emergency-section">
+                <h3 class="section-title">🚨 W nagłych wypadkach</h3>
+                <div class="emergency-contacts">
+                    <div class="emergency-card">
+                        <div class="emergency-icon">🚑</div>
+                        <h4>Pogotowie ratunkowe</h4>
+                        <a href="tel:112" class="emergency-number">112</a>
+                    </div>
+                    <div class="emergency-card">
+                        <div class="emergency-icon">👮</div>
+                        <h4>Policja</h4>
+                        <a href="tel:997" class="emergency-number">997</a>
+                    </div>
+                    <div class="emergency-card">
+                        <div class="emergency-icon">🚒</div>
+                        <h4>Straż pożarna</h4>
+                        <a href="tel:998" class="emergency-number">998</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer with Foundation info -->
+        <footer class="kids-footer">
+            <div class="footer-content">
+                <div class="foundation-info">
+                    <div class="foundation-logo">💝</div>
+                    <div class="foundation-text" id="foundation-text">
+                        <h4 id="foundation-header">Stworzone z ❤️ przez</h4>
+                        <a href="https://fundacja-hospicjum.org/" target="_blank" class="foundation-link">
+                            <strong>Fundację Hospicjum</strong>
+                        </a>
+                        <p class="foundation-note" id="foundation-note">
+                            Ta aplikacja jest <strong>całkowicie bezpłatna</strong>.<br>
+                            Jeśli chcesz wspierać rozwój aplikacji,<br>
+                            możesz przekazać darowiznę na konto Fundacji.
+                        </p>
+                        <a href="https://fundacja-hospicjum.org/" target="_blank" class="donation-btn" id="donation-btn">
+                            🌟 Wspieraj Fundację
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Copyright Notice -->
+                <div class="copyright-notice">
+                    <p>&copy; 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie</p>
+                    <p class="rights-reserved">All Rights Reserved. Proprietary and Confidential.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="parental-consent.js"></script>
+    <script src="mina-parental-zk.js"></script>
+    <script src="enhanced-security-zk.js"></script> <!-- Enhanced Security Storage -->
+    <!-- test-enhanced-security.js removed - test scripts should not run in production -->
+    <script src="child-session-manager.js"></script> <!-- Multi-Child Support - RODO Art. 8 -->
+    <script src="parent-cms.js"></script> <!-- Parent CMS functions for main app --> <!-- ZK Privacy for RODO Art. 8 -->
+    <script src="adaptive-learning.js"></script> <!-- AI Learning System -->
+    <script src="polish-ai-client.js"></script> <!-- Client-side Polish AI -->
+    <script src="alert-classifier.js"></script> <!-- Enhanced Alert Classification -->
+    <script src="emergency-real-places.js"></script> <!-- Real Safe Places from OpenStreetMap -->
+    <script src="parent-location-sharing.js"></script>
+    <script src="parent-routing-safety.js"></script>
+    <script src="web-crypto-security.js"></script> <!-- 🔐 Real encryption (AES-256-GCM) --> <!-- 🛡️ Safety validation for parent routing --> <!-- Parent Location Tracking -->
+    <script src="parent-map-display.js"></script> <!-- Parent Map Display -->
+    <script src="real-sync-system.js"></script> <!-- Real Synchronization System -->
+    <script src="emergency-survival-mode.js"></script> <!-- TRUE Emergency Survival Mode (72+ hours) -->
+    <!-- Runtime API base override: use ?api=https://your-backend.example.com/api or stored value -->
+    <script>
+      (function() {
+        try {
+          const qs = new URLSearchParams(location.search);
+          const apiOverride = qs.get('api');
+          if (apiOverride) {
+            localStorage.setItem('app_api_base_url', apiOverride);
+          }
+          const stored = localStorage.getItem('app_api_base_url');
+          if (stored) {
+            window.APP_API_BASE_URL = stored;
+            console.log('[Config] Using API base from override:', stored);
+          }
+        } catch (e) {
+          console.warn('[Config] API base override not set:', e);
+        }
+      })();
+    </script>
+    <script src="app.js"></script>
+    <script src="location-message-fix.js"></script> <!-- Enhanced Location Messages with Parent CMS -->
+    <!-- 🚨 MINA EMERGENCY INTEGRATION - CRITICAL! -->
+    <!-- Times are not safe - immediate emergency preparedness required -->
+    <script src="mina-safety-core.js"></script>
+    <script type="module" src="emergency-mina-integration.js"></script>
+    
+    <!-- 🔒 PERSISTENT SETTINGS & PWA SYSTEM -->
+    <!-- enhanced-security-zk.js already loaded above to avoid duplication -->
+    <script src="persistent-settings-zk.js"></script>
+    <script src="pwa-installer.js"></script>
+    
+    <script>
+        // 🛡️ EMERGENCY DETECTION & APP INITIALIZATION
+        window.addEventListener('load', async () => {
+            console.log('🚨 Emergency Mina system loading...');
+            console.log('⚔️ Times are not safe - privacy protection active');
+
+            // 🔄 RESTORE PERSISTENT SETTINGS FIRST
+            try {
+                if (window.PersistentSettings) {
+                    const settings = await window.PersistentSettings.loadSettings();
+                    console.log('✅ Settings restored:', settings);
+                    
+                    // Apply sound settings
+                    if (typeof settings.soundEnabled === 'boolean') {
+                        window.soundEnabled = settings.soundEnabled;
+                        console.log(`🔊 Sound setting restored: ${settings.soundEnabled}`);
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Failed to restore settings:', error);
+            }
+
+            // 📱 PWA INSTALLATION CHECK
+            setTimeout(() => {
+                if (window.PWAInstaller && !window.PWAInstaller.isInstalled) {
+                    console.log('📱 Checking PWA installation availability...');
+                }
+            }, 2000);
+
+            // Check for crisis conditions (battery check must be awaited)
+            let isLowBattery = false;
+            try {
+                if (navigator.getBattery) {
+                    const batteryInfo = await navigator.getBattery();
+                    isLowBattery = batteryInfo.level < 0.3;
+                }
+            } catch (e) {
+                isLowBattery = false;
+            }
+            const isOffline = !navigator.onLine;
+            const isSlowConnection = navigator.connection?.effectiveType === 'slow-2g' ||
+                                   navigator.connection?.effectiveType === '2g';
+
+            if (isOffline) {
+                console.log('🚨 Offline detected - verifying before survival');
+                if (window.emergencyMina && typeof window.emergencyMina.verifyOfflineThenActivate === 'function') {
+                    window.emergencyMina.verifyOfflineThenActivate();
+                }
+            }
+            if (isLowBattery) {
+                console.log('🔋 Low battery - not auto-activating survival mode');
+            }
+        });
+        
+        // 🔋 BATTERY MONITORING
+        if (navigator.getBattery) {
+            navigator.getBattery().then(battery => {
+                battery.addEventListener('levelchange', () => {
+                    try {
+                        if (window.emergencySurvival && typeof window.emergencySurvival.checkBatteryLevel === 'function') {
+                            window.emergencySurvival.checkBatteryLevel(battery);
+                        } else if (battery.level <= 0.1 && window.emergencyMina && typeof window.emergencyMina.activateSurvivalMode === 'function') {
+                            console.log('🔋 Very low battery - activating survival mode');
+                            window.emergencyMina.activateSurvivalMode();
+                        }
+                    } catch (e) {
+                        console.warn('⚠️ Battery event handling failed:', e);
+                    }
+                });
+            });
+        }
+        
+        // 📡 NETWORK MONITORING
+        window.addEventListener('offline', () => {
+            console.log('📡 Network lost - verifying before enabling survival mode');
+            if (window.emergencyMina && typeof window.emergencyMina.verifyOfflineThenActivate === 'function') {
+                window.emergencyMina.verifyOfflineThenActivate();
+            }
+        });
+        
+        window.addEventListener('online', () => {
+            console.log('📡 Network restored - attempting Mina sync');
+            if (window.emergencyMina && typeof window.emergencyMina.syncSatellite === 'function') {
+                window.emergencyMina.syncSatellite();
+            }
+        });
+    </script>
+</body>
+</html>
