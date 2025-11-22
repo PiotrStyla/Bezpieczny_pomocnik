@@ -212,8 +212,9 @@ Repozytorium jest monorepo z **frontendem (PWA)** i **backendem (FastAPI)**.
 ### Produkcyjna architektura (split deployment)
 
 - **Frontend (PWA)** – GitHub Pages
-  - URL: `https://piotrstyla.github.io/Bezpieczny_pomocnik/frontend/`
+  - URL: `https://piotrstyla.github.io/Bezpieczny_pomocnik/`
   - statyczne pliki: `frontend/index.html`, `style.css`, `app.js`, `sw.js`, `manifest.json`
+  - Uwaga: pliki są serwowane z `/docs` folder na GitHubie
 
 - **Backend (API)** – Vercel serverless
   - URL bazowy: `https://pomocnikapp.vercel.app/api/`
@@ -325,12 +326,12 @@ Zobacz `TESTING-GUIDE.md` dla szczegółowego przewodnika testowania manualnego 
 
 **Szybki start:**
 1. Deploy backend na Vercel (import z GitHub)
-2. Włącz GitHub Pages (Settings → Pages → `/frontend`)
+2. Włącz GitHub Pages (Settings → Pages → `/docs`)
 3. Skonfiguruj API URL w `frontend/app.js`
 4. Gotowe! 🎉
 
 **Demo:** 
-- Frontend: https://piotrstyla.github.io/Bezpieczny_pomocnik/frontend/
+- Frontend: https://piotrstyla.github.io/Bezpieczny_pomocnik/
 - Backend API: https://pomocnikapp.vercel.app/api/
 
 ---
