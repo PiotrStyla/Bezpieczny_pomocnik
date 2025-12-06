@@ -205,7 +205,7 @@ Use our PR template and include:
 All contributors are acknowledged in:
 - README.md contributor section
 - Release notes
-- Annual foundation report
+- Project updates and milestones
 - Special contributor badge in app
 
 ---
@@ -213,8 +213,9 @@ All contributors are acknowledged in:
 ## 💬 **Getting Help**
 
 ### **Questions?**
-- 📧 Email: kontakt@fundacja-hospicjum.org
+- 📧 Email: p.styla [at] gmail [dot] com
 - 💬 GitHub Issues: [Create a question](https://github.com/PiotrStyla/Bezpieczny_pomocnik/issues/new?assignees=&labels=question&template=question.md)
+- 👤 Maintainer: @PiotrStyla
 - 📖 Documentation: Check existing guides first
 
 ### **Community**
@@ -227,11 +228,12 @@ All contributors are acknowledged in:
 
 ## 📋 **License Note**
 
-By contributing, you agree that your contributions will be licensed under the same [Foundation Approval License](LICENSE) as the main project. This means:
+By contributing, you agree that your contributions will be licensed under the same [Developer Maintained License](LICENSE) as the main project. This means:
 
 - ✅ Your code is open for learning and development
-- ❌ Commercial use requires Foundation permission
+- ❌ Commercial use requires developer permission
 - 🛡️ Child safety always comes first
+- 🏛️ Future benefits dedicated to Fundacja Hospicjum
 
 ---
 
@@ -251,10 +253,16 @@ Every contribution helps make children safer. Whether you're:
 
 ## 📞 **Contact**
 
-**Foundation Hospicjum**
-- 📧 kontakt@fundacja-hospicjum.org
-- 🔗 https://fundacja-hospicjum.org
+**Project Maintainer:**
+- 👤 Piotr Styla
+- 📧 p.styla [at] gmail [dot] com
+- 💻 GitHub: @PiotrStyla
 - 📍 Kraków, Poland
+
+**Project Beneficiary:**
+- 🏛️ Fundacja Hospicjum Maryi Królowej Apostołów
+- 🔗 https://fundacja-hospicjum.org
+- ⚠️ Foundation assumes no liability during development
 
 **Technical Questions**
 - 📧 Create GitHub Issue for fastest response
