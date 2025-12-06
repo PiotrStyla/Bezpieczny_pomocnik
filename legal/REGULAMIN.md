@@ -9,7 +9,9 @@
 
 ## § 1. POSTANOWIENIA OGÓLNE
 
-1.1. **Administratorem** aplikacji "Bezpieczny Pomocnik" jest **Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie** z siedzibą w Krakowie 30-404, ul. Cegielniana 6B/45, wpisana do Krajowego Rejestru Sądowego pod numerem KRS 0001063161, NIP: 6793279476, REGON: 526664276, zwana dalej **"Fundacją"**.
+1.1. **Administratorem** aplikacji "Bezpieczny Pomocnik" jest **Piotr Styla**, e-mail: p.styla [at] gmail [dot] com, GitHub: github.com/PiotrStyla, zwany dalej **"Administratorem"** lub **"Deweloperem"**.
+
+1.1a. **Projekt tworzony na rzecz (beneficjent):** Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie z siedzibą w Krakowie 30-404, ul. Cegielniana 6B/45, wpisana do Krajowego Rejestru Sądowego pod numerem KRS 0001063161, NIP: 6793279476, REGON: 526664276, zwana dalej **"Fundacją"** lub **"Beneficjentem"**. ⚠️ Fundacja nie ponosi odpowiedzialności prawnej w fazie rozwoju projektu.
 
 1.2. **Aplikacja** "Bezpieczny Pomocnik" to internetowa aplikacja przeznaczona dla dzieci i ich rodziców/opiekunów prawnych, udostępniająca informacje o alertach pogodowych, ostrzeżeniach bezpieczeństwa oraz edukację w zakresie bezpieczeństwa dzieci na terenie Polski.
 
@@ -114,14 +116,15 @@ Użytkownikom zabrania się:
 - **Security benefits:** eliminacja ryzyka przypadkowego dostępu dziecka do danych rodzeństwa
 
 4.4. **Zgłaszanie problemów:**
-Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adres: kontakt@fundacja-hospicjum.org
+Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adres: p.styla [at] gmail [dot] com
 
 ## § 5. ODPOWIEDZIALNOŚĆ
 
-5.1. **Fundacja:**
+5.1. **Administrator (Deweloper):**
 - Dokłada wszelkich starań, aby informacje w Aplikacji były aktualne i rzetelne
 - Nie ponosi odpowiedzialności za niewłaściwe działania i ich skutki
 - Zaleca zawsze weryfikację krytycznych informacji z oficjalnymi źródłami
+- Projekt tworzony na rzecz Fundacji, która nie ponosi odpowiedzialności prawnej w fazie rozwoju
 
 5.2. **Użytkownik/Rodzic/Opiekun:**
 - Ponosi odpowiedzialność za sposób korzystania z Aplikacji
@@ -130,15 +133,15 @@ Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adre
 
 ## § 6. DOSTĘPNOŚĆ USŁUGI
 
-6.1. Fundacja dokłada wszelkich starań, aby Aplikacja była dostępna 24/7, jednak nie gwarantuje ciągłości działania.
+6.1. Administrator dokłada wszelkich starań, aby Aplikacja była dostępna 24/7, jednak nie gwarantuje ciągłości działania.
 
-6.2. Fundacja zastrzega sobie prawo do czasowego wyłączenia Aplikacji w celu przeprowadzenia prac technicznych, o czym będzie informować z odpowiednim wyprzedzeniem.
+6.2. Administrator zastrzega sobie prawo do czasowego wyłączenia Aplikacji w celu przeprowadzenia prac technicznych, o czym będzie informować z odpowiednim wyprzedzeniem.
 
-6.3. Fundacja nie ponosi odpowiedzialności za przerwy w działaniu Aplikacji wynikające z niezależnych zakłóceń u dostawców usług chmurowych, internetowych oraz innych usług technicznych świadczonych przez podmioty trzecie.
+6.3. Administrator nie ponosi odpowiedzialności za przerwy w działaniu Aplikacji wynikające z niezależnych zakłóceń u dostawców usług chmurowych, internetowych oraz innych usług technicznych świadczonych przez podmioty trzecie.
 
 ## § 7. ZMIANY REGULAMINU
 
-7.1. Fundacja zastrzega sobie prawo do zmiany niniejszego Regulaminu.
+7.1. Administrator zastrzega sobie prawo do zmiany niniejszego Regulaminu.
 
 7.2. O planowanych zmianach Użytkownicy będą informowani poprzez Aplikację z co najmniej 7-dniowym wyprzedzeniem.
 
@@ -148,7 +151,7 @@ Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adre
 
 8.1. W sprawach nieuregulowanych niniejszym Regulaminem zastosowanie mają przepisy prawa polskiego.
 
-8.2. Ewentualne spory będą rozstrzygane przez sądy polskie właściwe dla siedziby Fundacji.
+8.2. Ewentualne spory będą rozstrzygane przez sądy polskie.
 
 8.3. Jeśli którekolwiek postanowienie Regulaminu zostanie uznane za nieważne, pozostałe postanowienia pozostają w mocy.
 
@@ -156,10 +159,21 @@ Rodzice/Opiekunowie mogą zgłaszać wszelkie obawy dotyczące Aplikacji na adre
 
 ## 📞 KONTAKT
 
-**Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**  
+**Administrator / Developer:**  
+👤 Piotr Styla  
+📧 E-mail: p.styla [at] gmail [dot] com  
+💻 GitHub: github.com/PiotrStyla
+
+*Dla kontaktu technicznego, zgłoszeń błędów, propozycji funkcji i współpracy.*
+
+---
+
+**Beneficjent Projektu:**  
+🏛️ Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie  
 📍 30-404 Kraków, ul. Cegielniana 6B/45  
-📧 E-mail: kontakt@fundacja-hospicjum.org  
 🌐 www.fundacja-hospicjum.org
+
+*Przyszłe dochody i rozpoznawalność dedykowane Fundacji. Fundacja nie ponosi odpowiedzialności prawnej w fazie rozwoju.*
 
 ---
 

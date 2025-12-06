@@ -9,14 +9,20 @@
 
 ## § 1. ADMINISTRATOR DANYCH OSOBOWYCH
 
-**Administratorem** Twoich danych osobowych jest:
+**Administratorem** aplikacji i Twoich danych osobowych jest:
 
-**Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**  
+**Piotr Styla**  
+  E-mail: p.styla [at] gmail [dot] com  
+  GitHub: github.com/PiotrStyla
+
+**Projekt tworzony na rzecz (beneficjent):**  
+  Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie  
   30-404 Kraków, ul. Cegielniana 6B/45  
-  E-mail: kontakt@fundacja-hospicjum.org  
-  KRS: 0001063161, NIP: 6793279476, REGON: 526664276
+  Website: https://fundacja-hospicjum.org/  
+  KRS: 0001063161, NIP: 6793279476, REGON: 526664276  
+  ⚠️ Fundacja nie ponosi odpowiedzialności prawnej w fazie rozwoju projektu.
 
-**Inspektor Ochrony Danych:** kontakt@fundacja-hospicjum.org
+**Inspektor Ochrony Danych:** p.styla [at] gmail [dot] com
 
 ---
 
@@ -207,7 +213,7 @@
 
 ### ✅ **Masz prawo do:**
 
-1. **Dostępu** do swoich danych - napisz na kontakt@fundacja-hospicjum.org
+1. **Dostępu** do swoich danych - napisz na p.styla [at] gmail [dot] com
 2. **Sprostowania** niepoprawnych danych
 3. **Usunięcia** danych ("prawo do bycia zapomnianym")
 4. **Ograniczenia** przetwarzania  
@@ -216,7 +222,7 @@
 7. **Cofnięcia zgody** w każdym czasie (nie wpływa na już dokonane przetwarzanie)
 
 ### 📞 **Jak skorzystać z praw:**
-- **E-mail:** kontakt@fundacja-hospicjum.org
+- **E-mail:** p.styla [at] gmail [dot] com
 - **Czas odpowiedzi:** Do 30 dni
 
 ### ⚖️ **Skarga do UODO:**
@@ -273,11 +279,11 @@ Masz prawo wniesienia skargi do Prezesa Urzędu Ochrony Danych Osobowych (UODO) 
 ## § 10. KONTAKT W SPRAWACH PRYWATNOŚCI
 
 ### 📧 **Inspektor Ochrony Danych:**
-E-mail: kontakt@fundacja-hospicjum.org  
+E-mail: p.styla [at] gmail [dot] com  
 Temat: "RODO - Bezpieczny Pomocnik"
 
 ### 📋 **Zgłaszanie naruszeń:**
-W przypadku podejrzenia naruszenia danych osobowych prosimy o natychmiastowy kontakt na adres e-mail: kontakt@fundacja-hospicjum.org
+W przypadku podejrzenia naruszenia danych osobowych prosimy o natychmiastowy kontakt na adres e-mail: p.styla [at] gmail [dot] com
 
 ---
 

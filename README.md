@@ -82,18 +82,28 @@ We welcome developers, designers, testers, and anyone passionate about child saf
 
 **All contributors are acknowledged in our releases and documentation!**
 
-## 🏛️ **Copyright & Ownership**
+## 👤 **Developer & Contact**
 
-**© 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**  
-**All Rights Reserved. Proprietary and Confidential.**
+**Lead Developer:** Piotr Styla  
+**Contact:** p.styla [at] gmail [dot] com  
+**GitHub:** [@PiotrStyla](https://github.com/PiotrStyla)
 
-### 📞 **Foundation Contact**
-- **Full Name:** Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
+*For technical questions, bug reports, feature requests, and collaboration opportunities.*
+
+---
+
+## 🏛️ **Project Beneficiary**
+
+**Created in support of:**  
+**Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**
+
+- 🎯 Future revenues and recognition dedicated to the Foundation
+- 📍 Foundation serves as beneficiary of project success
+- ⚖️ Foundation assumes no legal responsibility during development phase
+
+### 📄 **Foundation Information**
 - **Address:** 30-404 Kraków, ul. Cegielniana 6B/45
-- **Email:** kontakt@fundacja-hospicjum.org
 - **Website:** https://fundacja-hospicjum.org/
-
-### 📄 **Legal Information**
 - **KRS:** 0001063161
 - **NIP:** 6793279476  
 - **REGON:** 526664276
@@ -116,7 +126,7 @@ We welcome developers, designers, testers, and anyone passionate about child saf
 - ❌ **No service integration** - platform use requires explicit consent
 
 ### 📋 **Request Use Permission**
-**Contact:** 📧 kontakt@fundacja-hospicjum.org  
+**Contact:** 📧 p.styla [at] gmail [dot] com  
 **Include in your request:**
 - Your organization name and contact information
 - Intended use case and deployment scope

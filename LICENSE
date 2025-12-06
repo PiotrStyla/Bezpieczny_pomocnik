@@ -1,21 +1,31 @@
-Foundation Approval License 1.0
+Developer Maintained License 1.0
 
-Copyright (c) 2025 Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
+Copyright (c) 2025 Piotr Styla
 All rights reserved.
 
 ================================================================================
 
-This software application "Bezpieczny Pomocnik" (Safety Helper) is owned by:
+DEVELOPER & MAINTAINER:
+
+    Piotr Styla
+    E-mail: p.styla [at] gmail [dot] com
+    GitHub: github.com/PiotrStyla
+    
+    Technical contact for: bug reports, feature requests, contributions,
+    licensing questions, and deployment permissions.
+
+PROJECT BENEFICIARY (future revenues and recognition):
 
     Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
     30-404 Kraków, ul. Cegielniana 6B/45
-    Tel. +48 735 749 618
-    E-mail: kontakt@fundacja-hospicjum.org
+    Website: https://fundacja-hospicjum.org
     
     KRS: 0001063161
     NIP: 6793279476  
     REGON: 526664276
-    🔗 https://fundacja-hospicjum.org
+    
+    ⚖️ Foundation assumes no legal responsibility during development phase.
+    🎯 Future revenues and recognition dedicated to the Foundation.
 
 ================================================================================
 
@@ -39,7 +49,7 @@ RESTRICTIONS (FOUNDATION APPROVAL REQUIRED):
 
 HOW TO REQUEST USE PERMISSION:
 
-📧 Email: kontakt@fundacja-hospicjum.org
+📧 Email: p.styla [at] gmail [dot] com
 📋 Please include in your request:
    - Your organization name and contact information
    - Intended use case and deployment scope
@@ -47,9 +57,9 @@ HOW TO REQUEST USE PERMISSION:
    - Expected timeline for implementation
    - Any modifications or customizations planned
 
-FOUNDATION APPROVAL PROCESS:
+APPROVAL PROCESS:
 1. Submit request via email with required information
-2. Foundation review (typically 3-5 business days)
+2. Developer review (typically 3-5 business days)
 3. Response with approval, conditions, or denial
 4. If approved, separate usage agreement will be provided
 5. Commercial users will receive commercial license terms
@@ -82,4 +92,4 @@ Bezpieczny Pomocnik - Open for Learning, Protected for Use
 Created with ❤️ for children's safety
 www.fundacja-hospicjum.org
 
-For questions about licensing or use permissions: kontakt@fundacja-hospicjum.org
+For questions about licensing or use permissions: p.styla [at] gmail [dot] com
