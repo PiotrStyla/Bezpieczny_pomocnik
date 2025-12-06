@@ -6,15 +6,21 @@
 
 ---
 
-## 🏛️ INFORMACJE O ORGANIZACJI
+## 🏛️ INFORMACJE O APLIKACJI
 
-**Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie** zobowiązuje się zapewniać dostępność swojej aplikacji internetowej "Bezpieczny Pomocnik" zgodnie z polską ustawą z dnia 4 kwietnia 2019 r. o dostępności cyfrowej stron internetowych i aplikacji mobilnych podmiotów publicznych oraz stosownymi standardami międzynarodowymi.
+**Administrator aplikacji "Bezpieczny Pomocnik"**: Piotr Styla zobowiązuje się zapewniać dostępność aplikacji zgodnie z polską ustawą z dnia 4 kwietnia 2019 r. o dostępności cyfrowej stron internetowych i aplikacji mobilnych podmiotów publicznych oraz stosownymi standardami międzynarodowymi.
 
-### 📞 **Dane kontaktowe organizacji:**
+### 📞 **Kontakt ws. dostępności:**
+- **Administrator:** Piotr Styla
+- **E-mail:** p.styla [at] gmail [dot] com
+- **GitHub:** github.com/PiotrStyla
+
+### 🏛️ **Beneficjent projektu:**
 - **Nazwa:** Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie
 - **Adres:** 30-404 Kraków, ul. Cegielniana 6B/45  
-- **E-mail:** kontakt@fundacja-hospicjum.org
+- **Website:** https://fundacja-hospicjum.org/
 - **KRS:** 0001063161
+- ⚠️ Fundacja nie ponosi odpowiedzialności prawnej w fazie rozwoju
 
 ---
 

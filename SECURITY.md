@@ -2,14 +2,15 @@
 
 ## Reporting Security Vulnerabilities
 
-**Bezpieczny Pomocnik** is a child safety application developed by Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie. We take security seriously, especially when it comes to protecting children.
+**Bezpieczny Pomocnik** is a child safety application developed by Piotr Styla in support of Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie. We take security seriously, especially when it comes to protecting children.
 
 ### 🛡️ **How to Report**
 
 If you discover a security vulnerability, please report it responsibly:
 
-**📧 Email:** kontakt@fundacja-hospicjum.org  
-**📍 Address:** 30-404 Kraków, ul. Cegielniana 6B/45
+**📧 Email:** p.styla [at] gmail [dot] com  
+**👤 Developer:** Piotr Styla  
+**💻 GitHub:** github.com/PiotrStyla
 
 ### ⚠️ **Please DO NOT:**
 - Create public GitHub issues for security vulnerabilities

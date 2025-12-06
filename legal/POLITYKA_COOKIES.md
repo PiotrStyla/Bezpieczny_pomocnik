@@ -174,8 +174,9 @@
 ## 📞 KONTAKT
 
 ### 🤔 **Pytania o cookies?**
-📧 E-mail: kontakt@fundacja-hospicjum.org  
-📍 Adres: 30-404 Kraków, ul. Cegielniana 6B/45
+📧 E-mail: p.styla [at] gmail [dot] com  
+👤 Administrator: Piotr Styla  
+💻 GitHub: github.com/PiotrStyla
 
 ### 🛠️ **Problemy techniczne z cookies?**
 Opisz problem podając:
