@@ -587,13 +587,13 @@ function formatNumbersForChildren(text) {
 }
 
 /**
- * ?? FORMAT TEXT FOR KRYSTYNA CZUB�WNA STYLE
- * Adds characteristic pauses and rhythm like the legendary Polish narrator
+ * 🗣️ FORMAT TEXT FOR PROFESSIONAL EDUCATIONAL NARRATOR STYLE
+ * Adds characteristic pauses and rhythm for clear, engaging speech
  */
-function formatTextForCzubowna(text) {
+function formatTextForEducationalNarrator(text) {
     // Handle Promise or non-string inputs
     if (!text || typeof text !== 'string') {
-        console.warn('?? formatTextForCzubowna received non-string:', typeof text, text);
+        console.warn('⚠️ formatTextForEducationalNarrator received non-string:', typeof text, text);
         return String(text || '');
     }
     
@@ -639,10 +639,10 @@ function formatTextForCzubowna(text) {
 }
 
 /**
- * ?? SELECT VOICE MOST SIMILAR TO KRYSTYNA CZUB�WNA
- * Prioritizes warm, mature feminine Polish voices
+ * 🎙️ SELECT PROFESSIONAL EDUCATIONAL VOICE
+ * Prioritizes warm, mature feminine Polish voices suitable for children
  */
-function selectCzubownaLikeVoice(lang = 'pl') {
+function selectProfessionalEducationalVoice(lang = 'pl') {
     const voices = window.speechSynthesis.getVoices();
     
     if (voices.length === 0) {
@@ -651,7 +651,7 @@ function selectCzubownaLikeVoice(lang = 'pl') {
     }
     
     // Professional Polish voice characteristics priority:
-    const czubownaPreferences = [
+    const educationalVoicePreferences = [
         // Polish voices that sound mature and warm for children
         'Microsoft Paulina - Polish (Poland)',  // Usually the best for Polish
         'Paulina',
@@ -672,7 +672,7 @@ function selectCzubownaLikeVoice(lang = 'pl') {
     console.log('???? Available Polish voices:', polishVoices.map(v => v.name));
     
     // Try to find the best professional educational voice
-    for (const preference of czubownaPreferences) {
+    for (const preference of educationalVoicePreferences) {
         const voice = voices.find(v => 
             v.name.includes(preference) && 
             (v.lang.includes('pl') || v.lang.includes('PL'))
@@ -840,7 +840,7 @@ function initializeVoices() {
             console.log('???? Available Polish voices:', polishVoices.map(v => `${v.name} (${v.lang})`));
             
             // Pre-select the best voice for children
-            const childVoice = selectCzubownaLikeVoice('pl');
+            const childVoice = selectProfessionalEducationalVoice('pl');
             if (childVoice) {
                 console.log(`?? Pre-selected professional voice for children: ${childVoice.name}`);
             }
