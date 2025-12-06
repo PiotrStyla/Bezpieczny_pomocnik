@@ -473,6 +473,42 @@ function initMap() {
     }
 }
 
+/**
+ * 📱 DETECT DEVICE TYPE FOR ADAPTIVE SPEECH
+ * Mobile devices often have weaker TTS engines
+ */
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           (navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
+}
+
+/**
+ * 🎛️ GET ADAPTIVE SPEECH RATE
+ * Faster on mobile to prevent sluggish performance
+ */
+function getAdaptiveSpeechRate() {
+    // Check if user has custom preference
+    const customRate = localStorage.getItem('speech_rate_preference');
+    if (customRate) {
+        return parseFloat(customRate);
+    }
+    
+    // Adaptive defaults based on device
+    if (isMobileDevice()) {
+        return 0.85;  // Faster for mobile - more natural, less processor load
+    } else {
+        return 0.70;  // Desktop - slightly slower for clarity
+    }
+}
+
+/**
+ * 🎛️ GET ADAPTIVE PITCH
+ * Consistent across devices
+ */
+function getAdaptivePitch() {
+    return 1.10;  // Gentle, warm tone (slightly reduced from 1.15)
+}
+
 // Speech functions with professional educational voice
 async function speakText(text, lang = 'pl') {
     // Handle async text (Promises)
@@ -520,10 +556,12 @@ async function speakText(text, lang = 'pl') {
         
         utterance.lang = lang === 'pl' ? 'pl-PL' : lang === 'en' ? 'en-US' : 'uk-UA';
         
-        // PROFESSIONAL EDUCATIONAL VOICE PARAMETERS:
-        utterance.rate = 0.55;   // Very slow, contemplative for child comprehension
-        utterance.pitch = 1.15;  // Gentle, warm feminine tone
-        utterance.volume = 0.9;  // Clear, confident but not aggressive
+        // ADAPTIVE PROFESSIONAL EDUCATIONAL VOICE PARAMETERS:
+        utterance.rate = getAdaptiveSpeechRate();   // Adaptive: faster on mobile
+        utterance.pitch = getAdaptivePitch();       // Gentle, warm feminine tone
+        utterance.volume = 0.9;                     // Clear, confident but not aggressive
+        
+        console.log(`🎙️ Speech settings: rate=${utterance.rate.toFixed(2)} (${isMobileDevice() ? 'mobile' : 'desktop'}), pitch=${utterance.pitch}`);
         
         // Add professional educational emotional expression
         utterance.onstart = () => {
@@ -589,6 +627,7 @@ function formatNumbersForChildren(text) {
 /**
  * 🗣️ FORMAT TEXT FOR PROFESSIONAL EDUCATIONAL NARRATOR STYLE
  * Adds characteristic pauses and rhythm for clear, engaging speech
+ * ADAPTIVE: Fewer pauses on mobile for better performance
  */
 function formatTextForEducationalNarrator(text) {
     // Handle Promise or non-string inputs
@@ -603,38 +642,51 @@ function formatTextForEducationalNarrator(text) {
     // ?? FORMAT NUMBERS FOR CHILDREN - pojedyncze cyfry
     formatted = formatNumbersForChildren(formatted);
     
-    // Add characteristic educational pauses:
+    const isMobile = isMobileDevice();
     
-    // After important words (bezpiecze�stwo, lokalizacja, etc.)
-    formatted = formatted.replace(/\b(bezpiecze�stwo|lokalizacja|dziecko|rodzic|pomoc|zagro�enie)\b/gi, '$1...');
+    // Add characteristic educational pauses (REDUCED on mobile):
     
-    // After conjunctions (natural speech breaks)
-    formatted = formatted.replace(/\b(ale|wi�c|czyli|oraz|a tak�e|i)\b/gi, '$1...');
-    
-    // Before important information
-    formatted = formatted.replace(/\b(uwaga|pami�taj|wa�ne|ostrze�enie)\b/gi, '...$1');
-    
-    // Add pauses after punctuation (professional dramatic timing for clarity)
-    formatted = formatted.replace(/([.!?])\s+/g, '$1... ');
-    
-    // Add gentle pauses in longer sentences (every 4-5 words)
-    const words = formatted.split(' ');
-    if (words.length > 6) {
-        let result = [];
-        for (let i = 0; i < words.length; i++) {
-            result.push(words[i]);
-            // Add pause every 4-5 words, but not at the end
-            if ((i + 1) % 4 === 0 && i < words.length - 1) {
-                result.push('...');
+    if (!isMobile) {
+        // DESKTOP: Full pauses for dramatic effect
+        
+        // After important words
+        formatted = formatted.replace(/\b(bezpieczeństwo|lokalizacja|dziecko|rodzic|pomoc|zagrożenie)\b/gi, '$1...');
+        
+        // After conjunctions (natural speech breaks)
+        formatted = formatted.replace(/\b(ale|więc|czyli|oraz|a także|i)\b/gi, '$1...');
+        
+        // Before important information
+        formatted = formatted.replace(/\b(uwaga|pamiętaj|ważne|ostrzeżenie)\b/gi, '...$1');
+        
+        // Add pauses after punctuation
+        formatted = formatted.replace(/([.!?])\s+/g, '$1... ');
+        
+        // Add gentle pauses in longer sentences (every 4-5 words)
+        const words = formatted.split(' ');
+        if (words.length > 6) {
+            let result = [];
+            for (let i = 0; i < words.length; i++) {
+                result.push(words[i]);
+                if ((i + 1) % 4 === 0 && i < words.length - 1) {
+                    result.push('...');
+                }
             }
+            formatted = result.join(' ');
         }
-        formatted = result.join(' ');
+    } else {
+        // MOBILE: Minimal pauses - TTS is slower, don't overload
+        
+        // Only before CRITICAL information
+        formatted = formatted.replace(/\b(uwaga|niebezpieczeństwo|ostrzeżenie)\b/gi, '...$1');
+        
+        // Light pause after sentences only
+        formatted = formatted.replace(/([.!?])\s+/g, '$1. ');
     }
     
     // Clean up multiple consecutive pauses
     formatted = formatted.replace(/\.{6,}/g, '...');
     
-    console.log(`?? Formatted for educational style: "${formatted}"`);
+    console.log(`?? Formatted for ${isMobile ? 'mobile' : 'desktop'}: "${formatted.substring(0, 100)}..."`);
     return formatted;
 }
 
