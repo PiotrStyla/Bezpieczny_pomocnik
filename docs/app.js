@@ -484,7 +484,7 @@ async function speakText(text, lang = 'pl') {
             text = 'Error loading message';
         }
     }
-    console.log('?? CZUB�WNA-INSPIRED VOICE SYNTHESIS:', text);
+    console.log('?? PROFESSIONAL EDUCATIONAL VOICE SYNTHESIS:', text);
     
     // RODO Art. 8 COMPLIANCE - Smart consent checking
     // If child age is available, it means parent has already verified via RODO process
@@ -508,11 +508,11 @@ async function speakText(text, lang = 'pl') {
 
     setTimeout(() => {
         // Format text with educational voice-style pauses
-        const czubownaText = formatTextForCzubowna(text);
-        const utterance = new SpeechSynthesisUtterance(czubownaText);
+        const educationalText = formatTextForEducationalNarrator(text);
+        const utterance = new SpeechSynthesisUtterance(educationalText);
         
         // Select most suitable professional Polish voice
-        const selectedVoice = selectCzubownaLikeVoice(lang);
+        const selectedVoice = selectProfessionalEducationalVoice(lang);
         if (selectedVoice) {
             utterance.voice = selectedVoice;
             console.log(`?? Using professional educational voice: ${selectedVoice.name}`);
