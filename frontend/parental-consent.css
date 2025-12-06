@@ -62,7 +62,7 @@
     margin: 0 0 10px 0;
     font-size: 1.6rem;
     font-weight: 700;
-    font-family: 'Fredoka', 'Comic Neue', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     text-align: center;
 }
 
@@ -101,7 +101,7 @@
     color: #4A90FF;
     font-size: 1.3rem;
     margin: 0 0 15px 0;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
 }
 
 .confirmation-points {
@@ -161,7 +161,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     border: 3px solid transparent;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -235,7 +235,7 @@
 .adult-verification h3 {
     color: #4A90FF;
     margin: 0 0 20px 0;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     text-align: center;
 }
 
@@ -334,7 +334,7 @@
 .access-denied h3 {
     color: #FF6B6B;
     margin: 0 0 15px 0;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
 }
 
 .access-denied p {
@@ -366,7 +366,7 @@
 .consent-confirmation h3 {
     color: #32D74B;
     margin: 0 0 15px 0;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
 }
 
 .btn-ok {
@@ -417,7 +417,7 @@
 
 .popup-content h3 {
     margin: 0 0 15px 0;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     text-align: center;
 }
 

@@ -38,7 +38,7 @@
 }
 
 body {
-    font-family: 'Comic Neue', 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-gradient);
     min-height: 100vh;
     color: var(--text-dark);
@@ -1077,7 +1077,7 @@ body {
 }
 
 .foundation-text h4 {
-    font-family: 'Comic Neue', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     font-size: 1.3rem;
     margin: 0 0 10px 0;
     color: #FFE55C;
@@ -1091,7 +1091,7 @@ body {
     color: white;
     text-decoration: none;
     font-size: 1.5rem;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     font-weight: 600;
     transition: all 0.3s ease;
     display: inline-block;
@@ -1110,7 +1110,7 @@ body {
     line-height: 1.4;
     margin: 20px 0;
     color: #E0E0E0;
-    font-family: 'Comic Neue', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
 }
 
 .foundation-note strong {
@@ -1125,7 +1125,7 @@ body {
     text-decoration: none;
     padding: 12px 24px;
     border-radius: 25px;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     font-weight: 600;
     font-size: 1.1rem;
     transition: all 0.3s ease;
@@ -1174,7 +1174,7 @@ body {
     border-radius: 15px;
     padding: 15px;
     color: white;
-    font-family: 'Comic Neue', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     max-width: 250px;
     backdrop-filter: blur(10px);
     border: 2px solid var(--primary-yellow);
@@ -1220,7 +1220,7 @@ body {
 .popup-text strong {
     color: var(--primary-yellow);
     font-size: 1.1rem;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     font-weight: 600;
 }
 
@@ -1261,7 +1261,7 @@ body {
     transition: opacity 0.3s ease;
     max-width: 500px;
     width: 90%;
-    font-family: 'Comic Neue', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
 }
 
 .coverage-info-popup.show {
@@ -1271,7 +1271,7 @@ body {
 .coverage-info-popup h3 {
     color: #4A90FF;
     margin: 0 0 20px 0;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
     text-align: center;
     font-size: 1.3rem;
 }
@@ -1294,7 +1294,7 @@ body {
     font-size: 2.5rem;
     font-weight: 700;
     color: #4A90FF;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
 }
 
 .stat-label {
@@ -1333,7 +1333,7 @@ body {
 .covered-locations h4 {
     color: #333;
     margin: 0 0 10px 0;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
 }
 
 .location-tags {
@@ -1362,7 +1362,7 @@ body {
     cursor: pointer;
     display: block;
     margin: 20px auto 0;
-    font-family: 'Fredoka', sans-serif;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
 }
 
 .coverage-info-popup .btn-ok:hover {
@@ -1989,7 +1989,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(64, 123, 255, 0.3);
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, cursive;
     min-width: 200px;
 }
 
@@ -2038,7 +2038,7 @@ body {
     z-index: 10000;
     animation: slideInRight 0.5s ease-out;
     max-width: 300px;
-    font-family: 'Comic Neue', cursive;
+    font-family: 'Comic Sans MS', 'Trebuchet MS', 'Segoe UI', system-ui, cursive;
 }
 
 .achievement-content h3 {
