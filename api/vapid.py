@@ -1,5 +1,5 @@
 # Minimal VAPID endpoint for Vercel
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import sys
 import os
@@ -8,7 +8,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["https://piotrstyla.github.io"], allow_credentials=False, allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 
 @app.get("/api/vapid_public_key")
 def get_vapid_public_key():
@@ -20,14 +20,9 @@ def get_vapid_public_key():
         return {"public_key": public_key}
     except Exception as e:
         # Fallback: return error info
-        return {"error": str(e), "type": str(type(e).__name__)}
+        raise HTTPException(status_code=503, detail="Usługa powiadomień jest niedostępna.")
 
 @app.post("/api/subscribe")
 def subscribe(subscription_info: dict = Body(...)):
-    """Save push notification subscription"""
-    try:
-        from backend import push_notifications
-        push_notifications.add_subscription(subscription_info)
-        return {"status": "success", "message": "Subscription saved"}
-    except Exception as e:
-        return {"error": str(e), "type": str(type(e).__name__)}
+    """Legacy registrations are disabled on the separate Vercel entrypoint too."""
+    raise HTTPException(status_code=410, detail="Rejestracja powiadomień starej wersji jest wyłączona.")

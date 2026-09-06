@@ -1,35 +1,37 @@
-name: 🚀 Deploy Emergency Safety App
-
+name: Verify and deploy child app
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-
+    branches: [main]
+permissions:
+  contents: read
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: 📥 Checkout Repository
-      uses: actions/checkout@v3
-      
-    - name: 🛡️ Setup Emergency Environment
-      run: |
-        echo "🚨 Deploying emergency-ready safety app"
-        echo "⚔️ Times are not safe - blockchain privacy protection active"
-        
-    - name: 🌍 Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./frontend
-        cname: bezpieczny-pomocnik.github.io
-        
-    - name: ✅ Deployment Complete
-      run: |
-        echo "🚨 Emergency safety system deployed!"
-        echo "🛡️ Multilingual crisis communications: Polish/English/Ukrainian"
-        echo "👶 Age-appropriate messaging: Young (6-10) / Older (11-16)"
-        echo "⚡ 22KB blockchain sync ready for war-time scenarios"
-        echo "🌍 Production URL: https://${{ github.repository_owner }}.github.io/Bezpieczny_pomocnik/"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/*.test.mjs
+      - run: node scripts/build.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: child-app
+          path: dist
+  deploy:
+    if: github.event_name == 'push'
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: child-app
+          path: dist
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist

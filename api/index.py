@@ -10,12 +10,12 @@ try:
     from backend.main import app
 except Exception as e:
     # If import fails, create a minimal debug app
-    from fastapi import FastAPI
+    from fastapi import FastAPI, HTTPException
     from fastapi.middleware.cors import CORSMiddleware
     
     app = FastAPI(title="Debug API")
-    app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+    app.add_middleware(CORSMiddleware, allow_origins=["https://piotrstyla.github.io"], allow_credentials=False, allow_methods=["GET"])
     
     @app.get("/api/vapid_public_key")
     def debug_error():
-        return {"error": f"Backend import failed: {str(e)}", "type": str(type(e).__name__)}
+        raise HTTPException(status_code=503, detail="Usługa jest niedostępna.")

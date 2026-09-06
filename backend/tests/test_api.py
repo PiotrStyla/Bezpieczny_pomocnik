@@ -74,7 +74,6 @@ def test_subscribe(mock_add):
     subscription_data = {"endpoint": "https://example.com", "keys": {"p256dh": "123", "auth": "456"}}
     response = client.post("/api/subscribe", json=subscription_data)
     
-    assert response.status_code == 201
-    assert response.json() == {"message": "Subskrypcja zapisana."}
+    assert response.status_code == 410
     
-    mock_add.assert_called_once_with(subscription_data)
+    mock_add.assert_not_called()

@@ -1,56 +1,36 @@
 {
-    "name": "🛡️ Bezpieczny Pomocnik dla Dzieci",
-    "short_name": "Pomocnik",
-    "start_url": "./index.html",
-    "display": "standalone",
-    "orientation": "portrait-primary",
-    "background_color": "#f4f7fa",
-    "theme_color": "#3367D6",
-    "description": "Bezpieczna aplikacja z alertami dla dzieci w Polsce. Sprawdź zagrożenia w swojej okolicy!",
-    "categories": ["safety", "kids", "emergency"],
-    "lang": "pl",
-    "dir": "ltr",
-    "scope": "./",
-    "icons": [
-        {
-            "src": "./images/logo_192x192.png",
-            "sizes": "192x192",
-            "type": "image/png",
-            "purpose": "any maskable"
-        },
-        {
-            "src": "./images/logo_512x512.png",
-            "sizes": "512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
-        }
-    ],
-    "shortcuts": [
-        {
-            "name": "🚨 Sprawdź Alerty",
-            "short_name": "Alerty",
-            "description": "Sprawdź aktualne alerty w swojej okolicy",
-            "url": "./index.html#alerts",
-            "icons": [{ "src": "./images/logo_192x192.png", "sizes": "192x192" }]
-        },
-        {
-            "name": "🧭 Znajdź Mnie",
-            "short_name": "Lokalizacja", 
-            "description": "Sprawdź gdzie się znajdujesz",
-            "url": "./index.html#location",
-            "icons": [{ "src": "./images/logo_192x192.png", "sizes": "192x192" }]
-        }
-    ],
-    "related_applications": [],
-    "prefer_related_applications": false,
-    "share_target": {
-        "action": "./share-target",
-        "method": "POST",
-        "enctype": "multipart/form-data",
-        "params": {
-            "title": "title",
-            "text": "text",
-            "url": "url"
-        }
+  "id": "./",
+  "name": "Bezpieczny Pomocnik",
+  "short_name": "Pomocnik",
+  "description": "Twój dobry krok. Pomoc, lekcje i rodzinny plan dla dzieci 7–12 lat.",
+  "lang": "pl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f8f5",
+  "theme_color": "#244d43",
+  "icons": [
+    {
+      "src": "./images/logo_192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./images/logo_512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mój plan",
+      "url": "./index.html#plan"
+    },
+    {
+      "name": "Lekcje bezpieczeństwa",
+      "url": "./index.html#learn"
+    }
+  ]
 }

@@ -32,6 +32,8 @@ generate_keys.py
 
 # Node dependencies
 node_modules/
+dist/
+work/
 
 # Klucze PEM (nie śledzić w repozytorium)
 private_key.pem

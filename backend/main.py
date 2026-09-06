@@ -56,7 +56,7 @@ app = FastAPI(
     version="1.8.0"
 )
 
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=["https://piotrstyla.github.io", "http://127.0.0.1:4173", "http://localhost:4173"], allow_credentials=False, allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 
 def check_for_new_alerts_job():
     logging.info("Harmonogram: Sprawdzanie nowych alertów...")
@@ -73,12 +73,14 @@ def check_for_new_alerts_job():
 
 @app.on_event("startup")
 async def startup_event():
-    scheduler.add_job(check_for_new_alerts_job, 'interval', minutes=settings.SCHEDULER_INTERVAL_MINUTES)
-    scheduler.start()
+    # The old job broadcast every region's warning to every child.
+    # Keep it disabled until opt-in, region scoping and delivery auth exist.
+    pass
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    scheduler.shutdown()
+    if scheduler.running:
+        scheduler.shutdown()
 
 def _matches_keyword(text: str, keyword: str) -> bool:
     # Allow morphological suffixes for selected high-signal keywords
@@ -140,8 +142,7 @@ def get_vapid_key():
 
 @app.post("/api/subscribe", status_code=201, summary="Zapisz subskrypcję na powiadomienia")
 def subscribe(subscription: Dict[str, Any] = Body(...)):
-    push_notifications.add_subscription(subscription)
-    return {"message": "Subskrypcja zapisana."}
+    raise HTTPException(status_code=410, detail="Rejestracja powiadomień starej wersji jest wyłączona.")
 
 @app.get("/api/alerts/location", response_model=List[Alert], summary="Pobierz alerty dla konkretnej lokalizacji")
 async def get_alerts_for_location(
@@ -327,7 +328,6 @@ async def get_ai_config():
         "providers": {
             "openai": {
                 "available": bool(openai_key and openai_key.startswith('sk-')),
-                "key": openai_key if openai_key and openai_key.startswith('sk-') else None
             }
         },
         "default_provider": "openai" if openai_key else "fallback"
@@ -339,27 +339,13 @@ def audit_parental_consent(entry: Dict[str, Any] = Body(...)):
     Minimal audit receiver for parental consent events.
     Logs the entry and returns 201 Created.
     """
-    logging.info(f"Audit parental-consent: {entry}")
+    logging.info("Parental-consent event received (payload not logged)")
     return {"status": "ok"}
 
 @app.post("/api/push/test", status_code=202, summary="Wyślij testowe powiadomienie push")
 def push_test(data: Dict[str, Any] = Body(None)):
     """Send a simple test push notification to all current subscriptions."""
-    title = (data or {}).get("title", "🔔 Test powiadomień")
-    body = (data or {}).get("body", "To jest testowe powiadomienie z backendu.")
-    try:
-        results = push_notifications.send_notification_to_all(title, body)
-        return {
-            "status": "ok",
-            "count": {
-                "success": len(results.get("successes", [])),
-                "failure": len(results.get("failures", []))
-            },
-            "results": results
-        }
-    except Exception as e:
-        logging.error(f"Error sending test push: {e}")
-        raise HTTPException(status_code=500, detail="Błąd wysyłania testowego powiadomienia")
+    raise HTTPException(status_code=403, detail="Publiczne powiadomienia testowe są wyłączone.")
 
 # Icon aliases for PWA/platform fallbacks
 @app.get("/icon-192.png")

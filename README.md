@@ -1,3 +1,79 @@
+# Bezpieczny Pomocnik — wersja dla dzieci 7–12 lat
+
+Nowy frontend jest w `frontend/index.html` i `frontend/v2/`. To spokojna aplikacja pomocy z lokalnym planem rodzinnym, czterema lekcjami bezpieczeństwa i ostrzeżeniami IMGW pobieranymi na życzenie. Nie wymaga konta, backendu, klucza AI ani instalacji pakietów npm do działania.
+
+## Uruchomienie i budowanie
+
+Wymagany Node.js 22 lub nowszy:
+
+```sh
+node scripts/serve.mjs
+# Otwórz http://127.0.0.1:4186/
+node --test tests/*.test.mjs
+node scripts/build.mjs
+```
+
+Nie otwieraj pliku przez `file://`: moduły i kopia offline wymagają serwera. Na produkcji wymagany HTTPS. Serwer deweloperski jest dostępny tylko na tym komputerze.
+
+Publikuj **wyłącznie zawartość `dist/`**, nie katalog główny repozytorium, stare `docs/` ani cały `frontend/`. Lista `scripts/public-files.mjs` dopuszcza 15 publicznych plików. Budowanie odmawia pracy, jeżeli w `dist/` znajdzie niespodziewane pliki; sprawdź je ręcznie zamiast automatycznie usuwać. Stare narzędzia diagnostyczne, demonstracyjne i skrypty pozostają w repozytorium, ale nie trafiają do tej paczki.
+
+Workflow `.github/workflows/deploy.yml` testuje i buduje paczkę; push do `main` publikuje ją do `gh-pages`. Ustaw źródło GitHub Pages na **gałąź `gh-pages`, katalog `/`**. Jeżeli aktualna witryna używa `main /docs`, sam build jej nie przełączy. Netlify korzysta z `dist/` zgodnie z `netlify.toml`. Przygotowanie tych plików nie oznacza wykonania publikacji ani zmiany ustawień hostingu.
+
+## Co zawiera nowa wersja
+
+- Mój dzień: trzy czytelne drogi — kontakt z bliską osobą, wskazówki pomocy, krótka lekcja.
+- Mój plan: dwie zaufane osoby, opcjonalne miejsce spotkania i wiadomość od opiekuna.
+- Strefa opiekuna: świadomy zapis na urządzeniu, edycja i usuwanie danych tej wersji.
+- Lekcje: podejrzane linki, presja i niebezpieczne sekrety, podszywanie się głosem/AI oraz cyberprzemoc. Bez rankingu, kar, reklam, czatu ani presji czasu.
+- Pomoc: wskazówki krok po kroku oraz jawne przyciski telefonu. Otwarcie okna pomocy nie dzwoni automatycznie. Nie testuj połączeń na numerach alarmowych.
+- Moja okolica: ręczny wybór województwa i pobranie publicznego zestawu IMGW. Brak GPS, śledzenia lokalizacji i automatycznych powiadomień.
+- Czytanie na głos: wyłącznie dostępny lokalny głos polski. Brak odpowiedniego głosu jest wyjaśniany w aplikacji; nie przełączamy po cichu na usługę chmurową.
+
+## Prywatność i granice ochrony
+
+Plan zapisujemy w `localStorage` pod `bp.v2.family`, a identyfikatory ukończonych lekcji pod `bp.v2.lessons`. Dane nie są wysyłane na backend, lecz **nie są szyfrowane hasłem** i może je odczytać użytkownik urządzenia lub rozszerzenie przeglądarki mające odpowiednie uprawnienia. Strefa opiekuna nie jest uwierzytelnieniem ani blokadą rodzicielską. Nie wpisuj nazwiska dziecka, adresu domu, szkoły ani danych zdrowotnych. Nie ma synchronizacji między urządzeniami.
+
+Usunięcie danych w aplikacji dotyczy tylko tych dwóch kluczy. Wcześniejsze dane nie są odczytywane, importowane ani automatycznie kasowane. Ich usunięcie wymaga ustawień danych witryny w przeglądarce.
+
+Grafika, fonty i kod są serwowane lokalnie, bez CDN. CSP blokuje skrypty inline/eval i nieprzewidziane połączenia. Żądanie do IMGW następuje po naciśnięciu przycisku; nie zawiera planu ani lokalizacji urządzenia. Operator serwera i IMGW nadal mogą widzieć standardowe metadane połączenia, np. IP. Przejście do zewnętrznych źródeł podlega zasadom tych serwisów.
+
+Ostrzeżenia są walidowane, filtrowane według kodów TERYT i czasu Europe/Warsaw. Błąd źródła nie jest komunikatem o braku zagrożenia. Obsługiwany jest również dokładny komunikat IMGW `No products were found` z HTTP 404, odróżniany od awarii HTTP. Brak ostrzeżeń pogodowych nigdy nie oznacza potwierdzenia bezpieczeństwa. Dane ostrzeżeń nie są zapisywane w cache offline.
+
+## Przygotowanie offline
+
+Otwórz aplikację z internetem i poczekaj na potwierdzenie gotowej kopii w Strefie opiekuna. Następnie sprawdź otwarcie i odświeżenie planu bez sieci na docelowym telefonie. Kopia obejmuje interfejs, wskazówki i lekcje; przeglądarka może ją usunąć, np. przy czyszczeniu danych lub braku miejsca. Połączenia telefoniczne i świeże ostrzeżenia wymagają właściwej łączności.
+
+Service worker instalowany jest atomowo i usuwa wyłącznie starsze cache z własnego prefiksu i zakresu. Nie usuwa pamięci innych aplikacji. Trasy `#plan`, `#parent` i pozostałe korzystają z tej samej kopii HTML. Przy każdej zmianie publicznych zasobów zwiększ numer `CACHE` w `frontend/sw.js` i ponownie zbuduj paczkę.
+
+## Ważne dla operatora starego backendu
+
+W poprzednim kodzie `/api/ai-config` zwracało klucz API. Usunięto sekret z odpowiedzi. **Jeżeli ten endpoint był publiczny z prawdziwym kluczem, unieważnij i wymień klucz u dostawcy.** Zmiana kodu nie unieważnia wcześniej ujawnionego sekretu. Nie sprawdzano ani nie pobierano produkcyjnego klucza.
+
+Wyłączono publiczne rozsyłanie testowych powiadomień (403), stare rejestracje push w obu punktach wejścia (410) oraz automatyczny harmonogram rozsyłający ostrzeżenia. Ograniczono CORS i usunięto dane zgody z logów. Nowy frontend nie używa tych integracji. Jest to ograniczona poprawka wskazanych ryzyk, nie pełny audyt pozostałego backendu ani certyfikat bezpieczeństwa.
+
+Testy historycznego backendu uruchamiaj w osobnym środowisku Python 3.12:
+
+```sh
+python -m venv .venv-test
+# Aktywuj środowisko zgodnie ze swoim systemem.
+python -m pip install -r requirements-test.txt
+python -m pytest backend/tests -q
+```
+
+Użyj wartości testowych zmiennych OPENAI_API_KEY, VAPID_PRIVATE_KEY i VAPID_PUBLIC_KEY, nie produkcyjnych sekretów. Backend ma starsze zależności i ostrzeżenia o przestarzałych interfejsach; nie jest potrzebny do uruchomienia v2.
+
+## Przed udostępnieniem dzieciom
+
+Przetestuj docelowe telefony Android/iOS, instalację PWA, czytniki ekranu i lokalne głosy. Zweryfikuj aktualność treści i źródeł oraz przeprowadź przegląd z osobą kompetentną w ochronie dzieci. Ustal politykę prywatności operatora i retencję logów hostingu. Nie dodawaj otwartego czatu AI, analityki dzieci ani zdalnego panelu bez osobnego projektu zabezpieczeń. Aplikacja nie zastępuje opiekuna, służb ratunkowych ani profesjonalnej pomocy.
+
+Ilustracja liska została wygenerowana dla tej wersji. Font Nunito jest dostarczany lokalnie z licencją `frontend/images/Nunito-OFL.txt`; nie zmienia to istniejącej licencji całego projektu.
+
+---
+
+## Dokumentacja historyczna (wersja sprzed przebudowy)
+
+**Poniższe opisy AI, push, blockchain, szerszego wieku odbiorców i starego sposobu wdrażania nie opisują nowej wersji.** Zachowano je jako kontekst istniejącego projektu. Dla v2 obowiązują instrukcje powyżej.
+
 # 🛡️ Bezpieczny Pomocnik - Child Safety Application
 
 **Created with ❤️ for children's safety by Fundacja na rzecz Hospicjum Maryi Królowej Apostołów w Krakowie**
