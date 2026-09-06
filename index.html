@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#244d43">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Pomoc, rodzinny plan i krótkie lekcje bezpieczeństwa dla dzieci 7–12 lat. Bez konta i bez śledzenia lokalizacji.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://danepubliczne.imgw.pl; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; worker-src 'self'">
+  <title>Bezpieczny Pomocnik · Twój dobry krok</title>
+  <link rel="icon" href="images/logo_192x192.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="v2/app.css">
+  <script type="module" src="v2/app.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Przejdź do treści</a>
+  <aside class="sidebar">
+    <a class="brand" href="#home" aria-label="Bezpieczny Pomocnik — mój dzień"><span data-icon="shield"></span><span>Bezpieczny<br>Pomocnik</span></a>
+    <nav aria-label="Główna nawigacja">
+      <a href="#home" data-nav="home"><span data-icon="home"></span><span>Mój dzień</span></a>
+      <a href="#area" data-nav="area"><span data-icon="pin"></span><span>Moja okolica</span></a>
+      <a href="#learn" data-nav="learn"><span data-icon="book"></span><span>Uczę się<br class="desktop-only"> bezpieczeństwa</span></a>
+      <a href="#plan" data-nav="plan"><span data-icon="plan"></span><span>Mój plan</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <a class="parent-link" href="#parent"><span data-icon="users"></span>Strefa opiekuna</a>
+      <div class="privacy-note"><span data-icon="lock"></span><p>Twoje dane są ważne.<br>Szanujemy Twoją prywatność.<br><a href="#privacy">Dowiedz się więcej</a></p></div>
+    </div>
+  </aside>
+  <div class="page">
+    <header class="topbar"><span class="date"><span data-icon="calendar"></span><span id="today"></span></span><button class="button subtle" id="read-aloud"><span data-icon="volume"></span><span>Czytaj na głos</span></button></header>
+    <div id="connection" class="connection" role="status" hidden></div>
+    <main id="main" tabindex="-1"></main>
+    <footer><span>Twoje tempo. Twoja prywatność.</span><button class="button emergency" data-action="emergency"><span data-icon="phone"></span>Pomoc · 112</button></footer>
+  </div>
+  <dialog id="modal" aria-labelledby="modal-title"><div class="dialog-top"><span class="dialog-label">Jesteśmy krok po kroku</span><button class="icon-button" id="close-modal" aria-label="Zamknij okno"><span data-icon="close"></span></button></div><div id="modal-content"></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <noscript><div class="no-script">Włącz JavaScript, aby korzystać z planu i lekcji. W nagłym zagrożeniu życia lub zdrowia <a href="tel:112">zadzwoń pod 112</a>. Jeśli potrzebujesz rozmowy, <a href="tel:116111">116 111</a>.</div></noscript>
+</body>
+</html>
